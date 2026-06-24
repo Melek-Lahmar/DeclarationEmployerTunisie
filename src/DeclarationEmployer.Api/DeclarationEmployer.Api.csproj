@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+    <PackageReference Include="FluentValidation" Version="12.1.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeclarationEmployer.Domain\DeclarationEmployer.Domain.csproj" />
+    <ProjectReference Include="..\DeclarationEmployer.Contracts\DeclarationEmployer.Contracts.csproj" />
+    <ProjectReference Include="..\DeclarationEmployer.Application\DeclarationEmployer.Application.csproj" />
+    <ProjectReference Include="..\DeclarationEmployer.Infrastructure\DeclarationEmployer.Infrastructure.csproj" />
+    <ProjectReference Include="..\DeclarationEmployer.FiscalEngine\DeclarationEmployer.FiscalEngine.csproj" />
+    <ProjectReference Include="..\DeclarationEmployer.Import\DeclarationEmployer.Import.csproj" />
+    <ProjectReference Include="..\DeclarationEmployer.Reports\DeclarationEmployer.Reports.csproj" />
+  </ItemGroup>
+
+</Project>

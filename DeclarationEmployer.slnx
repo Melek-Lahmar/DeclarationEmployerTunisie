@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DeclarationEmployer.Api/DeclarationEmployer.Api.csproj" />
+    <Project Path="src/DeclarationEmployer.Application/DeclarationEmployer.Application.csproj" />
+    <Project Path="src/DeclarationEmployer.Contracts/DeclarationEmployer.Contracts.csproj" />
+    <Project Path="src/DeclarationEmployer.Desktop/DeclarationEmployer.Desktop.csproj" />
+    <Project Path="src/DeclarationEmployer.Domain/DeclarationEmployer.Domain.csproj" />
+    <Project Path="src/DeclarationEmployer.FiscalEngine/DeclarationEmployer.FiscalEngine.csproj" />
+    <Project Path="src/DeclarationEmployer.Import/DeclarationEmployer.Import.csproj" />
+    <Project Path="src/DeclarationEmployer.Infrastructure/DeclarationEmployer.Infrastructure.csproj" />
+    <Project Path="src/DeclarationEmployer.Reports/DeclarationEmployer.Reports.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DeclarationEmployer.Tests/DeclarationEmployer.Tests.csproj" />
+  </Folder>
+</Solution>
