@@ -21,8 +21,15 @@ public partial class App : Application
                     client.BaseAddress = new Uri("http://localhost:5050/");
                 });
 
+                services.AddHttpClient<FiscalYearsApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                });
+
                 services.AddTransient<ClientsViewModel>();
+                services.AddTransient<FiscalYearsViewModel>();
                 services.AddTransient<ClientsView>();
+                services.AddTransient<FiscalYearsView>();
                 services.AddTransient<MainWindow>();
             })
             .Build();

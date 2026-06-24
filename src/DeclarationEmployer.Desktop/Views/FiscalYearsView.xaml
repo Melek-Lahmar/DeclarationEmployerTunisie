@@ -1,0 +1,138 @@
+<UserControl x:Class="DeclarationEmployer.Desktop.Views.FiscalYearsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="650"
+             d:DesignWidth="1000">
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="White"
+                CornerRadius="12"
+                Padding="18"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left">
+                    <TextBlock Text="Exercices fiscaux"
+                               FontSize="26"
+                               FontWeight="SemiBold"
+                               Foreground="#111827"/>
+                    <TextBlock Text="Création, consultation, clôture et réouverture des exercices par société cliente."
+                               Margin="0,6,0,0"
+                               Foreground="#6B7280"
+                               FontSize="13"/>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Right"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="Actualiser"
+                            Width="110"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding LoadCommand}"/>
+                    <Button Content="Filtrer client"
+                            Width="110"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding LoadByClientCommand}"/>
+                    <Button Content="Créer"
+                            Width="95"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding CreateCommand}"/>
+                    <Button Content="Clôturer"
+                            Width="95"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding CloseCommand}"/>
+                    <Button Content="Réouvrir"
+                            Width="95"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding ReopenCommand}"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="12"
+                Padding="18"
+                Margin="0,16,0,0"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                    <TextBlock Text="Société cliente" FontWeight="SemiBold"/>
+                    <ComboBox ItemsSource="{Binding Clients}"
+                              SelectedItem="{Binding SelectedClient, Mode=TwoWay}"
+                              DisplayMemberPath="RaisonSociale"
+                              Height="34"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="0,0,16,0">
+                    <TextBlock Text="Année" FontWeight="SemiBold"/>
+                    <TextBox Text="{Binding Year, UpdateSourceTrigger=PropertyChanged}"
+                             Height="34"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="Règles simples"
+                               FontWeight="SemiBold"
+                               Foreground="#111827"/>
+                    <TextBlock Text="Un exercice par client et par année. Les règles fiscales détaillées restent côté API."
+                               TextWrapping="Wrap"
+                               Foreground="#6B7280"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <DataGrid Grid.Row="2"
+                  Margin="0,16,0,0"
+                  ItemsSource="{Binding FiscalYears}"
+                  SelectedItem="{Binding SelectedFiscalYear, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserAddRows="False"
+                  SelectionMode="Single"
+                  Background="White"
+                  BorderBrush="#E2E8F0"
+                  BorderThickness="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Année" Binding="{Binding Year}" Width="90"/>
+                <DataGridTextColumn Header="Code client" Binding="{Binding ClientCode}" Width="120"/>
+                <DataGridTextColumn Header="Raison sociale" Binding="{Binding ClientRaisonSociale}" Width="280"/>
+                <DataGridTextColumn Header="Statut" Binding="{Binding Status}" Width="110"/>
+                <DataGridCheckBoxColumn Header="Clôturé" Binding="{Binding IsClosed}" Width="90"/>
+                <DataGridTextColumn Header="Clôturé le" Binding="{Binding ClosedAt}" Width="170"/>
+                <DataGridTextColumn Header="Créé le" Binding="{Binding CreatedAt}" Width="170"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Row="3"
+                Background="#111827"
+                CornerRadius="8"
+                Padding="12"
+                Margin="0,12,0,0">
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="White"
+                       FontSize="13"/>
+        </Border>
+    </Grid>
+</UserControl>
