@@ -20,6 +20,7 @@ public sealed class DeclarationsViewModel : ObservableObject
     private string _selectedStatusFilter = "Tous";
     private string _title = string.Empty;
     private string? _notes;
+    private DeclarationSummaryDto? _selectedSummary;
     private bool _isBusy;
     private string _statusMessage = "Pret.";
 
@@ -45,6 +46,8 @@ public sealed class DeclarationsViewModel : ObservableObject
     public ObservableCollection<FiscalYearDto> FiscalYears { get; } = [];
 
     public ObservableCollection<DeclarationDto> Declarations { get; } = [];
+
+    public ObservableCollection<DeclarationEventDto> SelectedDeclarationEvents { get; } = [];
 
     public IReadOnlyList<string> StatusFilters { get; } = ["Tous", "Draft", "Validated", "Generated", "Archived", "Closed"];
 
@@ -106,6 +109,12 @@ public sealed class DeclarationsViewModel : ObservableObject
     {
         get => _notes;
         set => SetProperty(ref _notes, value);
+    }
+
+    public DeclarationSummaryDto? SelectedSummary
+    {
+        get => _selectedSummary;
+        set => SetProperty(ref _selectedSummary, value);
     }
 
     public bool IsBusy
@@ -321,6 +330,8 @@ public sealed class DeclarationsViewModel : ObservableObject
     {
         _editingId = null;
         SelectedDeclaration = null;
+        SelectedSummary = null;
+        SelectedDeclarationEvents.Clear();
         Title = string.Empty;
         Notes = string.Empty;
         StatusMessage = "Nouvelle declaration.";
@@ -341,17 +352,40 @@ public sealed class DeclarationsViewModel : ObservableObject
         }
     }
 
-    private void LoadSelectedDeclarationIntoForm()
+    private async void LoadSelectedDeclarationIntoForm()
     {
         if (SelectedDeclaration is null)
         {
+            SelectedSummary = null;
+            SelectedDeclarationEvents.Clear();
             return;
         }
 
         _editingId = SelectedDeclaration.Id;
         Title = SelectedDeclaration.Title;
         Notes = SelectedDeclaration.Notes;
-        StatusMessage = $"Modification : {SelectedDeclaration.Title}";
+        StatusMessage = $"Declaration selectionnee : {SelectedDeclaration.Title}";
+
+        try
+        {
+            IsBusy = true;
+            SelectedSummary = await _declarationsApiClient.GetSummaryAsync(SelectedDeclaration.Id);
+
+            SelectedDeclarationEvents.Clear();
+            var events = await _declarationsApiClient.GetEventsAsync(SelectedDeclaration.Id);
+            foreach (var declarationEvent in events)
+            {
+                SelectedDeclarationEvents.Add(declarationEvent);
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur chargement details : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private static string? ToApiStatus(string filter)

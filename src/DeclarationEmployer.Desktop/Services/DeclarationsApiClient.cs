@@ -73,6 +73,28 @@ public sealed class DeclarationsApiClient
         return result ?? throw new InvalidOperationException("Reponse API vide apres creation de la declaration.");
     }
 
+    public async Task<DeclarationSummaryDto?> GetSummaryAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        return await _httpClient.GetFromJsonAsync<DeclarationSummaryDto>(
+            $"api/declarations/{id}/summary",
+            JsonOptions,
+            cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<DeclarationEventDto>> GetEventsAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _httpClient.GetFromJsonAsync<List<DeclarationEventDto>>(
+            $"api/declarations/{id}/events",
+            JsonOptions,
+            cancellationToken);
+
+        return result ?? [];
+    }
+
     public async Task<DeclarationDto> UpdateAsync(
         Guid id,
         UpdateDeclarationRequest request,
