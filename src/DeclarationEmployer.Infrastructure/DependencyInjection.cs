@@ -1,5 +1,6 @@
 using DeclarationEmployer.Application.Cabinet;
 using DeclarationEmployer.Application.Cabinet.Validation;
+using DeclarationEmployer.Application.Dashboard;
 using DeclarationEmployer.Infrastructure.Persistence;
 using DeclarationEmployer.Infrastructure.Services;
 using FluentValidation;
@@ -31,6 +32,7 @@ public static class DependencyInjection
         services.AddValidatorsFromAssemblyContaining<CreateClientCompanyRequestValidator>();
         services.AddScoped<IClientsService, ClientsService>();
         services.AddScoped<IFiscalYearsService, FiscalYearsService>();
+        services.AddScoped<IDashboardService, DashboardService>();
 
         return services;
     }

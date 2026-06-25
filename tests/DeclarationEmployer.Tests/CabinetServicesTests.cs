@@ -1,6 +1,7 @@
 using DeclarationEmployer.Application.Cabinet.Validation;
 using DeclarationEmployer.Application.Common;
 using DeclarationEmployer.Contracts.Cabinet;
+using DeclarationEmployer.Domain.Audit;
 using DeclarationEmployer.Domain.Cabinet;
 using DeclarationEmployer.Infrastructure.Persistence;
 using DeclarationEmployer.Infrastructure.Services;
@@ -123,6 +124,50 @@ public sealed class CabinetServicesTests
 
         var history = await service.GetHistoryAsync(fiscalYear.Id);
         history.Should().HaveCount(3);
+    }
+
+    [Fact]
+    public async Task DashboardService_GetSummaryAndRecentActions_ReturnsExistingDataOnly()
+    {
+        await using var db = CreateDbContext();
+        var clientId = Guid.NewGuid();
+        db.Clients.Add(new ClientCompany
+        {
+            Id = clientId,
+            Code = "CLI01",
+            RaisonSociale = "Societe Test",
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        db.FiscalYears.Add(new FiscalYear
+        {
+            Id = Guid.NewGuid(),
+            ClientCompanyId = clientId,
+            Year = 2025,
+            IsClosed = false,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        db.AuditLogs.Add(new AuditLog
+        {
+            Id = Guid.NewGuid(),
+            Action = "CLIENT_CREATED",
+            EntityName = nameof(ClientCompany),
+            Details = "Creation test",
+            OccurredAt = DateTimeOffset.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var service = new DashboardService(db);
+
+        var summary = await service.GetSummaryAsync();
+        summary.ClientsCount.Should().Be(1);
+        summary.ActiveClientsCount.Should().Be(1);
+        summary.FiscalYearsCount.Should().Be(1);
+        summary.OpenFiscalYearsCount.Should().Be(1);
+        summary.BlockingAnomaliesCount.Should().Be(0);
+
+        var actions = await service.GetRecentActionsAsync(10);
+        actions.Should().ContainSingle(x => x.Action == "CLIENT_CREATED");
     }
 
     private static ApplicationDbContext CreateDbContext()

@@ -1,7 +1,7 @@
 <Window x:Class="DeclarationEmployer.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Déclaration Employeur Tunisie"
+        Title="Declaration Employeur Tunisie"
         Height="760"
         Width="1250"
         MinHeight="700"
@@ -22,12 +22,20 @@
                                Foreground="White"
                                FontSize="24"
                                FontWeight="Bold"/>
-                    <TextBlock Text="Déclaration Employeur Tunisie"
+                    <TextBlock Text="Declaration Employeur Tunisie"
                                Foreground="#CBD5E1"
                                FontSize="12"
                                Margin="0,6,0,22"/>
 
-                    <Button Content="Sociétés clientes"
+                    <Button Content="Tableau de bord"
+                            Height="42"
+                            Margin="0,0,0,10"
+                            Padding="12"
+                            HorizontalContentAlignment="Left"
+                            FontWeight="SemiBold"
+                            Click="ShowDashboard_Click"/>
+
+                    <Button Content="Societes clientes"
                             Height="42"
                             Margin="0,0,0,10"
                             Padding="12"
@@ -49,10 +57,10 @@
                     <TextBlock Text="Import Excel"
                                Foreground="#94A3B8"
                                Margin="12,12,0,0"/>
-                    <TextBlock Text="Contrôles"
+                    <TextBlock Text="Controles"
                                Foreground="#94A3B8"
                                Margin="12,12,0,0"/>
-                    <TextBlock Text="Génération fichiers"
+                    <TextBlock Text="Generation fichiers"
                                Foreground="#94A3B8"
                                Margin="12,12,0,0"/>
                     <TextBlock Text="Archivage"

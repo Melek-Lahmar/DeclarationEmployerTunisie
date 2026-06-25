@@ -26,8 +26,15 @@ public partial class App : Application
                     client.BaseAddress = new Uri("http://localhost:5050/");
                 });
 
+                services.AddHttpClient<DashboardApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                });
+
+                services.AddTransient<DashboardViewModel>();
                 services.AddTransient<ClientsViewModel>();
                 services.AddTransient<FiscalYearsViewModel>();
+                services.AddTransient<DashboardView>();
                 services.AddTransient<ClientsView>();
                 services.AddTransient<FiscalYearsView>();
                 services.AddTransient<MainWindow>();

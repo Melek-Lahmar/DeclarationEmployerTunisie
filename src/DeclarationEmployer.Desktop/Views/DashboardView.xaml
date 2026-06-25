@@ -1,0 +1,147 @@
+<UserControl x:Class="DeclarationEmployer.Desktop.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="650"
+             d:DesignWidth="1000">
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="White"
+                CornerRadius="12"
+                Padding="18"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left">
+                    <TextBlock Text="Tableau de bord"
+                               FontSize="26"
+                               FontWeight="SemiBold"
+                               Foreground="#111827"/>
+                    <TextBlock Text="Vue globale locale : clients, exercices fiscaux, avancement et audit recent."
+                               Margin="0,6,0,0"
+                               Foreground="#6B7280"
+                               FontSize="13"/>
+                </StackPanel>
+
+                <Button DockPanel.Dock="Right"
+                        Content="Actualiser"
+                        Width="120"
+                        Height="36"
+                        Command="{Binding LoadCommand}"/>
+            </DockPanel>
+        </Border>
+
+        <UniformGrid Grid.Row="1"
+                     Columns="4"
+                     Margin="0,16,0,0">
+            <Border Background="White" CornerRadius="10" Padding="16" Margin="0,0,12,0" BorderBrush="#E2E8F0" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Clients actifs" Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding Summary.ActiveClientsCount}" FontSize="28" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="{Binding Summary.ClientsCount, StringFormat=Total : {0}}" Foreground="#6B7280"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="10" Padding="16" Margin="0,0,12,0" BorderBrush="#E2E8F0" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Exercices ouverts" Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding Summary.OpenFiscalYearsCount}" FontSize="28" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="{Binding Summary.FiscalYearsCount, StringFormat=Total : {0}}" Foreground="#6B7280"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="10" Padding="16" Margin="0,0,12,0" BorderBrush="#E2E8F0" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Anomalies bloquantes" Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding Summary.BlockingAnomaliesCount}" FontSize="28" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="Module controle a venir" Foreground="#6B7280"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="White" CornerRadius="10" Padding="16" BorderBrush="#E2E8F0" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Archives" Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding Summary.ArchivedDeclarationsCount}" FontSize="28" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="{Binding Summary.GeneratedFilesCount, StringFormat=Fichiers generes : {0}}" Foreground="#6B7280"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <Grid Grid.Row="2" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.1*"/>
+                <ColumnDefinition Width="1.4*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="18"
+                    Margin="0,0,16,0"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Avancement declaration"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#111827"/>
+                    <TextBlock Text="Les compteurs restent a zero tant que le module declaration n'est pas cree."
+                               Margin="0,6,0,14"
+                               TextWrapping="Wrap"
+                               Foreground="#6B7280"/>
+                    <TextBlock Text="{Binding Progress.DeclarationsCount, StringFormat=Declarations : {0}}" Margin="0,4"/>
+                    <TextBlock Text="{Binding Progress.ValidatedCount, StringFormat=Validees : {0}}" Margin="0,4"/>
+                    <TextBlock Text="{Binding Progress.GeneratedCount, StringFormat=Generees : {0}}" Margin="0,4"/>
+                    <TextBlock Text="{Binding Progress.ArchivedCount, StringFormat=Archivees : {0}}" Margin="0,4"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="18"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top"
+                               Text="Actions recentes"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#111827"
+                               Margin="0,0,0,12"/>
+                    <DataGrid ItemsSource="{Binding RecentActions}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserAddRows="False"
+                              BorderThickness="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="150"/>
+                            <DataGridTextColumn Header="Entite" Binding="{Binding EntityName}" Width="110"/>
+                            <DataGridTextColumn Header="Details" Binding="{Binding Details}" Width="*"/>
+                            <DataGridTextColumn Header="Date" Binding="{Binding OccurredAt}" Width="170"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="3"
+                Background="#111827"
+                CornerRadius="8"
+                Padding="12"
+                Margin="0,12,0,0">
+            <TextBlock Text="{Binding StatusMessage}"
+                       Foreground="White"
+                       FontSize="13"/>
+        </Border>
+    </Grid>
+</UserControl>
