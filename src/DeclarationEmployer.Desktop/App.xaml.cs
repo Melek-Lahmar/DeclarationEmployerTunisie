@@ -31,12 +31,19 @@ public partial class App : Application
                     client.BaseAddress = new Uri("http://localhost:5050/");
                 });
 
+                services.AddHttpClient<DeclarationsApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                });
+
                 services.AddTransient<DashboardViewModel>();
                 services.AddTransient<ClientsViewModel>();
                 services.AddTransient<FiscalYearsViewModel>();
+                services.AddTransient<DeclarationsViewModel>();
                 services.AddTransient<DashboardView>();
                 services.AddTransient<ClientsView>();
                 services.AddTransient<FiscalYearsView>();
+                services.AddTransient<DeclarationsView>();
                 services.AddTransient<MainWindow>();
             })
             .Build();

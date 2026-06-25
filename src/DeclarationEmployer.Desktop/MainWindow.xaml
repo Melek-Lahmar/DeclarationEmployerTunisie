@@ -51,6 +51,14 @@
                             FontWeight="SemiBold"
                             Click="ShowFiscalYears_Click"/>
 
+                    <Button Content="Declarations employeur"
+                            Height="42"
+                            Margin="0,0,0,10"
+                            Padding="12"
+                            HorizontalContentAlignment="Left"
+                            FontWeight="SemiBold"
+                            Click="ShowDeclarations_Click"/>
+
                     <TextBlock Text="Annexes"
                                Foreground="#94A3B8"
                                Margin="12,12,0,0"/>

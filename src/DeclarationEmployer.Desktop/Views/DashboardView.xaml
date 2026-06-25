@@ -94,7 +94,7 @@
                                FontSize="18"
                                FontWeight="SemiBold"
                                Foreground="#111827"/>
-                    <TextBlock Text="Les compteurs restent a zero tant que le module declaration n'est pas cree."
+                    <TextBlock Text="Compteurs issus du module declarations local pour suivre l'avancement par statut."
                                Margin="0,6,0,14"
                                TextWrapping="Wrap"
                                Foreground="#6B7280"/>
