@@ -1,6 +1,7 @@
 ﻿using DeclarationEmployer.Domain.Audit;
 using DeclarationEmployer.Domain.Auth;
 using DeclarationEmployer.Domain.Cabinet;
+using DeclarationEmployer.Domain.Declarations;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeclarationEmployer.Infrastructure.Persistence;
@@ -17,6 +18,10 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<ClientCompany> Clients => Set<ClientCompany>();
 
     public DbSet<FiscalYear> FiscalYears => Set<FiscalYear>();
+
+    public DbSet<EmployerDeclaration> Declarations => Set<EmployerDeclaration>();
+
+    public DbSet<DeclarationEvent> DeclarationEvents => Set<DeclarationEvent>();
 
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
@@ -174,6 +179,119 @@ public sealed class ApplicationDbContext : DbContext
 
             entity.HasIndex(x => new { x.ClientCompanyId, x.Year })
                 .IsUnique();
+        });
+
+        modelBuilder.Entity<EmployerDeclaration>(entity =>
+        {
+            entity.ToTable("declarations", "declaration");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("id");
+
+            entity.Property(x => x.ClientCompanyId)
+                .HasColumnName("client_company_id")
+                .IsRequired();
+
+            entity.Property(x => x.FiscalYearId)
+                .HasColumnName("fiscal_year_id")
+                .IsRequired();
+
+            entity.Property(x => x.Year)
+                .HasColumnName("year")
+                .IsRequired();
+
+            entity.Property(x => x.Status)
+                .HasColumnName("status")
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
+            entity.Property(x => x.Title)
+                .HasColumnName("title")
+                .HasMaxLength(250)
+                .IsRequired();
+
+            entity.Property(x => x.Notes)
+                .HasColumnName("notes")
+                .HasMaxLength(1000);
+
+            entity.Property(x => x.IsLocked)
+                .HasColumnName("is_locked")
+                .IsRequired();
+
+            entity.Property(x => x.LockedAt)
+                .HasColumnName("locked_at");
+
+            entity.Property(x => x.LockedBy)
+                .HasColumnName("locked_by")
+                .HasMaxLength(100);
+
+            entity.Property(x => x.CreatedBy)
+                .HasColumnName("created_by")
+                .HasMaxLength(100);
+
+            entity.Property(x => x.CreatedAt)
+                .HasColumnName("created_at")
+                .IsRequired();
+
+            entity.Property(x => x.UpdatedAt)
+                .HasColumnName("updated_at");
+
+            entity.HasOne(x => x.ClientCompany)
+                .WithMany()
+                .HasForeignKey(x => x.ClientCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.FiscalYear)
+                .WithMany()
+                .HasForeignKey(x => x.FiscalYearId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => new { x.ClientCompanyId, x.FiscalYearId })
+                .IsUnique();
+
+            entity.HasIndex(x => x.Status);
+        });
+
+        modelBuilder.Entity<DeclarationEvent>(entity =>
+        {
+            entity.ToTable("declaration_events", "declaration");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("id");
+
+            entity.Property(x => x.DeclarationId)
+                .HasColumnName("declaration_id")
+                .IsRequired();
+
+            entity.Property(x => x.Action)
+                .HasColumnName("action")
+                .HasMaxLength(150)
+                .IsRequired();
+
+            entity.Property(x => x.Description)
+                .HasColumnName("description")
+                .HasMaxLength(1000);
+
+            entity.Property(x => x.UserName)
+                .HasColumnName("user_name")
+                .HasMaxLength(100);
+
+            entity.Property(x => x.OccurredAt)
+                .HasColumnName("occurred_at")
+                .IsRequired();
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany()
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => x.OccurredAt);
         });
 
         modelBuilder.Entity<AuditLog>(entity =>

@@ -1,8 +1,11 @@
 using DeclarationEmployer.Application.Cabinet.Validation;
 using DeclarationEmployer.Application.Common;
+using DeclarationEmployer.Application.Declarations.Validation;
 using DeclarationEmployer.Contracts.Cabinet;
+using DeclarationEmployer.Contracts.Declarations;
 using DeclarationEmployer.Domain.Audit;
 using DeclarationEmployer.Domain.Cabinet;
+using DeclarationEmployer.Domain.Declarations;
 using DeclarationEmployer.Infrastructure.Persistence;
 using DeclarationEmployer.Infrastructure.Services;
 using FluentAssertions;
@@ -168,6 +171,71 @@ public sealed class CabinetServicesTests
 
         var actions = await service.GetRecentActionsAsync(10);
         actions.Should().ContainSingle(x => x.Action == "CLIENT_CREATED");
+    }
+
+    [Fact]
+    public async Task DeclarationsService_CreateCloseAndPreventUpdate_WritesEventsAndAudit()
+    {
+        await using var db = CreateDbContext();
+        var clientId = Guid.NewGuid();
+        var fiscalYearId = Guid.NewGuid();
+
+        db.Clients.Add(new ClientCompany
+        {
+            Id = clientId,
+            Code = "CLI01",
+            RaisonSociale = "Societe Test",
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        db.FiscalYears.Add(new FiscalYear
+        {
+            Id = fiscalYearId,
+            ClientCompanyId = clientId,
+            Year = 2025,
+            IsClosed = false,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var service = new DeclarationsService(
+            db,
+            new CreateDeclarationRequestValidator(),
+            new UpdateDeclarationRequestValidator());
+
+        var declaration = await service.CreateAsync(
+            new CreateDeclarationRequest
+            {
+                ClientCompanyId = clientId,
+                FiscalYearId = fiscalYearId,
+                Title = "Declaration employeur 2025"
+            },
+            null);
+
+        declaration.Status.Should().Be(DeclarationStatus.Draft.ToString());
+        db.AuditLogs.Should().Contain(x => x.Action == "DECLARATION_CREATED");
+
+        var duplicateAct = () => service.CreateAsync(
+            new CreateDeclarationRequest
+            {
+                ClientCompanyId = clientId,
+                FiscalYearId = fiscalYearId
+            },
+            null);
+        await duplicateAct.Should().ThrowAsync<ApplicationConflictException>();
+
+        var events = await service.GetEventsAsync(declaration.Id);
+        events.Should().ContainSingle(x => x.Action == "DECLARATION_CREATED");
+
+        var closed = await service.CloseAsync(declaration.Id, null);
+        closed.Status.Should().Be(DeclarationStatus.Closed.ToString());
+        closed.IsLocked.Should().BeTrue();
+
+        var updateClosedAct = () => service.UpdateAsync(
+            declaration.Id,
+            new UpdateDeclarationRequest { Title = "Declaration modifiee" },
+            null);
+        await updateClosedAct.Should().ThrowAsync<ApplicationConflictException>();
     }
 
     private static ApplicationDbContext CreateDbContext()

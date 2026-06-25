@@ -1,5 +1,6 @@
 using DeclarationEmployer.Application.Dashboard;
 using DeclarationEmployer.Contracts.Dashboard;
+using DeclarationEmployer.Domain.Declarations;
 using DeclarationEmployer.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -57,18 +58,30 @@ public sealed class DashboardService : IDashboardService
             .ToListAsync(cancellationToken);
     }
 
-    public Task<DeclarationProgressDto> GetProgressAsync(
+    public async Task<DeclarationProgressDto> GetProgressAsync(
         Guid? clientId,
         int? year,
         CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new DeclarationProgressDto
+        var query = _db.Declarations.AsNoTracking().AsQueryable();
+
+        if (clientId.HasValue)
         {
-            DeclarationsCount = 0,
-            DraftCount = 0,
-            ValidatedCount = 0,
-            GeneratedCount = 0,
-            ArchivedCount = 0
-        });
+            query = query.Where(x => x.ClientCompanyId == clientId.Value);
+        }
+
+        if (year.HasValue)
+        {
+            query = query.Where(x => x.Year == year.Value);
+        }
+
+        return new DeclarationProgressDto
+        {
+            DeclarationsCount = await query.CountAsync(cancellationToken),
+            DraftCount = await query.CountAsync(x => x.Status == DeclarationStatus.Draft, cancellationToken),
+            ValidatedCount = await query.CountAsync(x => x.Status == DeclarationStatus.Validated, cancellationToken),
+            GeneratedCount = await query.CountAsync(x => x.Status == DeclarationStatus.Generated, cancellationToken),
+            ArchivedCount = await query.CountAsync(x => x.Status == DeclarationStatus.Archived, cancellationToken)
+        };
     }
 }

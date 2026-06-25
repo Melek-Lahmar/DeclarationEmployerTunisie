@@ -1,6 +1,7 @@
 using DeclarationEmployer.Application.Cabinet;
 using DeclarationEmployer.Application.Cabinet.Validation;
 using DeclarationEmployer.Application.Dashboard;
+using DeclarationEmployer.Application.Declarations;
 using DeclarationEmployer.Infrastructure.Persistence;
 using DeclarationEmployer.Infrastructure.Services;
 using FluentValidation;
@@ -33,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<IClientsService, ClientsService>();
         services.AddScoped<IFiscalYearsService, FiscalYearsService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<IDeclarationsService, DeclarationsService>();
 
         return services;
     }
