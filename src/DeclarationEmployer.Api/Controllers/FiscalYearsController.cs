@@ -93,10 +93,12 @@ public sealed class FiscalYearsController : ControllerBase
     [HttpPost("fiscal-years/{id:guid}/reopen")]
     public async Task<ActionResult<FiscalYearDto>> Reopen(
         Guid id,
+        ReopenFiscalYearRequest request,
         CancellationToken cancellationToken = default)
     {
         var fiscalYear = await _fiscalYearsService.ReopenAsync(
             id,
+            request,
             HttpContext.Connection.RemoteIpAddress?.ToString(),
             cancellationToken);
 

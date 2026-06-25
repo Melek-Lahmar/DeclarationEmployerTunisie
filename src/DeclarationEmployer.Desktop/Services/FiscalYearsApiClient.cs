@@ -82,11 +82,13 @@ public sealed class FiscalYearsApiClient
 
     public async Task<FiscalYearDto> ReopenAsync(
         Guid fiscalYearId,
+        ReopenFiscalYearRequest request,
         CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.PostAsync(
+        var response = await _httpClient.PostAsJsonAsync(
             $"api/fiscal-years/{fiscalYearId}/reopen",
-            content: null,
+            request,
+            JsonOptions,
             cancellationToken);
 
         await EnsureSuccessAsync(response, cancellationToken);

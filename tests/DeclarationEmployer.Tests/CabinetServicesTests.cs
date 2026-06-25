@@ -98,7 +98,22 @@ public sealed class CabinetServicesTests
         closed.IsClosed.Should().BeTrue();
         closed.ClosedAt.Should().NotBeNull();
 
-        var reopened = await service.ReopenAsync(fiscalYear.Id, null);
+        var updateClosedAct = () => service.UpdateAsync(
+            fiscalYear.Id,
+            new UpdateFiscalYearRequest { Year = 2026 },
+            null);
+        await updateClosedAct.Should().ThrowAsync<ApplicationConflictException>();
+
+        var reopenWithoutReasonAct = () => service.ReopenAsync(
+            fiscalYear.Id,
+            new ReopenFiscalYearRequest { Reason = " " },
+            null);
+        await reopenWithoutReasonAct.Should().ThrowAsync<ApplicationConflictException>();
+
+        var reopened = await service.ReopenAsync(
+            fiscalYear.Id,
+            new ReopenFiscalYearRequest { Reason = "Correction apres controle interne." },
+            null);
         reopened.IsClosed.Should().BeFalse();
         reopened.ClosedAt.Should().BeNull();
 

@@ -125,6 +125,11 @@ public sealed class FiscalYearsService : IFiscalYearsService
             throw new ApplicationNotFoundException("Exercice fiscal introuvable.");
         }
 
+        if (entity.IsClosed)
+        {
+            throw new ApplicationConflictException("Impossible de modifier un exercice fiscal cloture.");
+        }
+
         var duplicate = await _db.FiscalYears
             .AnyAsync(x => x.ClientCompanyId == entity.ClientCompanyId &&
                            x.Year == request.Year &&
@@ -182,9 +187,15 @@ public sealed class FiscalYearsService : IFiscalYearsService
 
     public async Task<FiscalYearDto> ReopenAsync(
         Guid id,
+        ReopenFiscalYearRequest request,
         string? ipAddress,
         CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(request.Reason))
+        {
+            throw new ApplicationConflictException("La justification de reouverture est obligatoire.");
+        }
+
         var entity = await _db.FiscalYears
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
@@ -201,7 +212,7 @@ public sealed class FiscalYearsService : IFiscalYearsService
                 "FISCAL_YEAR_REOPENED",
                 nameof(FiscalYear),
                 entity.Id.ToString(),
-                $"Réouverture exercice fiscal {entity.Year} pour client {entity.ClientCompanyId}",
+                $"Reouverture exercice fiscal {entity.Year} pour client {entity.ClientCompanyId}. Justification : {request.Reason.Trim()}",
                 ipAddress);
             await _db.SaveChangesAsync(cancellationToken);
         }

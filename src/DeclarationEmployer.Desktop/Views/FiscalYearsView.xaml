@@ -26,7 +26,7 @@
                                FontSize="26"
                                FontWeight="SemiBold"
                                Foreground="#111827"/>
-                    <TextBlock Text="Création, consultation, clôture et réouverture des exercices par société cliente."
+                    <TextBlock Text="Creation, consultation, cloture et reouverture des exercices par societe cliente."
                                Margin="0,6,0,0"
                                Foreground="#6B7280"
                                FontSize="13"/>
@@ -45,17 +45,17 @@
                             Height="36"
                             Margin="6,0"
                             Command="{Binding LoadByClientCommand}"/>
-                    <Button Content="Créer"
+                    <Button Content="Creer"
                             Width="95"
                             Height="36"
                             Margin="6,0"
                             Command="{Binding CreateCommand}"/>
-                    <Button Content="Clôturer"
+                    <Button Content="Cloturer"
                             Width="95"
                             Height="36"
                             Margin="6,0"
                             Command="{Binding CloseCommand}"/>
-                    <Button Content="Réouvrir"
+                    <Button Content="Reouvrir"
                             Width="95"
                             Height="36"
                             Margin="6,0"
@@ -77,28 +77,38 @@
                     <ColumnDefinition Width="220"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                    <TextBlock Text="Société cliente" FontWeight="SemiBold"/>
+                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,16,0">
+                    <TextBlock Text="Societe cliente" FontWeight="SemiBold"/>
                     <ComboBox ItemsSource="{Binding Clients}"
                               SelectedItem="{Binding SelectedClient, Mode=TwoWay}"
                               DisplayMemberPath="RaisonSociale"
                               Height="34"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1" Margin="0,0,16,0">
-                    <TextBlock Text="Année" FontWeight="SemiBold"/>
+                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,16,0">
+                    <TextBlock Text="Annee" FontWeight="SemiBold"/>
                     <TextBox Text="{Binding Year, UpdateSourceTrigger=PropertyChanged}"
                              Height="34"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                    <TextBlock Text="Règles simples"
+                <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="Regles simples"
                                FontWeight="SemiBold"
                                Foreground="#111827"/>
-                    <TextBlock Text="Un exercice par client et par année. Les règles fiscales détaillées restent côté API."
+                    <TextBlock Text="Un exercice par client et par annee. Les regles fiscales detaillees restent cote API."
                                TextWrapping="Wrap"
                                Foreground="#6B7280"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,14,0,0">
+                    <TextBlock Text="Justification de reouverture" FontWeight="SemiBold"/>
+                    <TextBox Text="{Binding ReopenReason, UpdateSourceTrigger=PropertyChanged}"
+                             Height="34"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -115,13 +125,13 @@
                   BorderBrush="#E2E8F0"
                   BorderThickness="1">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Année" Binding="{Binding Year}" Width="90"/>
+                <DataGridTextColumn Header="Annee" Binding="{Binding Year}" Width="90"/>
                 <DataGridTextColumn Header="Code client" Binding="{Binding ClientCode}" Width="120"/>
                 <DataGridTextColumn Header="Raison sociale" Binding="{Binding ClientRaisonSociale}" Width="280"/>
                 <DataGridTextColumn Header="Statut" Binding="{Binding Status}" Width="110"/>
-                <DataGridCheckBoxColumn Header="Clôturé" Binding="{Binding IsClosed}" Width="90"/>
-                <DataGridTextColumn Header="Clôturé le" Binding="{Binding ClosedAt}" Width="170"/>
-                <DataGridTextColumn Header="Créé le" Binding="{Binding CreatedAt}" Width="170"/>
+                <DataGridCheckBoxColumn Header="Cloture" Binding="{Binding IsClosed}" Width="90"/>
+                <DataGridTextColumn Header="Cloture le" Binding="{Binding ClosedAt}" Width="170"/>
+                <DataGridTextColumn Header="Cree le" Binding="{Binding CreatedAt}" Width="170"/>
             </DataGrid.Columns>
         </DataGrid>
 

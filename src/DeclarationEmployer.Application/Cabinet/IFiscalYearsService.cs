@@ -34,6 +34,7 @@ public interface IFiscalYearsService
 
     Task<FiscalYearDto> ReopenAsync(
         Guid id,
+        ReopenFiscalYearRequest request,
         string? ipAddress,
         CancellationToken cancellationToken = default);
 

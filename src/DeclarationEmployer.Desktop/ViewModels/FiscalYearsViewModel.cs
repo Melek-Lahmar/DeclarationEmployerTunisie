@@ -14,6 +14,7 @@ public sealed class FiscalYearsViewModel : ObservableObject
     private ClientCompanyDto? _selectedClient;
     private FiscalYearDto? _selectedFiscalYear;
     private int _year = DateTime.Today.Year;
+    private string _reopenReason = string.Empty;
     private bool _isBusy;
     private string _statusMessage = "Pret.";
 
@@ -67,6 +68,12 @@ public sealed class FiscalYearsViewModel : ObservableObject
     {
         get => _year;
         set => SetProperty(ref _year, value);
+    }
+
+    public string ReopenReason
+    {
+        get => _reopenReason;
+        set => SetProperty(ref _reopenReason, value);
     }
 
     public bool IsBusy
@@ -215,11 +222,20 @@ public sealed class FiscalYearsViewModel : ObservableObject
             return;
         }
 
+        if (string.IsNullOrWhiteSpace(ReopenReason))
+        {
+            StatusMessage = "La justification de reouverture est obligatoire.";
+            return;
+        }
+
         try
         {
             IsBusy = true;
-            await _fiscalYearsApiClient.ReopenAsync(SelectedFiscalYear.Id);
+            await _fiscalYearsApiClient.ReopenAsync(
+                SelectedFiscalYear.Id,
+                new ReopenFiscalYearRequest { Reason = ReopenReason });
             await ReloadCurrentScopeAsync();
+            ReopenReason = string.Empty;
             StatusMessage = "Exercice reouvert.";
         }
         catch (Exception ex)
