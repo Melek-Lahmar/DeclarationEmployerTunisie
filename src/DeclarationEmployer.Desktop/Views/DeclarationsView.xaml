@@ -65,6 +65,11 @@
                             Height="36"
                             Margin="6,0"
                             Command="{Binding CloseCommand}"/>
+                    <Button Content="Supprimer"
+                            Width="95"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding DeleteCommand}"/>
                 </StackPanel>
             </DockPanel>
         </Border>

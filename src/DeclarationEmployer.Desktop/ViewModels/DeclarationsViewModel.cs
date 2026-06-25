@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DeclarationEmployer.Contracts.Cabinet;
@@ -38,6 +39,7 @@ public sealed class DeclarationsViewModel : ObservableObject
         SaveCommand = new AsyncRelayCommand(SaveAsync);
         LockCommand = new AsyncRelayCommand(LockAsync);
         CloseCommand = new AsyncRelayCommand(CloseAsync);
+        DeleteCommand = new AsyncRelayCommand(DeleteAsync);
         NewCommand = new RelayCommand(NewDeclaration);
     }
 
@@ -60,6 +62,8 @@ public sealed class DeclarationsViewModel : ObservableObject
     public IAsyncRelayCommand LockCommand { get; }
 
     public IAsyncRelayCommand CloseCommand { get; }
+
+    public IAsyncRelayCommand DeleteCommand { get; }
 
     public IRelayCommand NewCommand { get; }
 
@@ -319,6 +323,44 @@ public sealed class DeclarationsViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Erreur cloture : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration a supprimer.";
+            return;
+        }
+
+        var confirmation = MessageBox.Show(
+            $"Supprimer logiquement la declaration '{SelectedDeclaration.Title}' ?",
+            "Confirmation suppression",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (confirmation != MessageBoxResult.Yes)
+        {
+            StatusMessage = "Suppression annulee.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            await _declarationsApiClient.DeleteAsync(SelectedDeclaration.Id);
+            await LoadDeclarationsAsync();
+            NewDeclaration();
+            StatusMessage = "Declaration supprimee logiquement.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur suppression : {ex.Message}";
         }
         finally
         {

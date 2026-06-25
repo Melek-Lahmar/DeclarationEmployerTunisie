@@ -151,6 +151,17 @@ public sealed class DeclarationsApiClient
         return result ?? throw new InvalidOperationException("Reponse API vide apres cloture.");
     }
 
+    public async Task DeleteAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.DeleteAsync(
+            $"api/declarations/{id}",
+            cancellationToken);
+
+        await EnsureSuccessAsync(response, cancellationToken);
+    }
+
     private static async Task EnsureSuccessAsync(
         HttpResponseMessage response,
         CancellationToken cancellationToken)
