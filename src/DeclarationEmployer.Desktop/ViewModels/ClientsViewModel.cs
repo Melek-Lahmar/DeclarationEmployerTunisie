@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DeclarationEmployer.Contracts.Cabinet;
@@ -26,6 +27,8 @@ public sealed class ClientsViewModel : ObservableObject
     private string? _telephone;
     private bool _isActive = true;
     private bool _isBusy;
+    private string? _searchText;
+    private string _selectedStatusFilter = "Tous";
     private string _statusMessage = "Prêt.";
 
     public ClientsViewModel(ClientsApiClient apiClient)
@@ -39,6 +42,8 @@ public sealed class ClientsViewModel : ObservableObject
     }
 
     public ObservableCollection<ClientCompanyDto> Clients { get; } = [];
+
+    public IReadOnlyList<string> StatusFilters { get; } = ["Tous", "Actifs", "Inactifs"];
 
     public IAsyncRelayCommand LoadCommand { get; }
 
@@ -144,6 +149,18 @@ public sealed class ClientsViewModel : ObservableObject
         set => SetProperty(ref _isBusy, value);
     }
 
+    public string? SearchText
+    {
+        get => _searchText;
+        set => SetProperty(ref _searchText, value);
+    }
+
+    public string SelectedStatusFilter
+    {
+        get => _selectedStatusFilter;
+        set => SetProperty(ref _selectedStatusFilter, value);
+    }
+
     public string StatusMessage
     {
         get => _statusMessage;
@@ -159,7 +176,10 @@ public sealed class ClientsViewModel : ObservableObject
 
             Clients.Clear();
 
-            var clients = await _apiClient.GetClientsAsync(includeInactive: true);
+            var clients = await _apiClient.GetClientsAsync(
+                includeInactive: SelectedStatusFilter == "Tous",
+                search: SearchText,
+                status: ToApiStatus(SelectedStatusFilter));
 
             foreach (var client in clients)
             {
@@ -287,6 +307,18 @@ public sealed class ClientsViewModel : ObservableObject
                 return;
             }
 
+            var confirmation = MessageBox.Show(
+                $"Désactiver la société {SelectedClient.Code} - {SelectedClient.RaisonSociale} ?",
+                "Confirmation désactivation",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (confirmation != MessageBoxResult.Yes)
+            {
+                StatusMessage = "Désactivation annulée.";
+                return;
+            }
+
             IsBusy = true;
             StatusMessage = "Désactivation de la société...";
 
@@ -331,5 +363,15 @@ public sealed class ClientsViewModel : ObservableObject
         IsActive = SelectedClient.IsActive;
 
         StatusMessage = $"Modification : {SelectedClient.Code} - {SelectedClient.RaisonSociale}";
+    }
+
+    private static string ToApiStatus(string statusFilter)
+    {
+        return statusFilter switch
+        {
+            "Actifs" => "active",
+            "Inactifs" => "inactive",
+            _ => "all"
+        };
     }
 }

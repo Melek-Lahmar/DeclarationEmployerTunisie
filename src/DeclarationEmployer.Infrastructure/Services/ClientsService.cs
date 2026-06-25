@@ -29,9 +29,10 @@ public sealed class ClientsService : IClientsService
     public async Task<IReadOnlyList<ClientCompanyDto>> GetAllAsync(
         bool includeInactive,
         string? search,
+        string? status,
         CancellationToken cancellationToken = default)
     {
-        return await BuildQuery(includeInactive, search)
+        return await BuildQuery(includeInactive, search, status)
             .OrderBy(x => x.Code)
             .Select(x => ToDto(x))
             .ToListAsync(cancellationToken);
@@ -40,6 +41,7 @@ public sealed class ClientsService : IClientsService
     public async Task<PagedResult<ClientCompanyDto>> GetPagedAsync(
         bool includeInactive,
         string? search,
+        string? status,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default)
@@ -47,7 +49,7 @@ public sealed class ClientsService : IClientsService
         page = Math.Max(1, page);
         pageSize = Math.Clamp(pageSize, 1, 100);
 
-        var query = BuildQuery(includeInactive, search).OrderBy(x => x.Code);
+        var query = BuildQuery(includeInactive, search, status).OrderBy(x => x.Code);
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query
             .Skip((page - 1) * pageSize)
@@ -106,6 +108,24 @@ public sealed class ClientsService : IClientsService
             LastAuditAction = lastAudit?.Action,
             LastAuditAt = lastAudit?.OccurredAt
         };
+    }
+
+    public async Task<IReadOnlyList<ClientHistoryDto>> GetHistoryAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.AuditLogs
+            .AsNoTracking()
+            .Where(x => x.EntityName == nameof(ClientCompany) && x.EntityId == id.ToString())
+            .OrderByDescending(x => x.OccurredAt)
+            .Select(x => new ClientHistoryDto
+            {
+                Action = x.Action,
+                Details = x.Details,
+                UserName = x.UserName,
+                OccurredAt = x.OccurredAt
+            })
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<ClientCompanyDto> CreateAsync(
@@ -231,11 +251,22 @@ public sealed class ClientsService : IClientsService
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    private IQueryable<ClientCompany> BuildQuery(bool includeInactive, string? search)
+    private IQueryable<ClientCompany> BuildQuery(bool includeInactive, string? search, string? status)
     {
         IQueryable<ClientCompany> query = _db.Clients.AsNoTracking();
 
-        if (!includeInactive)
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            var normalizedStatus = status.Trim().ToLowerInvariant();
+            query = normalizedStatus switch
+            {
+                "active" or "actif" => query.Where(x => x.IsActive),
+                "inactive" or "inactif" => query.Where(x => !x.IsActive),
+                "all" or "tous" => query,
+                _ => includeInactive ? query : query.Where(x => x.IsActive)
+            };
+        }
+        else if (!includeInactive)
         {
             query = query.Where(x => x.IsActive);
         }
@@ -246,7 +277,8 @@ public sealed class ClientsService : IClientsService
             query = query.Where(x =>
                 x.Code.ToLower().Contains(term) ||
                 x.RaisonSociale.ToLower().Contains(term) ||
-                (x.MatriculeFiscal != null && x.MatriculeFiscal.ToLower().Contains(term)));
+                (x.MatriculeFiscal != null && x.MatriculeFiscal.ToLower().Contains(term)) ||
+                (x.Ville != null && x.Ville.ToLower().Contains(term)));
         }
 
         return query;

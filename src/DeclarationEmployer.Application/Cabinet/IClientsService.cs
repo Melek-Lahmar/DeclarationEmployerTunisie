@@ -8,11 +8,13 @@ public interface IClientsService
     Task<IReadOnlyList<ClientCompanyDto>> GetAllAsync(
         bool includeInactive,
         string? search,
+        string? status,
         CancellationToken cancellationToken = default);
 
     Task<PagedResult<ClientCompanyDto>> GetPagedAsync(
         bool includeInactive,
         string? search,
+        string? status,
         int page,
         int pageSize,
         CancellationToken cancellationToken = default);
@@ -22,6 +24,10 @@ public interface IClientsService
         CancellationToken cancellationToken = default);
 
     Task<ClientSummaryDto?> GetSummaryAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<ClientHistoryDto>> GetHistoryAsync(
         Guid id,
         CancellationToken cancellationToken = default);
 

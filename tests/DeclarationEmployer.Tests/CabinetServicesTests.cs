@@ -24,18 +24,28 @@ public sealed class CabinetServicesTests
             new CreateClientCompanyRequest
             {
                 Code = " cli01 ",
-                RaisonSociale = " Société Test "
+                RaisonSociale = " Societe Test ",
+                Ville = "Sfax"
             },
             "127.0.0.1");
 
         client.Code.Should().Be("CLI01");
-        client.RaisonSociale.Should().Be("Société Test");
+        client.RaisonSociale.Should().Be("Societe Test");
         db.AuditLogs.Should().ContainSingle(x => x.Action == "CLIENT_CREATED");
 
         var summary = await service.GetSummaryAsync(client.Id);
         summary.Should().NotBeNull();
         summary!.Client.Code.Should().Be("CLI01");
         summary.LastAuditAction.Should().Be("CLIENT_CREATED");
+
+        var searchResult = await service.GetAllAsync(
+            includeInactive: false,
+            search: "sfax",
+            status: "active");
+        searchResult.Should().ContainSingle(x => x.Code == "CLI01");
+
+        var history = await service.GetHistoryAsync(client.Id);
+        history.Should().ContainSingle(x => x.Action == "CLIENT_CREATED");
     }
 
     [Fact]
@@ -50,7 +60,7 @@ public sealed class CabinetServicesTests
         var request = new CreateClientCompanyRequest
         {
             Code = "CLI01",
-            RaisonSociale = "Société Test"
+            RaisonSociale = "Societe Test"
         };
 
         await service.CreateAsync(request, null);
@@ -67,7 +77,7 @@ public sealed class CabinetServicesTests
         {
             Id = Guid.NewGuid(),
             Code = "CLI01",
-            RaisonSociale = "Société Test",
+            RaisonSociale = "Societe Test",
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow
         };

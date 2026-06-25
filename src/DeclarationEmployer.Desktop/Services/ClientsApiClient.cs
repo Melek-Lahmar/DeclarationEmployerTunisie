@@ -21,11 +21,30 @@ public sealed class ClientsApiClient
 
     public async Task<IReadOnlyList<ClientCompanyDto>> GetClientsAsync(
         bool includeInactive = false,
+        string? search = null,
+        string? status = null,
         CancellationToken cancellationToken = default)
     {
-        var url = includeInactive
-            ? "api/clients?includeInactive=true"
-            : "api/clients";
+        var query = new List<string>();
+
+        if (includeInactive)
+        {
+            query.Add("includeInactive=true");
+        }
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query.Add($"search={Uri.EscapeDataString(search)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query.Add($"status={Uri.EscapeDataString(status)}");
+        }
+
+        var url = query.Count == 0
+            ? "api/clients"
+            : $"api/clients?{string.Join("&", query)}";
 
         var result = await _httpClient.GetFromJsonAsync<List<ClientCompanyDto>>(
             url,

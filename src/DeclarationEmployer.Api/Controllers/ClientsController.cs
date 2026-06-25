@@ -19,6 +19,7 @@ public sealed class ClientsController : ControllerBase
     public async Task<ActionResult> GetAll(
         [FromQuery] bool includeInactive = false,
         [FromQuery] string? search = null,
+        [FromQuery] string? status = null,
         [FromQuery] int? page = null,
         [FromQuery] int? pageSize = null,
         CancellationToken cancellationToken = default)
@@ -28,6 +29,7 @@ public sealed class ClientsController : ControllerBase
             var paged = await _clientsService.GetPagedAsync(
                 includeInactive,
                 search,
+                status,
                 page ?? 1,
                 pageSize ?? 20,
                 cancellationToken);
@@ -38,6 +40,7 @@ public sealed class ClientsController : ControllerBase
         var clients = await _clientsService.GetAllAsync(
             includeInactive,
             search,
+            status,
             cancellationToken);
 
         return Ok(clients);
@@ -71,6 +74,22 @@ public sealed class ClientsController : ControllerBase
         }
 
         return Ok(summary);
+    }
+
+    [HttpGet("{id:guid}/history")]
+    public async Task<ActionResult<IReadOnlyList<ClientHistoryDto>>> GetHistory(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var client = await _clientsService.GetByIdAsync(id, cancellationToken);
+
+        if (client is null)
+        {
+            return NotFound(new { message = "Societe cliente introuvable." });
+        }
+
+        var history = await _clientsService.GetHistoryAsync(id, cancellationToken);
+        return Ok(history);
     }
 
     [HttpPost]

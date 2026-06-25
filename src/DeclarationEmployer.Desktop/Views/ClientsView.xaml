@@ -66,6 +66,33 @@
                 Margin="0,16,0,0"
                 BorderBrush="#E2E8F0"
                 BorderThickness="1">
+            <StackPanel>
+            <Grid Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="180"/>
+                    <ColumnDefinition Width="120"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                    <TextBlock Text="Recherche" FontWeight="SemiBold"/>
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="0,0,12,0">
+                    <TextBlock Text="Statut" FontWeight="SemiBold"/>
+                    <ComboBox ItemsSource="{Binding StatusFilters}"
+                              SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay}"
+                              Height="32"/>
+                </StackPanel>
+
+                <Button Grid.Column="2"
+                        Content="Rechercher"
+                        Height="32"
+                        Margin="0,18,0,0"
+                        Command="{Binding LoadCommand}"/>
+            </Grid>
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1.1*"/>
@@ -147,6 +174,7 @@
                           VerticalAlignment="Center"
                           IsChecked="{Binding IsActive}"/>
             </Grid>
+            </StackPanel>
         </Border>
 
         <DataGrid Grid.Row="2"
