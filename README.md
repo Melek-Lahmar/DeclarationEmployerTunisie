@@ -116,6 +116,10 @@ Separation actuelle :
   pg_dump configure,
   historique sauvegardes,
   verification hash
+- Desktop WPF etendu :
+  generation foundation,
+  archivage,
+  ouverture rapports PDF
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -344,3 +348,11 @@ Le module sauvegarde expose :
 - `POST /api/backups/{id}/verify`
 
 La creation exige un chemin `Backup:PgDumpPath` valide. La restauration destructive n'est pas automatisee.
+
+## Desktop WPF
+
+L'ecran declarations permet maintenant aussi :
+
+- lancer la generation foundation ;
+- ouvrir les rapports PDF resume et generation ;
+- archiver une declaration avec confirmation.

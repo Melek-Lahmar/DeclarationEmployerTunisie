@@ -33,6 +33,7 @@
 - rapports PDF foundation
 - archivage foundation
 - sauvegarde PostgreSQL foundation
+- integration WPF generation/PDF/archive
 
 ## Partiellement termine
 
@@ -44,6 +45,7 @@
 - PDF : rapports foundation presents, mise en page commerciale avancee restante
 - archivage : recu foundation present, archive complete immutable et copie fichiers restantes
 - backup : creation/verif foundation presentes, restauration guidee restante
+- WPF : actions principales exposees dans declarations, ecrans dedies annexes/backup restants
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes

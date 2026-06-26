@@ -76,6 +76,10 @@
   BackupEvent,
   pg_dump configure,
   verification hash
+- Desktop declarations :
+  commandes generation foundation,
+  rapports PDF,
+  archivage
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -166,6 +170,10 @@ Le projet `DeclarationEmployer.Reports` fournit `PdfReportBuilder` via QuestPDF.
 ## Sauvegarde PostgreSQL foundation
 
 `BackupService` cree une sauvegarde via `pg_dump` lorsque `Backup:PgDumpPath` est configure, stocke `BackupRecord` / `BackupEvent` et verifie les fichiers par SHA256. Aucune restauration destructive n'est exposee.
+
+## Desktop WPF
+
+L'ecran declarations integre les clients API `GenerationApiClient`, `ArchiveApiClient` et `ReportsApiClient` pour lancer les actions foundation depuis le Desktop.
 
 ## Endpoints ajoutes ou confirms
 

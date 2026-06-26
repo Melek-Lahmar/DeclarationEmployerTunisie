@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using Microsoft.Win32;
@@ -22,6 +23,9 @@ public sealed class DeclarationsViewModel : ObservableObject
     private readonly ImportExcelApiClient _importExcelApiClient;
     private readonly DeclarationControlApiClient _declarationControlApiClient;
     private readonly DeclarationExportApiClient _declarationExportApiClient;
+    private readonly GenerationApiClient _generationApiClient;
+    private readonly ArchiveApiClient _archiveApiClient;
+    private readonly ReportsApiClient _reportsApiClient;
 
     private ClientCompanyDto? _selectedClient;
     private FiscalYearDto? _selectedFiscalYear;
@@ -66,7 +70,10 @@ public sealed class DeclarationsViewModel : ObservableObject
         DeclarationAnomaliesApiClient anomaliesApiClient,
         ImportExcelApiClient importExcelApiClient,
         DeclarationControlApiClient declarationControlApiClient,
-        DeclarationExportApiClient declarationExportApiClient)
+        DeclarationExportApiClient declarationExportApiClient,
+        GenerationApiClient generationApiClient,
+        ArchiveApiClient archiveApiClient,
+        ReportsApiClient reportsApiClient)
     {
         _clientsApiClient = clientsApiClient;
         _fiscalYearsApiClient = fiscalYearsApiClient;
@@ -77,6 +84,9 @@ public sealed class DeclarationsViewModel : ObservableObject
         _importExcelApiClient = importExcelApiClient;
         _declarationControlApiClient = declarationControlApiClient;
         _declarationExportApiClient = declarationExportApiClient;
+        _generationApiClient = generationApiClient;
+        _archiveApiClient = archiveApiClient;
+        _reportsApiClient = reportsApiClient;
 
         LoadCommand = new AsyncRelayCommand(LoadAsync);
         FilterByClientCommand = new AsyncRelayCommand(FilterFiscalYearsByClientAsync);
@@ -87,6 +97,10 @@ public sealed class DeclarationsViewModel : ObservableObject
         ControlCommand = new AsyncRelayCommand(ControlAsync);
         PreviewExportCommand = new AsyncRelayCommand(PreviewExportAsync);
         GenerateExportCommand = new AsyncRelayCommand(GenerateExportAsync);
+        GenerateFoundationCommand = new AsyncRelayCommand(GenerateFoundationAsync);
+        ArchiveCommand = new AsyncRelayCommand(ArchiveAsync);
+        OpenSummaryReportCommand = new AsyncRelayCommand(OpenSummaryReportAsync);
+        OpenGenerationReportCommand = new AsyncRelayCommand(OpenGenerationReportAsync);
         RefreshDetailsCommand = new AsyncRelayCommand(RefreshSelectedDeclarationDetailsAsync);
         AddBeneficiaryCommand = new AsyncRelayCommand(AddBeneficiaryAsync);
         AddLineCommand = new AsyncRelayCommand(AddLineAsync);
@@ -135,6 +149,14 @@ public sealed class DeclarationsViewModel : ObservableObject
     public IAsyncRelayCommand PreviewExportCommand { get; }
 
     public IAsyncRelayCommand GenerateExportCommand { get; }
+
+    public IAsyncRelayCommand GenerateFoundationCommand { get; }
+
+    public IAsyncRelayCommand ArchiveCommand { get; }
+
+    public IAsyncRelayCommand OpenSummaryReportCommand { get; }
+
+    public IAsyncRelayCommand OpenGenerationReportCommand { get; }
 
     public IAsyncRelayCommand RefreshDetailsCommand { get; }
 
@@ -1005,6 +1027,105 @@ public sealed class DeclarationsViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Erreur generation export : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GenerateFoundationAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration avant la generation foundation.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            var result = await _generationApiClient.GenerateFoundationAsync(SelectedDeclaration.Id);
+            StatusMessage = $"Generation foundation terminee : {result.Files.Count} fichier(s).";
+            await LoadDeclarationsAsync();
+            await RefreshSelectedDeclarationDetailsAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur generation foundation : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ArchiveAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration avant archivage.";
+            return;
+        }
+
+        var confirmation = MessageBox.Show(
+            $"Archiver et verrouiller la declaration '{SelectedDeclaration.Title}' ?",
+            "Confirmation archivage",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning);
+
+        if (confirmation != MessageBoxResult.Yes)
+        {
+            StatusMessage = "Archivage annule.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            var result = await _archiveApiClient.ArchiveAsync(SelectedDeclaration.Id);
+            StatusMessage = $"Declaration archivee : {result.FileName}.";
+            await LoadDeclarationsAsync();
+            await RefreshSelectedDeclarationDetailsAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur archivage : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private Task OpenSummaryReportAsync() => OpenReportAsync(
+        "resume",
+        id => _reportsApiClient.GetSummaryReportAsync(id));
+
+    private Task OpenGenerationReportAsync() => OpenReportAsync(
+        "generation",
+        id => _reportsApiClient.GetGenerationReportAsync(id));
+
+    private async Task OpenReportAsync(string reportName, Func<Guid, Task<byte[]>> loadReport)
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration avant d'ouvrir un rapport.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            var bytes = await loadReport(SelectedDeclaration.Id);
+            var path = Path.Combine(Path.GetTempPath(), $"det_{reportName}_{SelectedDeclaration.Id:N}.pdf");
+            await File.WriteAllBytesAsync(path, bytes);
+            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            StatusMessage = $"Rapport {reportName} ouvert.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur rapport PDF : {ex.Message}";
         }
         finally
         {

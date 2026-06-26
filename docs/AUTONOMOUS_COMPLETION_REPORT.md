@@ -114,3 +114,15 @@ Message fiscal obligatoire :
 - Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
 - Notes : creation via `pg_dump` uniquement si `Backup:PgDumpPath` existe; verification par SHA256.
 - Blocages : restauration destructive non implementee volontairement.
+
+## Session 2026-06-26 - Integration WPF generation, PDF, archivage
+
+- Phase : WPF foundation
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : clients API Desktop, ViewModel declarations, XAML declarations, documentation
+- Migration : aucune
+- Tests : build Desktop OK
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Notes : boutons generation foundation, PDF resume/generation et archivage ajoutes.
+- Blocages : ecrans dedies backup et annexes restent a construire.
