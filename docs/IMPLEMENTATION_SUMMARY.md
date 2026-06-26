@@ -47,6 +47,11 @@
   creation/reutilisation beneficiaire,
   synthese,
   validation ligne
+- Annexes A2-A7 foundation :
+  endpoints generiques,
+  creation/reutilisation beneficiaire,
+  synthese,
+  validation codes annexes
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -104,6 +109,12 @@ L'Annexe I foundation repose sur une facade dediee au-dessus des entites existan
 
 Elle expose la liste des lignes, la creation, la suppression, une synthese et un controle ligne. La structure reste non officielle tant que le mapping EMPCCA 2025 n'est pas confirme.
 
+## Annexes A2-A7 foundation
+
+Les annexes A2 a A7 reposent sur `AnnexFoundationService` et les entites existantes `DeclarationAnnex`, `DeclarationBeneficiary` et `DeclarationLine`. Les codes acceptes sont strictement limites a `A2`, `A3`, `A4`, `A5`, `A6`, `A7`.
+
+Cette couche fournit une base CRUD/synthese non officielle pour les annexes restantes, sans pretendre couvrir les positions ou longueurs officielles EMPCCA.
+
 ## Endpoints ajoutes ou confirms
 
 - `GET /api/clients`
@@ -159,6 +170,10 @@ Elle expose la liste des lignes, la creation, la suppression, une synthese et un
 - `DELETE /api/declarations/{declarationId}/annexes/A1/lines/{lineId}`
 - `GET /api/declarations/{declarationId}/annexes/A1/summary`
 - `POST /api/declarations/{declarationId}/annexes/A1/validate-line/{lineId}`
+- `GET /api/declarations/{declarationId}/annexes/{annexCode}/lines`
+- `POST /api/declarations/{declarationId}/annexes/{annexCode}/lines`
+- `DELETE /api/declarations/{declarationId}/annexes/{annexCode}/lines/{lineId}`
+- `GET /api/declarations/{declarationId}/annexes/{annexCode}/summary`
 
 ## Tests ajoutes
 
@@ -178,6 +193,7 @@ Elle expose la liste des lignes, la creation, la suppression, une synthese et un
 - tests DeclarationExportService
 - tests FiscalReferenceService
 - tests AnnexA1Service
+- tests AnnexFoundationService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon

@@ -27,12 +27,13 @@
 - export interne structure MVP
 - referentiel fiscal EMPCCA 2025 foundation non officiel
 - Annexe I foundation API
+- Annexes A2-A7 foundation API
 
 ## Partiellement termine
 
 - dashboard : compteurs MVP, encore incomplets
 - declarations : workflow MVP present, generation et archivage reel encore absents
-- annexes : Annexe I API foundation presente, ecran WPF dedie et champs officiels restants
+- annexes : API foundation A1-A7 presente, ecrans WPF dedies et champs officiels restants
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes

@@ -90,6 +90,10 @@ Separation actuelle :
   creation/reutilisation beneficiaire,
   synthese,
   controle ligne
+- Annexes A2-A7 foundation :
+  lignes generiques,
+  synthese par annexe,
+  mapping non confirme
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -251,3 +255,16 @@ Le module Annexe I expose maintenant :
 - `POST /api/declarations/{declarationId}/annexes/A1/validate-line/{lineId}`
 
 Cette couche utilise les entites existantes `DeclarationAnnex`, `DeclarationBeneficiary` et `DeclarationLine`. Elle ne cree pas de format officiel et garde le mapping A1 en foundation non confirmee.
+
+## Annexes A2-A7 foundation
+
+Les annexes A2 a A7 exposent une API foundation commune :
+
+- `GET /api/declarations/{declarationId}/annexes/{annexCode}/lines`
+- `POST /api/declarations/{declarationId}/annexes/{annexCode}/lines`
+- `DELETE /api/declarations/{declarationId}/annexes/{annexCode}/lines/{lineId}`
+- `GET /api/declarations/{declarationId}/annexes/{annexCode}/summary`
+
+Codes acceptes : `A2`, `A3`, `A4`, `A5`, `A6`, `A7`.
+
+Ces endpoints sont une base technique non officielle et conservent le message de mapping EMPCCA 2025 non confirme.

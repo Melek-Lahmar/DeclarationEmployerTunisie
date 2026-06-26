@@ -36,3 +36,18 @@ Message fiscal obligatoire :
 - API smoke test : `/api/health` OK, `/api/info` OK
 - Notes : la couche A1 cree ou reutilise l'annexe A1 et le beneficiaire, puis stocke une ligne declaration standard.
 - Blocages : ecran WPF dedie et mapping officiel A1 restent a implementer apres confirmation metier.
+
+## Session 2026-06-26 - Annexes A2-A7 foundation API
+
+- Phase : Annexes A2-A7 foundation
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : Contracts AnnexFoundation, Application service interface, Infrastructure service, API controller, tests, documentation
+- Migration : aucune, reutilisation de `DeclarationAnnex`, `DeclarationBeneficiary` et `DeclarationLine`
+- Tests : `dotnet test DeclarationEmployerTunisie.sln` OK, 66/66
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Build Desktop : `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` OK
+- EF : `has-pending-model-changes` OK, aucune migration necessaire
+- API smoke test : `/api/health` OK, `/api/fiscal/annexes?year=2025` OK
+- Notes : les codes acceptes sont `A2` a `A7`; toute autre annexe est refusee.
+- Blocages : mapping officiel A2-A7 et ecrans WPF dedies restent a implementer apres confirmation metier.
