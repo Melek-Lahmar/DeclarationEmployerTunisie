@@ -60,14 +60,15 @@ Separation actuelle :
 - societes clientes
 - exercices fiscaux
 - declarations MVP
-- audit log basique
+- authentification JWT MVP
+- login Desktop simple
+- utilisateurs et roles MVP
+- audit utilisateur avec fallback development
 - middleware d'erreurs API
-- tests de services de base
+- tests de services et Auth de base
 
 ## Modules en developpement
 
-- authentification et roles
-- utilisateur courant et audit utilisateur
 - import Excel
 - moteur de controle fiscal
 - generation d'exports internes structures
@@ -79,15 +80,15 @@ Separation actuelle :
 ## Commandes build
 
 ```powershell
-dotnet restore
-dotnet build
+dotnet restore DeclarationEmployerTunisie.sln
+dotnet build DeclarationEmployerTunisie.sln
 dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj
 ```
 
 ## Commandes tests
 
 ```powershell
-dotnet test
+dotnet test DeclarationEmployerTunisie.sln
 ```
 
 ## Configuration locale
@@ -95,6 +96,10 @@ dotnet test
 - exemple non sensible : `src/DeclarationEmployer.Api/appsettings.Local.example.json`
 - fichier local a ne jamais commiter : `src/DeclarationEmployer.Api/appsettings.Local.json`
 - base locale typique : PostgreSQL sur `localhost:5432`
+- JWT :
+  `Jwt:Issuer`, `Jwt:Audience`, `Jwt:Secret`, `Jwt:ExpirationMinutes`
+- admin de developpement configurable :
+  `DefaultAdmin:UserName`, `DefaultAdmin:Email`, `DefaultAdmin:Password`
 
 ## Avertissement conformite fiscale
 
@@ -102,7 +107,8 @@ Le projet prepare une architecture prete pour integrer les formats officiels plu
 
 ## Limites actuelles
 
-- authentification reelle non finalisee
+- gestion des roles simple, surtout orientee Admin pour les endpoints utilisateurs
+- token uniquement en memoire cote Desktop
 - import Excel non implemente
 - moteur fiscal non implemente
 - generation PDF non implementee

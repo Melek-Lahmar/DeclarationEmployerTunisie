@@ -1,5 +1,7 @@
 using System.Windows;
+using DeclarationEmployer.Desktop.Services;
 using DeclarationEmployer.Desktop.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DeclarationEmployer.Desktop;
 
@@ -9,12 +11,16 @@ public partial class MainWindow : Window
     private readonly ClientsView _clientsView;
     private readonly FiscalYearsView _fiscalYearsView;
     private readonly DeclarationsView _declarationsView;
+    private readonly SessionService _sessionService;
+    private readonly IServiceProvider _serviceProvider;
 
     public MainWindow(
         DashboardView dashboardView,
         ClientsView clientsView,
         FiscalYearsView fiscalYearsView,
-        DeclarationsView declarationsView)
+        DeclarationsView declarationsView,
+        SessionService sessionService,
+        IServiceProvider serviceProvider)
     {
         InitializeComponent();
 
@@ -22,8 +28,13 @@ public partial class MainWindow : Window
         _clientsView = clientsView;
         _fiscalYearsView = fiscalYearsView;
         _declarationsView = declarationsView;
+        _sessionService = sessionService;
+        _serviceProvider = serviceProvider;
 
         MainContent.Content = _dashboardView;
+        ConnectedUserText.Text = _sessionService.CurrentUser is null
+            ? "Utilisateur : non connecte"
+            : $"Utilisateur : {_sessionService.CurrentUser.UserName} ({_sessionService.CurrentUser.Role})";
     }
 
     private void ShowDashboard_Click(object sender, RoutedEventArgs e)
@@ -44,5 +55,13 @@ public partial class MainWindow : Window
     private void ShowDeclarations_Click(object sender, RoutedEventArgs e)
     {
         MainContent.Content = _declarationsView;
+    }
+
+    private void Logout_Click(object sender, RoutedEventArgs e)
+    {
+        _sessionService.Clear();
+        var loginWindow = _serviceProvider.GetRequiredService<LoginWindow>();
+        loginWindow.Show();
+        Close();
     }
 }

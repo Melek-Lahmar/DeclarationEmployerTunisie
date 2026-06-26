@@ -1,15 +1,22 @@
+using DeclarationEmployer.Application.Auth;
+using DeclarationEmployer.Application.Auth.Validation;
 using DeclarationEmployer.Application.Cabinet.Validation;
 using DeclarationEmployer.Application.Common;
 using DeclarationEmployer.Application.Declarations.Validation;
+using DeclarationEmployer.Contracts.Auth;
 using DeclarationEmployer.Contracts.Cabinet;
 using DeclarationEmployer.Contracts.Declarations;
+using DeclarationEmployer.Contracts.Users;
 using DeclarationEmployer.Domain.Audit;
+using DeclarationEmployer.Domain.Auth;
 using DeclarationEmployer.Domain.Cabinet;
 using DeclarationEmployer.Domain.Declarations;
 using DeclarationEmployer.Infrastructure.Persistence;
 using DeclarationEmployer.Infrastructure.Services;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace DeclarationEmployer.Tests;
 
@@ -21,6 +28,8 @@ public sealed class CabinetServicesTests
         await using var db = CreateDbContext();
         var service = new ClientsService(
             db,
+            new FakeCurrentUserService(),
+            new TestHostEnvironment(),
             new CreateClientCompanyRequestValidator(),
             new UpdateClientCompanyRequestValidator());
 
@@ -58,6 +67,8 @@ public sealed class CabinetServicesTests
         await using var db = CreateDbContext();
         var service = new ClientsService(
             db,
+            new FakeCurrentUserService(),
+            new TestHostEnvironment(),
             new CreateClientCompanyRequestValidator(),
             new UpdateClientCompanyRequestValidator());
 
@@ -90,6 +101,8 @@ public sealed class CabinetServicesTests
 
         var service = new FiscalYearsService(
             db,
+            new FakeCurrentUserService(),
+            new TestHostEnvironment(),
             new CreateFiscalYearRequestValidator(),
             new UpdateFiscalYearRequestValidator());
 
@@ -200,6 +213,8 @@ public sealed class CabinetServicesTests
 
         var service = new DeclarationsService(
             db,
+            new FakeCurrentUserService(),
+            new TestHostEnvironment(),
             new CreateDeclarationRequestValidator(),
             new UpdateDeclarationRequestValidator());
 
@@ -238,6 +253,145 @@ public sealed class CabinetServicesTests
         await updateClosedAct.Should().ThrowAsync<ApplicationConflictException>();
     }
 
+    [Fact]
+    public async Task AuthService_LoginAsync_ReturnsTokenForValidCredentials()
+    {
+        await using var db = CreateDbContext();
+        var passwordService = new PasswordService();
+        var user = new ApplicationUser
+        {
+            Id = Guid.NewGuid(),
+            UserName = "admin",
+            Email = "admin@local.dev",
+            PasswordHash = passwordService.HashPassword("ChangeMe123!"),
+            Role = UserRole.Admin,
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+        db.Users.Add(user);
+        await db.SaveChangesAsync();
+
+        var service = new AuthService(
+            db,
+            passwordService,
+            CreateJwtTokenService(),
+            new LoginRequestValidator());
+
+        var response = await service.LoginAsync(new LoginRequest
+        {
+            UserNameOrEmail = "admin",
+            Password = "ChangeMe123!"
+        });
+
+        response.AccessToken.Should().NotBeNullOrWhiteSpace();
+        response.User.UserName.Should().Be("admin");
+        response.User.Role.Should().Be(UserRole.Admin.ToString());
+    }
+
+    [Fact]
+    public async Task AuthService_LoginAsync_RejectsInactiveUser()
+    {
+        await using var db = CreateDbContext();
+        var passwordService = new PasswordService();
+        db.Users.Add(new ApplicationUser
+        {
+            Id = Guid.NewGuid(),
+            UserName = "viewer",
+            Email = "viewer@local.dev",
+            PasswordHash = passwordService.HashPassword("ChangeMe123!"),
+            Role = UserRole.Viewer,
+            IsActive = false,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var service = new AuthService(
+            db,
+            passwordService,
+            CreateJwtTokenService(),
+            new LoginRequestValidator());
+
+        var act = () => service.LoginAsync(new LoginRequest
+        {
+            UserNameOrEmail = "viewer",
+            Password = "ChangeMe123!"
+        });
+
+        await act.Should().ThrowAsync<ApplicationUnauthorizedException>();
+    }
+
+    [Fact]
+    public async Task UsersService_CreateAsync_HashesPasswordAndWritesAuditWithCurrentUser()
+    {
+        await using var db = CreateDbContext();
+        var passwordService = new PasswordService();
+        var service = new UsersService(
+            db,
+            passwordService,
+            new FakeCurrentUserService(true, "admin", Guid.NewGuid(), UserRole.Admin.ToString()),
+            new TestHostEnvironment(),
+            new CreateUserRequestValidator(),
+            new UpdateUserRequestValidator(),
+            new ChangePasswordRequestValidator());
+
+        var user = await service.CreateAsync(new CreateUserRequest
+        {
+            UserName = "manager",
+            Email = "manager@local.dev",
+            Password = "ChangeMe123!",
+            Role = UserRole.Manager.ToString()
+        }, "127.0.0.1");
+
+        user.UserName.Should().Be("manager");
+        user.Role.Should().Be(UserRole.Manager.ToString());
+        db.Users.Single().PasswordHash.Should().NotBe("ChangeMe123!");
+        passwordService.VerifyPassword("ChangeMe123!", db.Users.Single().PasswordHash).Should().BeTrue();
+        db.AuditLogs.Should().ContainSingle(x => x.Action == "USER_CREATED" && x.UserName == "admin");
+    }
+
+    [Fact]
+    public async Task UsersService_CreateAsync_RejectsDuplicateEmail()
+    {
+        await using var db = CreateDbContext();
+        var passwordService = new PasswordService();
+        db.Users.Add(new ApplicationUser
+        {
+            Id = Guid.NewGuid(),
+            UserName = "admin",
+            Email = "admin@local.dev",
+            PasswordHash = passwordService.HashPassword("ChangeMe123!"),
+            Role = UserRole.Admin,
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var service = new UsersService(
+            db,
+            passwordService,
+            new FakeCurrentUserService(),
+            new TestHostEnvironment(),
+            new CreateUserRequestValidator(),
+            new UpdateUserRequestValidator(),
+            new ChangePasswordRequestValidator());
+
+        var act = () => service.CreateAsync(new CreateUserRequest
+        {
+            UserName = "manager",
+            Email = "admin@local.dev",
+            Password = "ChangeMe123!",
+            Role = UserRole.Manager.ToString()
+        }, null);
+
+        await act.Should().ThrowAsync<ApplicationConflictException>();
+    }
+
+    [Fact]
+    public async Task UserDto_DoesNotContainPasswordHash()
+    {
+        typeof(UserDto).GetProperty("PasswordHash").Should().BeNull();
+    }
+
     private static ApplicationDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -245,5 +399,51 @@ public sealed class CabinetServicesTests
             .Options;
 
         return new ApplicationDbContext(options);
+    }
+
+    private static JwtTokenService CreateJwtTokenService()
+    {
+        return new JwtTokenService(Options.Create(new Infrastructure.Configuration.JwtOptions
+        {
+            Issuer = "DeclarationEmployerTunisie",
+            Audience = "DeclarationEmployerTunisie.Desktop",
+            Secret = "ChangeThisExampleSigningKeyOnlyForLocalDev123456789",
+            ExpirationMinutes = 60
+        }));
+    }
+
+    private sealed class FakeCurrentUserService : ICurrentUserService
+    {
+        public FakeCurrentUserService(
+            bool isAuthenticated = false,
+            string? userName = null,
+            Guid? userId = null,
+            string? role = null)
+        {
+            IsAuthenticated = isAuthenticated;
+            UserName = userName;
+            UserId = userId;
+            Role = role;
+        }
+
+        public Guid? UserId { get; }
+
+        public string? UserName { get; }
+
+        public string? Role { get; }
+
+        public bool IsAuthenticated { get; }
+    }
+
+    private sealed class TestHostEnvironment : IHostEnvironment
+    {
+        public string EnvironmentName { get; set; } = Environments.Development;
+
+        public string ApplicationName { get; set; } = "DeclarationEmployer.Tests";
+
+        public string ContentRootPath { get; set; } = AppContext.BaseDirectory;
+
+        public Microsoft.Extensions.FileProviders.IFileProvider ContentRootFileProvider { get; set; } =
+            new Microsoft.Extensions.FileProviders.NullFileProvider();
     }
 }

@@ -30,11 +30,31 @@ Flux principal :
 
 ## Audit
 
-Le projet enregistre deja un audit log basique. L'identite utilisateur reelle reste a finaliser avec l'authentification. En mode developpement, certains services utilisent encore un fallback technique.
+Le projet enregistre un audit log applicatif. Les services metier utilisent maintenant `ICurrentUserService` pour recuperer l'utilisateur authentifie quand un JWT est present. En environnement Development, le fallback `system-dev` reste possible si aucune authentification n'est disponible.
 
 ## Auth
 
-Le modele utilisateur existe, mais l'authentification JWT et la notion d'utilisateur courant ne sont pas encore finalisees.
+Le socle Auth MVP est maintenant present :
+
+- `ApplicationUser` avec `Role`
+- hash de mot de passe
+- generation JWT
+- `AuthController` pour login et utilisateur courant
+- `UsersController` pour la gestion utilisateurs
+- seed d'un admin de developpement si aucun utilisateur n'existe
+
+Le Desktop utilise un `SessionService` en memoire, un `AuthApiClient` et un handler `AuthorizationHeaderHandler` pour propager le Bearer token.
+
+## Roles
+
+Les roles disponibles sont :
+
+- `Admin`
+- `Manager`
+- `Accountant`
+- `Viewer`
+
+Dans cette phase MVP, les endpoints de creation, modification, changement de mot de passe et desactivation utilisateur sont reserves au role `Admin`.
 
 ## Import Excel
 

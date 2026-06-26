@@ -1,7 +1,10 @@
+using DeclarationEmployer.Application.Auth;
 using DeclarationEmployer.Application.Cabinet;
+using DeclarationEmployer.Application.Auth.Validation;
 using DeclarationEmployer.Application.Cabinet.Validation;
 using DeclarationEmployer.Application.Dashboard;
 using DeclarationEmployer.Application.Declarations;
+using DeclarationEmployer.Infrastructure.Configuration;
 using DeclarationEmployer.Infrastructure.Persistence;
 using DeclarationEmployer.Infrastructure.Services;
 using FluentValidation;
@@ -30,7 +33,18 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString);
         });
 
+        services.AddHttpContextAccessor();
+        services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+        services.Configure<DefaultAdminOptions>(configuration.GetSection("DefaultAdmin"));
+
         services.AddValidatorsFromAssemblyContaining<CreateClientCompanyRequestValidator>();
+        services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IUsersService, UsersService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddSingleton<IPasswordService, PasswordService>();
+        services.AddSingleton<IJwtTokenService, JwtTokenService>();
+        services.AddScoped<DevelopmentAdminSeedService>();
         services.AddScoped<IClientsService, ClientsService>();
         services.AddScoped<IFiscalYearsService, FiscalYearsService>();
         services.AddScoped<IDashboardService, DashboardService>();

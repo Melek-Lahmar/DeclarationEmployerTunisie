@@ -16,42 +16,60 @@ public partial class App : Application
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
+                services.AddSingleton<SessionService>();
+                services.AddTransient<AuthorizationHeaderHandler>();
+
+                services.AddHttpClient<AuthApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
                 services.AddHttpClient<ClientsApiClient>(client =>
                 {
                     client.BaseAddress = new Uri("http://localhost:5050/");
-                });
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
 
                 services.AddHttpClient<FiscalYearsApiClient>(client =>
                 {
                     client.BaseAddress = new Uri("http://localhost:5050/");
-                });
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
 
                 services.AddHttpClient<DashboardApiClient>(client =>
                 {
                     client.BaseAddress = new Uri("http://localhost:5050/");
-                });
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
 
                 services.AddHttpClient<DeclarationsApiClient>(client =>
                 {
                     client.BaseAddress = new Uri("http://localhost:5050/");
-                });
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
 
+                services.AddTransient<LoginViewModel>();
                 services.AddTransient<DashboardViewModel>();
                 services.AddTransient<ClientsViewModel>();
                 services.AddTransient<FiscalYearsViewModel>();
                 services.AddTransient<DeclarationsViewModel>();
+                services.AddTransient<LoginView>();
                 services.AddTransient<DashboardView>();
                 services.AddTransient<ClientsView>();
                 services.AddTransient<FiscalYearsView>();
                 services.AddTransient<DeclarationsView>();
+                services.AddTransient<LoginWindow>();
                 services.AddTransient<MainWindow>();
             })
             .Build();
 
         await _host.StartAsync();
 
-        var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-        mainWindow.Show();
+        var sessionService = _host.Services.GetRequiredService<SessionService>();
+        if (sessionService.IsAuthenticated)
+        {
+            _host.Services.GetRequiredService<MainWindow>().Show();
+        }
+        else
+        {
+            _host.Services.GetRequiredService<LoginWindow>().Show();
+        }
 
         base.OnStartup(e);
     }

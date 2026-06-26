@@ -1,3 +1,4 @@
+using DeclarationEmployer.Application.Auth;
 using DeclarationEmployer.Application.Cabinet;
 using DeclarationEmployer.Application.Common;
 using DeclarationEmployer.Contracts.Cabinet;
@@ -6,21 +7,28 @@ using DeclarationEmployer.Domain.Cabinet;
 using DeclarationEmployer.Infrastructure.Persistence;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace DeclarationEmployer.Infrastructure.Services;
 
 public sealed class FiscalYearsService : IFiscalYearsService
 {
     private readonly ApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IHostEnvironment _environment;
     private readonly IValidator<CreateFiscalYearRequest> _createValidator;
     private readonly IValidator<UpdateFiscalYearRequest> _updateValidator;
 
     public FiscalYearsService(
         ApplicationDbContext db,
+        ICurrentUserService currentUserService,
+        IHostEnvironment environment,
         IValidator<CreateFiscalYearRequest> createValidator,
         IValidator<UpdateFiscalYearRequest> updateValidator)
     {
         _db = db;
+        _currentUserService = currentUserService;
+        _environment = environment;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
     }
@@ -284,10 +292,20 @@ public sealed class FiscalYearsService : IFiscalYearsService
             Action = action,
             EntityName = entityName,
             EntityId = entityId,
-            UserName = "system-dev",
+            UserName = GetAuditUserName(),
             Details = details,
             IpAddress = ipAddress,
             OccurredAt = DateTimeOffset.UtcNow
         });
+    }
+
+    private string GetAuditUserName()
+    {
+        if (_currentUserService.IsAuthenticated && !string.IsNullOrWhiteSpace(_currentUserService.UserName))
+        {
+            return _currentUserService.UserName!;
+        }
+
+        return _environment.IsDevelopment() ? "system-dev" : "system";
     }
 }

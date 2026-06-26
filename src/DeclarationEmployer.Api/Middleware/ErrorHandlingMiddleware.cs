@@ -47,6 +47,10 @@ public sealed class ErrorHandlingMiddleware
         {
             await WriteErrorAsync(context, HttpStatusCode.Conflict, "CONFLICT", ex.Message);
         }
+        catch (ApplicationUnauthorizedException ex)
+        {
+            await WriteErrorAsync(context, HttpStatusCode.Unauthorized, "UNAUTHORIZED", ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled API error");

@@ -10,6 +10,8 @@ public sealed class ApplicationUser
 
     public string PasswordHash { get; set; } = string.Empty;
 
+    public UserRole Role { get; set; } = UserRole.Admin;
+
     public bool IsActive { get; set; } = true;
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;

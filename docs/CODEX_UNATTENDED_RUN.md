@@ -89,3 +89,51 @@
 ## Commit cree
 
 - en attente tant que le commit Git propre n'a pas ete cree dans cette session
+
+## Session suivante
+
+- Heure de debut : 2026-06-26 05:06:39 +02:00
+- Objectif : authentification JWT, utilisateur courant, audit utilisateur, login Desktop
+- Etat initial : repository propre, build/tests precedents OK, solution `DeclarationEmployerTunisie.sln` deja presente
+
+### Commandes executees
+
+- `git status --short`
+- `dotnet build-server shutdown`
+- `dotnet build DeclarationEmployerTunisie.sln`
+- `dotnet test DeclarationEmployerTunisie.sln`
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj`
+- `dotnet ef migrations add AddAuthenticationAndUserRoles --project src\DeclarationEmployer.Infrastructure --startup-project src\DeclarationEmployer.Api --output-dir Persistence\Migrations`
+
+### Blocs termines
+
+- ajout de `UserRole` et completion de `ApplicationUser`
+- ajout des contracts Auth/Users
+- ajout des validators FluentValidation Auth/Users
+- ajout des interfaces `IAuthService`, `IUsersService`, `ICurrentUserService`, `IPasswordService`, `IJwtTokenService`
+- implementation infrastructure : Auth, Users, CurrentUser, Password, JWT, seed admin Development
+- configuration JWT et controllers API `AuthController` / `UsersController`
+- branchement de l'utilisateur courant dans l'audit Clients / FiscalYears / Declarations
+- ajout du login Desktop avec `SessionService`, `AuthApiClient`, `AuthorizationHeaderHandler`, `LoginView`, `LoginWindow` et deconnexion
+- mise a jour de la documentation
+
+### Tests et resultats
+
+- `dotnet build DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+- total tests : 10 OK
+
+### Problemes rencontres
+
+- surcharge `AddJwtBearer` incorrecte initialement, corrigee avec lecture directe de la configuration
+- `AuthorizationHeaderHandler` manquait du namespace `System.Net.Http`
+- verrous transitoires `VBCSCompiler` geres par `dotnet build-server shutdown`
+
+### Etat final de cette session
+
+- socle Auth/API/Desktop compile
+- migration `AddAuthenticationAndUserRoles` generee
+- audit utilisateur branche
+- Desktop login MVP present
+- commit encore en attente tant que la validation finale et le controle Git n'ont pas ete faits

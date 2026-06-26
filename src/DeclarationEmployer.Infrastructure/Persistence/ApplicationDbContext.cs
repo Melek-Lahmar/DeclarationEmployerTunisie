@@ -53,6 +53,12 @@ public sealed class ApplicationDbContext : DbContext
                 .HasMaxLength(500)
                 .IsRequired();
 
+            entity.Property(x => x.Role)
+                .HasColumnName("role")
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsRequired();
+
             entity.Property(x => x.IsActive)
                 .HasColumnName("is_active")
                 .IsRequired();

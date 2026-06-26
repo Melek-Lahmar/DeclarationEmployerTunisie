@@ -1,3 +1,4 @@
+using DeclarationEmployer.Application.Auth;
 using DeclarationEmployer.Application.Common;
 using DeclarationEmployer.Application.Declarations;
 using DeclarationEmployer.Contracts.Declarations;
@@ -6,21 +7,28 @@ using DeclarationEmployer.Domain.Declarations;
 using DeclarationEmployer.Infrastructure.Persistence;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace DeclarationEmployer.Infrastructure.Services;
 
 public sealed class DeclarationsService : IDeclarationsService
 {
     private readonly ApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IHostEnvironment _environment;
     private readonly IValidator<CreateDeclarationRequest> _createValidator;
     private readonly IValidator<UpdateDeclarationRequest> _updateValidator;
 
     public DeclarationsService(
         ApplicationDbContext db,
+        ICurrentUserService currentUserService,
+        IHostEnvironment environment,
         IValidator<CreateDeclarationRequest> createValidator,
         IValidator<UpdateDeclarationRequest> updateValidator)
     {
         _db = db;
+        _currentUserService = currentUserService;
+        _environment = environment;
         _createValidator = createValidator;
         _updateValidator = updateValidator;
     }
@@ -117,7 +125,7 @@ public sealed class DeclarationsService : IDeclarationsService
             Status = DeclarationStatus.Draft,
             Title = title,
             Notes = Normalize(request.Notes),
-            CreatedBy = "system-dev",
+            CreatedBy = GetAuditUserName(),
             CreatedAt = DateTimeOffset.UtcNow
         };
 
@@ -179,7 +187,7 @@ public sealed class DeclarationsService : IDeclarationsService
 
         entity.IsLocked = true;
         entity.LockedAt = DateTimeOffset.UtcNow;
-        entity.LockedBy = "system-dev";
+        entity.LockedBy = GetAuditUserName();
         entity.Status = DeclarationStatus.Closed;
         entity.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -254,7 +262,7 @@ public sealed class DeclarationsService : IDeclarationsService
         {
             entity.IsLocked = true;
             entity.LockedAt = DateTimeOffset.UtcNow;
-            entity.LockedBy = "system-dev";
+            entity.LockedBy = GetAuditUserName();
             entity.UpdatedAt = DateTimeOffset.UtcNow;
             AddEvent(entity.Id, "DECLARATION_LOCKED", "Verrouillage declaration.");
             AddAudit("DECLARATION_LOCKED", entity.Id, $"Verrouillage declaration : {entity.Title}", ipAddress);
@@ -283,7 +291,7 @@ public sealed class DeclarationsService : IDeclarationsService
             entity.Status = DeclarationStatus.Closed;
             entity.IsLocked = true;
             entity.LockedAt ??= DateTimeOffset.UtcNow;
-            entity.LockedBy ??= "system-dev";
+            entity.LockedBy ??= GetAuditUserName();
             entity.UpdatedAt = DateTimeOffset.UtcNow;
             AddEvent(entity.Id, "DECLARATION_CLOSED", "Cloture declaration.");
             AddAudit("DECLARATION_CLOSED", entity.Id, $"Cloture declaration : {entity.Title}", ipAddress);
@@ -337,7 +345,7 @@ public sealed class DeclarationsService : IDeclarationsService
             DeclarationId = declarationId,
             Action = action,
             Description = description,
-            UserName = "system-dev",
+            UserName = GetAuditUserName(),
             OccurredAt = DateTimeOffset.UtcNow
         });
     }
@@ -350,10 +358,20 @@ public sealed class DeclarationsService : IDeclarationsService
             Action = action,
             EntityName = nameof(EmployerDeclaration),
             EntityId = declarationId.ToString(),
-            UserName = "system-dev",
+            UserName = GetAuditUserName(),
             Details = details,
             IpAddress = ipAddress,
             OccurredAt = DateTimeOffset.UtcNow
         });
+    }
+
+    private string GetAuditUserName()
+    {
+        if (_currentUserService.IsAuthenticated && !string.IsNullOrWhiteSpace(_currentUserService.UserName))
+        {
+            return _currentUserService.UserName!;
+        }
+
+        return _environment.IsDevelopment() ? "system-dev" : "system";
     }
 }
