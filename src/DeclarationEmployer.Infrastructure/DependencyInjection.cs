@@ -84,6 +84,7 @@ public static class DependencyInjection
         services.AddScoped<IDeclarationImportService, DeclarationImportService>();
         services.AddScoped<IDeclarationControlService, DeclarationControlService>();
         services.AddScoped<IDeclarationExportService, DeclarationExportService>();
+        services.AddScoped<IGenerationService, GenerationService>();
         services.AddScoped<IValidationService, ValidationService>();
         services.AddScoped<IFiscalReferenceService, FiscalReferenceService>();
 

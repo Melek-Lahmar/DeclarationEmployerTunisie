@@ -57,6 +57,11 @@
   ValidationResult,
   endpoints validation,
   ignore avec justification
+- generation fichiers foundation :
+  endpoint generation,
+  fichiers foundation non officiels,
+  hash SHA256,
+  traces GeneratedFile
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -131,6 +136,10 @@ Le module validation ajoute :
 
 Il reutilise `DeclarationControlService`, persiste un run et des resultats, et permet de marquer une anomalie corrigee ou ignoree. Ignorer exige une justification.
 
+## Generation fichiers foundation
+
+Le module `GenerationService` ajoute une generation technique foundation non officielle. Il refuse le mode officiel, controle les anomalies bloquantes, cree des fichiers texte ASCII-safe et enregistre les traces `GeneratedFile`.
+
 ## Endpoints ajoutes ou confirms
 
 - `GET /api/clients`
@@ -195,6 +204,7 @@ Il reutilise `DeclarationControlService`, persiste un run et des resultats, et p
 - `GET /api/declarations/{declarationId}/errors`
 - `POST /api/validation-results/{id}/mark-corrected`
 - `POST /api/validation-results/{id}/ignore`
+- `POST /api/declarations/{declarationId}/generate`
 
 ## Tests ajoutes
 
@@ -216,6 +226,7 @@ Il reutilise `DeclarationControlService`, persiste un run et des resultats, et p
 - tests AnnexA1Service
 - tests AnnexFoundationService
 - tests ValidationService
+- tests GenerationService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon

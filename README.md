@@ -98,6 +98,11 @@ Separation actuelle :
   runs de validation,
   resultats persistants,
   correction/ignore avec justification
+- generation fichiers foundation :
+  fichiers texte non officiels,
+  hash SHA256,
+  traces GeneratedFile,
+  blocage mode officiel
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -284,3 +289,15 @@ Le module validation expose maintenant :
 - `POST /api/validation-results/{id}/ignore`
 
 La validation centralisee encapsule le moteur de controle existant, cree un `ValidationRun`, materialise les anomalies en `ValidationResult` et impose une justification pour ignorer une anomalie.
+
+## Generation fichiers foundation
+
+Le module generation expose :
+
+- `POST /api/declarations/{declarationId}/generate`
+
+Il cree des fichiers texte foundation non officiels, stockes avec hash SHA256 et traces dans `GeneratedFile`.
+
+Le mode officiel est refuse tant que le mapping EMPCCA 2025 n'est pas confirme :
+
+> Génération officielle non activée : mapping EMPCCA 2025 incomplet ou non confirmé.

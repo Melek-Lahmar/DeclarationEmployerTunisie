@@ -29,6 +29,7 @@
 - Annexe I foundation API
 - Annexes A2-A7 foundation API
 - validation centralisee foundation
+- generation fichiers foundation non officielle
 
 ## Partiellement termine
 
@@ -36,6 +37,7 @@
 - declarations : workflow MVP present, generation et archivage reel encore absents
 - annexes : API foundation A1-A7 presente, ecrans WPF dedies et champs officiels restants
 - validation : API foundation presente, ecran WPF dedie et workflow avance restants
+- generation : API foundation presente, format officiel EMPCCA restant
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes

@@ -1,6 +1,7 @@
 using DeclarationEmployer.Application.Auth;
 using DeclarationEmployer.Application.Common;
 using DeclarationEmployer.Contracts.Declarations;
+using DeclarationEmployer.Contracts.Generation;
 using DeclarationEmployer.Domain.Cabinet;
 using DeclarationEmployer.Domain.Declarations;
 using DeclarationEmployer.Infrastructure.Configuration;
@@ -216,6 +217,43 @@ public sealed class DeclarationExportServicesTests
             .WithMessage("Impossible de generer un export pour une declaration cloturee ou archivee.");
     }
 
+    [Fact]
+    public async Task GenerationService_Generate_RejectsOfficialMode()
+    {
+        await using var db = CreateDbContext();
+        var declaration = await SeedDeclarationAsync(db, DeclarationStatus.Controlled);
+        await SeedLineAsync(db, declaration.Id);
+        using var fixture = CreateGenerationFixture(db);
+
+        var act = () => fixture.Service.GenerateAsync(
+            declaration.Id,
+            new GenerateDeclarationFilesRequest { OfficialModeRequested = true });
+
+        await act.Should().ThrowAsync<ApplicationConflictException>()
+            .WithMessage(FiscalReferenceSeedService.OfficialMappingIncompleteMessage);
+    }
+
+    [Fact]
+    public async Task GenerationService_Generate_CreatesFoundationFiles()
+    {
+        await using var db = CreateDbContext();
+        var declaration = await SeedDeclarationAsync(db, DeclarationStatus.Controlled);
+        await SeedLineAsync(db, declaration.Id);
+        using var fixture = CreateGenerationFixture(db);
+
+        var result = await fixture.Service.GenerateAsync(
+            declaration.Id,
+            new GenerateDeclarationFilesRequest());
+
+        result.IsOfficialMode.Should().BeFalse();
+        result.Message.Should().Be(FiscalReferenceSeedService.OfficialMappingIncompleteMessage);
+        result.Files.Should().HaveCount(2);
+        result.Files.Should().OnlyContain(x => !string.IsNullOrWhiteSpace(x.Sha256Hash));
+        db.GeneratedFiles.Should().Contain(x => x.FileType == GeneratedFileType.FoundationDecemp);
+        db.GeneratedFiles.Should().Contain(x => x.FileType == GeneratedFileType.FoundationAnnex);
+        result.Files.Should().OnlyContain(x => File.Exists(Path.Combine(fixture.RootPath, x.RelativePath.Replace('/', Path.DirectorySeparatorChar))));
+    }
+
     private static ApplicationDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -340,6 +378,25 @@ public sealed class DeclarationExportServicesTests
         return new ExportFixture(service, rootPath);
     }
 
+    private static GenerationFixture CreateGenerationFixture(ApplicationDbContext db)
+    {
+        var rootPath = Path.Combine(Path.GetTempPath(), "DeclarationEmployerTests", "Generation", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(rootPath);
+
+        var environment = new TestHostEnvironment();
+        var storage = new DeclarationExportStorageService(
+            Options.Create(new StorageOptions { RootPath = rootPath }),
+            environment);
+        var service = new GenerationService(
+            db,
+            new FakeCurrentUserService(),
+            environment,
+            storage,
+            new FileHashService());
+
+        return new GenerationFixture(service, rootPath);
+    }
+
     private static TempDirectoryFixture CreateTempDirectory()
     {
         var rootPath = Path.Combine(Path.GetTempPath(), "DeclarationEmployerTests", "Hash", Guid.NewGuid().ToString("N"));
@@ -348,6 +405,17 @@ public sealed class DeclarationExportServicesTests
     }
 
     private sealed record ExportFixture(DeclarationExportService Service, string RootPath) : IDisposable
+    {
+        public void Dispose()
+        {
+            if (Directory.Exists(RootPath))
+            {
+                Directory.Delete(RootPath, recursive: true);
+            }
+        }
+    }
+
+    private sealed record GenerationFixture(GenerationService Service, string RootPath) : IDisposable
     {
         public void Dispose()
         {

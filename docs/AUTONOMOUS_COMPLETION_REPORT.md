@@ -66,3 +66,15 @@ Message fiscal obligatoire :
 - API smoke test : `/api/health` OK
 - Notes : le service reutilise le controle existant et materialise les anomalies en resultats de validation persistants.
 - Blocages : ecran WPF dedie et workflow avance de resolution restent a finaliser.
+
+## Session 2026-06-26 - Generation fichiers foundation
+
+- Phase : generation DECEMP/ANXEMP foundation non officielle
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : Domain GeneratedFileType, Contracts Generation, Application service interface, Infrastructure service, API controller, tests, documentation
+- Migration : aucune, enum stocke en string dans `GeneratedFile`
+- Tests : `dotnet test DeclarationEmployerTunisie.sln` OK, 70/70
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Notes : le mode officiel est refuse et les fichiers generes sont des `.txt` foundation non officiels avec SHA256.
+- Blocages : format officiel EMPCCA 2025 toujours non confirme.
