@@ -102,3 +102,15 @@ Message fiscal obligatoire :
 - Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
 - Notes : creation d'un recu d'archive avec SHA256 et verrouillage de la declaration.
 - Blocages : copie complete de tous les fichiers et archive immutable avancee restent a finaliser.
+
+## Session 2026-06-26 - Sauvegarde PostgreSQL foundation
+
+- Phase : sauvegarde PostgreSQL foundation
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : Domain Backup, Contracts Backup, Application Backup, Infrastructure service/EF/options, API controller, tests, documentation
+- Migration : `AddBackupManagement`
+- Tests : `dotnet test DeclarationEmployerTunisie.sln` OK, 74/74
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Notes : creation via `pg_dump` uniquement si `Backup:PgDumpPath` existe; verification par SHA256.
+- Blocages : restauration destructive non implementee volontairement.

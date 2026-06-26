@@ -1,4 +1,5 @@
 using DeclarationEmployer.Application.Auth;
+using DeclarationEmployer.Application.Backup;
 using DeclarationEmployer.Application.Cabinet;
 using DeclarationEmployer.Application.Auth.Validation;
 using DeclarationEmployer.Application.Cabinet.Validation;
@@ -41,6 +42,7 @@ public static class DependencyInjection
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.Configure<DefaultAdminOptions>(configuration.GetSection("DefaultAdmin"));
         services.Configure<StorageOptions>(configuration.GetSection("Storage"));
+        services.Configure<BackupOptions>(configuration.GetSection("Backup"));
 
         services.AddValidatorsFromAssemblyContaining<CreateClientCompanyRequestValidator>();
         services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
@@ -89,6 +91,7 @@ public static class DependencyInjection
         services.AddScoped<IValidationService, ValidationService>();
         services.AddScoped<IPdfReportService, PdfReportService>();
         services.AddScoped<IFiscalReferenceService, FiscalReferenceService>();
+        services.AddScoped<IBackupService, BackupService>();
 
         return services;
     }

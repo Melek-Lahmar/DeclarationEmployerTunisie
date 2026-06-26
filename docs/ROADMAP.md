@@ -32,6 +32,7 @@
 - generation fichiers foundation non officielle
 - rapports PDF foundation
 - archivage foundation
+- sauvegarde PostgreSQL foundation
 
 ## Partiellement termine
 
@@ -42,6 +43,7 @@
 - generation : API foundation presente, format officiel EMPCCA restant
 - PDF : rapports foundation presents, mise en page commerciale avancee restante
 - archivage : recu foundation present, archive complete immutable et copie fichiers restantes
+- backup : creation/verif foundation presentes, restauration guidee restante
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes

@@ -112,6 +112,10 @@ Separation actuelle :
   recu archive,
   hash SHA256,
   verrouillage declaration
+- sauvegarde PostgreSQL foundation :
+  pg_dump configure,
+  historique sauvegardes,
+  verification hash
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -329,3 +333,14 @@ Le module archivage expose :
 - `POST /api/declarations/{id}/archive`
 
 Il cree un recu d'archive foundation, calcule un hash SHA256, enregistre un `ArchivedDocument` et verrouille la declaration au statut `Archived`.
+
+## Sauvegarde PostgreSQL foundation
+
+Le module sauvegarde expose :
+
+- `POST /api/backups/create`
+- `GET /api/backups`
+- `GET /api/backups/{id}`
+- `POST /api/backups/{id}/verify`
+
+La creation exige un chemin `Backup:PgDumpPath` valide. La restauration destructive n'est pas automatisee.

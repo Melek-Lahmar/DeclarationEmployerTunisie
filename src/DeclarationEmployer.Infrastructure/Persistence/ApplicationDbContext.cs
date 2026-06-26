@@ -1,5 +1,6 @@
 ﻿using DeclarationEmployer.Domain.Audit;
 using DeclarationEmployer.Domain.Auth;
+using DeclarationEmployer.Domain.Backup;
 using DeclarationEmployer.Domain.Cabinet;
 using DeclarationEmployer.Domain.Declarations;
 using DeclarationEmployer.Domain.Fiscal;
@@ -49,6 +50,10 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<FiscalRateDefinition> FiscalRateDefinitions => Set<FiscalRateDefinition>();
 
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+
+    public DbSet<BackupRecord> BackupRecords => Set<BackupRecord>();
+
+    public DbSet<BackupEvent> BackupEvents => Set<BackupEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -713,6 +718,47 @@ public sealed class ApplicationDbContext : DbContext
             entity.HasIndex(x => x.OccurredAt);
             entity.HasIndex(x => x.EntityName);
             entity.HasIndex(x => x.Action);
+        });
+
+        modelBuilder.Entity<BackupRecord>(entity =>
+        {
+            entity.ToTable("backup_records", "backup");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.FileName).HasColumnName("file_name").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.StoredPath).HasColumnName("stored_path").HasMaxLength(1000).IsRequired();
+            entity.Property(x => x.Sha256Hash).HasColumnName("sha256_hash").HasMaxLength(128);
+            entity.Property(x => x.SizeBytes).HasColumnName("size_bytes").IsRequired();
+            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
+            entity.Property(x => x.CreatedBy).HasColumnName("created_by").HasMaxLength(100);
+            entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(1000);
+
+            entity.HasIndex(x => x.CreatedAt);
+            entity.HasIndex(x => x.Status);
+        });
+
+        modelBuilder.Entity<BackupEvent>(entity =>
+        {
+            entity.ToTable("backup_events", "backup");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.BackupRecordId).HasColumnName("backup_record_id").IsRequired();
+            entity.Property(x => x.Action).HasColumnName("action").HasMaxLength(100).IsRequired();
+            entity.Property(x => x.Description).HasColumnName("description").HasMaxLength(1000);
+            entity.Property(x => x.OccurredAt).HasColumnName("occurred_at").IsRequired();
+
+            entity.HasOne(x => x.BackupRecord)
+                .WithMany(x => x.Events)
+                .HasForeignKey(x => x.BackupRecordId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.BackupRecordId);
+            entity.HasIndex(x => x.OccurredAt);
         });
     }
 }

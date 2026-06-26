@@ -71,6 +71,11 @@
   hash SHA256,
   ArchivedDocument,
   verrouillage declaration
+- sauvegarde PostgreSQL foundation :
+  BackupRecord,
+  BackupEvent,
+  pg_dump configure,
+  verification hash
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -80,6 +85,7 @@
 - `AddDeclarationBusinessModel`
 - `AddFiscalReferenceFoundation`
 - `AddValidationAndAnomaliesFoundation`
+- `AddBackupManagement`
 
 ## Moteur de controle
 
@@ -157,6 +163,10 @@ Le projet `DeclarationEmployer.Reports` fournit `PdfReportBuilder` via QuestPDF.
 
 `ArchiveService` cree un recu texte foundation, calcule son SHA256, enregistre `ArchivedDocument` et passe la declaration en `Archived` verrouillee.
 
+## Sauvegarde PostgreSQL foundation
+
+`BackupService` cree une sauvegarde via `pg_dump` lorsque `Backup:PgDumpPath` est configure, stocke `BackupRecord` / `BackupEvent` et verifie les fichiers par SHA256. Aucune restauration destructive n'est exposee.
+
 ## Endpoints ajoutes ou confirms
 
 - `GET /api/clients`
@@ -227,6 +237,10 @@ Le projet `DeclarationEmployer.Reports` fournit `PdfReportBuilder` via QuestPDF.
 - `GET /api/declarations/{id}/reports/errors`
 - `GET /api/declarations/{id}/reports/generation`
 - `POST /api/declarations/{id}/archive`
+- `POST /api/backups/create`
+- `GET /api/backups`
+- `GET /api/backups/{id}`
+- `POST /api/backups/{id}/verify`
 
 ## Tests ajoutes
 
@@ -251,6 +265,7 @@ Le projet `DeclarationEmployer.Reports` fournit `PdfReportBuilder` via QuestPDF.
 - tests GenerationService
 - tests PdfReportService
 - tests ArchiveService
+- tests BackupService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon
