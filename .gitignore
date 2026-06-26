@@ -264,6 +264,12 @@ Generated_Code/
 # because we have git ;-)
 _UpgradeReport_Files/
 Backup*/
+!src/DeclarationEmployer.Application/Backup/
+!src/DeclarationEmployer.Application/Backup/**
+!src/DeclarationEmployer.Contracts/Backup/
+!src/DeclarationEmployer.Contracts/Backup/**
+!src/DeclarationEmployer.Domain/Backup/
+!src/DeclarationEmployer.Domain/Backup/**
 UpgradeLog*.XML
 UpgradeLog*.htm
 ServiceFabricBackup/
