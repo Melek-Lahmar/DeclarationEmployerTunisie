@@ -37,6 +37,11 @@
   hash SHA256,
   trace GeneratedFile,
   integration Desktop
+- referentiel fiscal EMPCCA 2025 foundation :
+  entites fiscales,
+  seed A1 a A7,
+  endpoints `/api/fiscal/*`,
+  readiness officiel/non officiel
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -44,6 +49,7 @@
 - `AddDeclarationsModule`
 - `AddAuthenticationAndUserRoles`
 - `AddDeclarationBusinessModel`
+- `AddFiscalReferenceFoundation`
 
 ## Moteur de controle
 
@@ -66,6 +72,21 @@ L'export MVP repose sur :
 - l'entite existante `GeneratedFile`
 
 Le fichier genere est un CSV interne structure. Il ne represente pas un format officiel tunisien.
+
+## Referentiel fiscal foundation
+
+Le referentiel fiscal 2025 repose sur :
+
+- `FiscalRuleSet`
+- `AnnexDefinition`
+- `FiscalFieldDefinition`
+- `FiscalRateDefinition`
+- `FiscalReferenceSeedService`
+- `FiscalReferenceService`
+
+Le seed cree `EMPCCA-2025-FOUNDATION` avec les annexes A1 a A7 et des champs foundation non confirmes. Le mode officiel reste bloque avec le message :
+
+> Génération officielle non activée : mapping EMPCCA 2025 incomplet ou non confirmé.
 
 ## Endpoints ajoutes ou confirms
 
@@ -110,6 +131,13 @@ Le fichier genere est un CSV interne structure. Il ne represente pas un format o
 - `POST /api/declarations/{declarationId}/control`
 - `GET /api/declarations/{declarationId}/export/preview`
 - `POST /api/declarations/{declarationId}/export/generate`
+- `GET /api/fiscal/rule-sets`
+- `GET /api/fiscal/rule-sets/{id}`
+- `GET /api/fiscal/annexes`
+- `GET /api/fiscal/annexes/{annexCode}`
+- `GET /api/fiscal/annexes/{annexCode}/fields`
+- `GET /api/fiscal/rates`
+- `GET /api/fiscal/readiness`
 
 ## Tests ajoutes
 
@@ -127,6 +155,7 @@ Le fichier genere est un CSV interne structure. Il ne represente pas un format o
 - tests FileHashService
 - tests InternalDeclarationCsvGenerator
 - tests DeclarationExportService
+- tests FiscalReferenceService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon
@@ -137,6 +166,7 @@ Le fichier genere est un CSV interne structure. Il ne represente pas un format o
 - gestion des roles encore MVP
 - changement de mot de passe reserve aux endpoints admin dans cette phase
 - moteur fiscal generique uniquement, sans conformite officielle
+- referentiel EMPCCA 2025 foundation, sans mapping officiel confirme
 - export interne CSV uniquement, sans conformite officielle
 - generation officielle absente
 - PDF absent

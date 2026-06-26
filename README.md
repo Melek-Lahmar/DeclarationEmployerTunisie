@@ -80,6 +80,11 @@ Separation actuelle :
   generation CSV interne,
   stockage avec hash SHA256,
   trace `GeneratedFile`
+- referentiel fiscal EMPCCA 2025 foundation :
+  rule set 2025,
+  annexes A1 a A7,
+  champs foundation,
+  readiness officiel/non officiel
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -127,6 +132,7 @@ Le projet prepare une architecture prete pour integrer les formats officiels plu
 - gestion des roles simple, surtout orientee Admin pour les endpoints utilisateurs
 - token uniquement en memoire cote Desktop
 - moteur fiscal volontairement generique, sans conformite officielle
+- mapping officiel EMPCCA 2025 non confirme
 - generation officielle de fichier non implementee
 - generation PDF non implementee
 - archivage reel et backup non finalises
@@ -211,3 +217,20 @@ Important :
 - cet export est un export interne structure MVP
 - ce n'est pas un format officiel tunisien
 - il ne doit pas etre presente comme fichier DGI, TEJ, DECEMP ou ANXEMP officiel
+
+## Referentiel fiscal foundation
+
+Le module fiscal expose maintenant :
+
+- `GET /api/fiscal/rule-sets`
+- `GET /api/fiscal/annexes?year=2025`
+- `GET /api/fiscal/annexes/{annexCode}?year=2025`
+- `GET /api/fiscal/annexes/{annexCode}/fields?year=2025`
+- `GET /api/fiscal/rates?year=2025`
+- `GET /api/fiscal/readiness?year=2025`
+
+Le seed 2025 cree un referentiel `EMPCCA-2025-FOUNDATION` avec les annexes A1 a A7, mais tous les mappings sont marques non confirmes.
+
+Message obligatoire tant que le cahier des charges officiel n'est pas integre :
+
+> Génération officielle non activée : mapping EMPCCA 2025 incomplet ou non confirmé.

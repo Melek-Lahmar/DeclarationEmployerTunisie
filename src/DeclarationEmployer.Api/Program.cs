@@ -98,6 +98,9 @@ using (var scope = app.Services.CreateScope())
 {
     var seedService = scope.ServiceProvider.GetRequiredService<DevelopmentAdminSeedService>();
     await seedService.EnsureSeededAsync();
+
+    var fiscalSeedService = scope.ServiceProvider.GetRequiredService<FiscalReferenceSeedService>();
+    await fiscalSeedService.EnsureSeededAsync();
 }
 
 app.MapGet("/api/health", async (ApplicationDbContext db) =>
@@ -133,7 +136,9 @@ app.MapGet("/api/info", () =>
         version = "0.1.0",
         type = "Local Desktop + Local API",
         database = "PostgreSQL",
-        fiscalYear = 2025
+        fiscalYear = 2025,
+        officialGenerationEnabled = false,
+        fiscalMappingMessage = "Génération officielle non activée : mapping EMPCCA 2025 incomplet ou non confirmé."
     });
 });
 

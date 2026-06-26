@@ -25,6 +25,7 @@
 - import Excel MVP
 - FiscalEngine MVP
 - export interne structure MVP
+- referentiel fiscal EMPCCA 2025 foundation non officiel
 
 ## Partiellement termine
 
@@ -45,6 +46,7 @@
 - export CSV interne uniquement, non officiel
 - pas de generation PDF
 - pas de generation officielle DECEMP / ANXEMP
+- cahier des charges EMPCCA 2025 officiel a confirmer avant tout mode officiel
 - pas d'archivage complet
 - pas de backup applicatif finalise
 

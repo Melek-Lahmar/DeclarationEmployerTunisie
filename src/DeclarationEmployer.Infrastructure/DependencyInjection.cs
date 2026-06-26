@@ -4,6 +4,7 @@ using DeclarationEmployer.Application.Auth.Validation;
 using DeclarationEmployer.Application.Cabinet.Validation;
 using DeclarationEmployer.Application.Dashboard;
 using DeclarationEmployer.Application.Declarations;
+using DeclarationEmployer.Application.Fiscal;
 using DeclarationEmployer.FiscalEngine;
 using DeclarationEmployer.FiscalEngine.Rules;
 using DeclarationEmployer.Import;
@@ -67,6 +68,7 @@ public static class DependencyInjection
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
         services.AddSingleton<ITemporaryFileStorageService, TemporaryFileStorageService>();
         services.AddScoped<DevelopmentAdminSeedService>();
+        services.AddScoped<FiscalReferenceSeedService>();
         services.AddScoped<IClientsService, ClientsService>();
         services.AddScoped<IFiscalYearsService, FiscalYearsService>();
         services.AddScoped<IDashboardService, DashboardService>();
@@ -80,6 +82,7 @@ public static class DependencyInjection
         services.AddScoped<IDeclarationImportService, DeclarationImportService>();
         services.AddScoped<IDeclarationControlService, DeclarationControlService>();
         services.AddScoped<IDeclarationExportService, DeclarationExportService>();
+        services.AddScoped<IFiscalReferenceService, FiscalReferenceService>();
 
         return services;
     }

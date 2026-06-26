@@ -2,6 +2,7 @@
 using DeclarationEmployer.Domain.Auth;
 using DeclarationEmployer.Domain.Cabinet;
 using DeclarationEmployer.Domain.Declarations;
+using DeclarationEmployer.Domain.Fiscal;
 using Microsoft.EntityFrameworkCore;
 
 namespace DeclarationEmployer.Infrastructure.Persistence;
@@ -34,6 +35,14 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<GeneratedFile> GeneratedFiles => Set<GeneratedFile>();
 
     public DbSet<ArchivedDocument> ArchivedDocuments => Set<ArchivedDocument>();
+
+    public DbSet<FiscalRuleSet> FiscalRuleSets => Set<FiscalRuleSet>();
+
+    public DbSet<AnnexDefinition> AnnexDefinitions => Set<AnnexDefinition>();
+
+    public DbSet<FiscalFieldDefinition> FiscalFieldDefinitions => Set<FiscalFieldDefinition>();
+
+    public DbSet<FiscalRateDefinition> FiscalRateDefinitions => Set<FiscalRateDefinition>();
 
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
@@ -492,6 +501,107 @@ public sealed class ApplicationDbContext : DbContext
             entity.HasIndex(x => x.DeclarationId);
             entity.HasIndex(x => new { x.ClientCompanyId, x.FiscalYearId });
             entity.HasIndex(x => x.DocumentType);
+        });
+
+        modelBuilder.Entity<FiscalRuleSet>(entity =>
+        {
+            entity.ToTable("rule_sets", "fiscal");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.Year).HasColumnName("year").IsRequired();
+            entity.Property(x => x.Code).HasColumnName("code").HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Name).HasColumnName("name").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.SourceName).HasColumnName("source_name").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.SourceReference).HasColumnName("source_reference").HasMaxLength(500);
+            entity.Property(x => x.IsActive).HasColumnName("is_active").IsRequired();
+            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
+
+            entity.HasIndex(x => new { x.Year, x.Code }).IsUnique();
+            entity.HasIndex(x => x.IsActive);
+        });
+
+        modelBuilder.Entity<AnnexDefinition>(entity =>
+        {
+            entity.ToTable("annex_definitions", "fiscal");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.RuleSetId).HasColumnName("rule_set_id").IsRequired();
+            entity.Property(x => x.Code).HasColumnName("code").HasMaxLength(20).IsRequired();
+            entity.Property(x => x.Name).HasColumnName("name").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.Description).HasColumnName("description").HasMaxLength(1000);
+            entity.Property(x => x.SortOrder).HasColumnName("sort_order").IsRequired();
+            entity.Property(x => x.IsActive).HasColumnName("is_active").IsRequired();
+            entity.Property(x => x.IsOfficialMappingConfirmed).HasColumnName("is_official_mapping_confirmed").IsRequired();
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(1000);
+
+            entity.HasOne(x => x.RuleSet)
+                .WithMany(x => x.Annexes)
+                .HasForeignKey(x => x.RuleSetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => new { x.RuleSetId, x.Code }).IsUnique();
+            entity.HasIndex(x => x.IsActive);
+            entity.HasIndex(x => x.IsOfficialMappingConfirmed);
+        });
+
+        modelBuilder.Entity<FiscalFieldDefinition>(entity =>
+        {
+            entity.ToTable("field_definitions", "fiscal");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.AnnexDefinitionId).HasColumnName("annex_definition_id").IsRequired();
+            entity.Property(x => x.Code).HasColumnName("code").HasMaxLength(100).IsRequired();
+            entity.Property(x => x.Label).HasColumnName("label").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.DataType).HasColumnName("data_type").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.IsRequired).HasColumnName("is_required").IsRequired();
+            entity.Property(x => x.Length).HasColumnName("length");
+            entity.Property(x => x.PositionStart).HasColumnName("position_start");
+            entity.Property(x => x.PositionEnd).HasColumnName("position_end");
+            entity.Property(x => x.PaddingType).HasColumnName("padding_type").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.DefaultValue).HasColumnName("default_value").HasMaxLength(250);
+            entity.Property(x => x.SourceReference).HasColumnName("source_reference").HasMaxLength(500);
+            entity.Property(x => x.IsConfirmed).HasColumnName("is_confirmed").IsRequired();
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(1000);
+
+            entity.HasOne(x => x.AnnexDefinition)
+                .WithMany(x => x.Fields)
+                .HasForeignKey(x => x.AnnexDefinitionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => new { x.AnnexDefinitionId, x.Code }).IsUnique();
+            entity.HasIndex(x => x.IsConfirmed);
+        });
+
+        modelBuilder.Entity<FiscalRateDefinition>(entity =>
+        {
+            entity.ToTable("rate_definitions", "fiscal");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.RuleSetId).HasColumnName("rule_set_id").IsRequired();
+            entity.Property(x => x.Code).HasColumnName("code").HasMaxLength(100).IsRequired();
+            entity.Property(x => x.Label).HasColumnName("label").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.Rate).HasColumnName("rate").HasPrecision(9, 4).IsRequired();
+            entity.Property(x => x.EffectiveFrom).HasColumnName("effective_from").IsRequired();
+            entity.Property(x => x.EffectiveTo).HasColumnName("effective_to");
+            entity.Property(x => x.SourceReference).HasColumnName("source_reference").HasMaxLength(500);
+            entity.Property(x => x.IsConfirmed).HasColumnName("is_confirmed").IsRequired();
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(1000);
+
+            entity.HasOne(x => x.RuleSet)
+                .WithMany(x => x.Rates)
+                .HasForeignKey(x => x.RuleSetId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => new { x.RuleSetId, x.Code }).IsUnique();
+            entity.HasIndex(x => x.IsConfirmed);
         });
 
         modelBuilder.Entity<AuditLog>(entity =>
