@@ -81,6 +81,7 @@ public static class DependencyInjection
         services.AddScoped<IDeclarationAnomaliesService, DeclarationAnomaliesService>();
         services.AddScoped<IGeneratedFilesService, GeneratedFilesService>();
         services.AddScoped<IArchivedDocumentsService, ArchivedDocumentsService>();
+        services.AddScoped<IArchiveService, ArchiveService>();
         services.AddScoped<IDeclarationImportService, DeclarationImportService>();
         services.AddScoped<IDeclarationControlService, DeclarationControlService>();
         services.AddScoped<IDeclarationExportService, DeclarationExportService>();

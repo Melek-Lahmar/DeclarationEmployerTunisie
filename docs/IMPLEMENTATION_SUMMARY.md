@@ -66,6 +66,11 @@
   QuestPDF,
   service rapports,
   endpoints PDF
+- archivage foundation :
+  recu archive,
+  hash SHA256,
+  ArchivedDocument,
+  verrouillage declaration
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -148,6 +153,10 @@ Le module `GenerationService` ajoute une generation technique foundation non off
 
 Le projet `DeclarationEmployer.Reports` fournit `PdfReportBuilder` via QuestPDF. `PdfReportService` expose des rapports internes pour resume, Annexe I, anomalies et generation.
 
+## Archivage foundation
+
+`ArchiveService` cree un recu texte foundation, calcule son SHA256, enregistre `ArchivedDocument` et passe la declaration en `Archived` verrouillee.
+
 ## Endpoints ajoutes ou confirms
 
 - `GET /api/clients`
@@ -217,6 +226,7 @@ Le projet `DeclarationEmployer.Reports` fournit `PdfReportBuilder` via QuestPDF.
 - `GET /api/declarations/{id}/reports/annex-a1`
 - `GET /api/declarations/{id}/reports/errors`
 - `GET /api/declarations/{id}/reports/generation`
+- `POST /api/declarations/{id}/archive`
 
 ## Tests ajoutes
 
@@ -240,6 +250,7 @@ Le projet `DeclarationEmployer.Reports` fournit `PdfReportBuilder` via QuestPDF.
 - tests ValidationService
 - tests GenerationService
 - tests PdfReportService
+- tests ArchiveService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon

@@ -31,6 +31,7 @@
 - validation centralisee foundation
 - generation fichiers foundation non officielle
 - rapports PDF foundation
+- archivage foundation
 
 ## Partiellement termine
 
@@ -40,6 +41,7 @@
 - validation : API foundation presente, ecran WPF dedie et workflow avance restants
 - generation : API foundation presente, format officiel EMPCCA restant
 - PDF : rapports foundation presents, mise en page commerciale avancee restante
+- archivage : recu foundation present, archive complete immutable et copie fichiers restantes
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes

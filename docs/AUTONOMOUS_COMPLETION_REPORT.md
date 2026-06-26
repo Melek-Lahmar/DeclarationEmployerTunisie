@@ -90,3 +90,15 @@ Message fiscal obligatoire :
 - Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
 - Notes : rapports internes pour resume, Annexe I, anomalies et generation.
 - Blocages : mise en page commerciale avancee et stockage PDF archive restent a finaliser.
+
+## Session 2026-06-26 - Archivage foundation
+
+- Phase : archivage foundation
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : Contracts Archive, Application service interface, Infrastructure service, API controller, tests, documentation
+- Migration : aucune, reutilisation de `ArchivedDocument`
+- Tests : `dotnet test DeclarationEmployerTunisie.sln` OK, 72/72
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Notes : creation d'un recu d'archive avec SHA256 et verrouillage de la declaration.
+- Blocages : copie complete de tous les fichiers et archive immutable avancee restent a finaliser.

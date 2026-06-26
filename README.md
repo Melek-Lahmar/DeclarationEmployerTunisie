@@ -108,6 +108,10 @@ Separation actuelle :
   Annexe I,
   anomalies,
   generation
+- archivage foundation :
+  recu archive,
+  hash SHA256,
+  verrouillage declaration
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -317,3 +321,11 @@ Le module PDF expose :
 - `GET /api/declarations/{id}/reports/generation`
 
 Ces rapports sont des documents internes foundation et non des documents fiscaux officiels.
+
+## Archivage foundation
+
+Le module archivage expose :
+
+- `POST /api/declarations/{id}/archive`
+
+Il cree un recu d'archive foundation, calcule un hash SHA256, enregistre un `ArchivedDocument` et verrouille la declaration au statut `Archived`.
