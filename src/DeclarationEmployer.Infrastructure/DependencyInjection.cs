@@ -49,6 +49,12 @@ public static class DependencyInjection
         services.AddScoped<IFiscalYearsService, FiscalYearsService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IDeclarationsService, DeclarationsService>();
+        services.AddScoped<IDeclarationAnnexesService, DeclarationAnnexesService>();
+        services.AddScoped<IDeclarationBeneficiariesService, DeclarationBeneficiariesService>();
+        services.AddScoped<IDeclarationLinesService, DeclarationLinesService>();
+        services.AddScoped<IDeclarationAnomaliesService, DeclarationAnomaliesService>();
+        services.AddScoped<IGeneratedFilesService, GeneratedFilesService>();
+        services.AddScoped<IArchivedDocumentsService, ArchivedDocumentsService>();
 
         return services;
     }

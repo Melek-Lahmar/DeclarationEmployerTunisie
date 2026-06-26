@@ -32,6 +32,19 @@ Flux principal :
 
 Le projet enregistre un audit log applicatif. Les services metier utilisent maintenant `ICurrentUserService` pour recuperer l'utilisateur authentifie quand un JWT est present. En environnement Development, le fallback `system-dev` reste possible si aucune authentification n'est disponible.
 
+Les services declaration ajoutent aussi des `DeclarationEvent` pour tracer les actions metier telles que :
+
+- `ANNEX_CREATED`
+- `ANNEX_UPDATED`
+- `ANNEX_DELETED`
+- `BENEFICIARY_CREATED`
+- `BENEFICIARY_UPDATED`
+- `BENEFICIARY_DELETED`
+- `LINE_CREATED`
+- `LINE_UPDATED`
+- `LINE_DELETED`
+- `ANOMALY_RESOLVED`
+
 ## Auth
 
 Le socle Auth MVP est maintenant present :
@@ -75,6 +88,30 @@ Le projet `DeclarationEmployer.Reports` doit produire des rapports de controle e
 ## Archivage
 
 L'archivage cible un stockage structure par client, exercice et declaration, avec hash et traces d'audit.
+
+## Modele declaration
+
+Le domaine declaration comporte maintenant :
+
+- `EmployerDeclaration` comme aggregate principal
+- `DeclarationAnnex` pour representer les annexes de travail
+- `DeclarationBeneficiary` pour representer les beneficiaires ou societes lies a la declaration
+- `DeclarationLine` pour porter les lignes de declaration et montants
+- `DeclarationAnomaly` pour les alertes et blocages
+- `GeneratedFile` pour les traces de fichiers techniques produits
+- `ArchivedDocument` pour les documents classes par client, exercice et declaration
+
+Relations principales :
+
+- une declaration possede plusieurs annexes, beneficiaires, lignes, anomalies et fichiers generes
+- une ligne peut referencer une annexe et un beneficiaire
+- un document archive pointe vers une declaration, un client et un exercice fiscal
+
+Extensibilite prevue :
+
+- enrichissement du controle fiscal dans `DeclarationEmployer.FiscalEngine`
+- import Excel transactionnel dans `DeclarationEmployer.Import`
+- generation d'exports puis de PDF dans les phases suivantes
 
 ## Backup
 

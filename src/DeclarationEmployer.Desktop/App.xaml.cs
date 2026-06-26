@@ -44,6 +44,36 @@ public partial class App : Application
                     client.BaseAddress = new Uri("http://localhost:5050/");
                 }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
 
+                services.AddHttpClient<DeclarationAnnexesApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
+                services.AddHttpClient<DeclarationBeneficiariesApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
+                services.AddHttpClient<DeclarationLinesApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
+                services.AddHttpClient<DeclarationAnomaliesApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
+                services.AddHttpClient<GeneratedFilesApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
+                services.AddHttpClient<ArchivedDocumentsApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
                 services.AddTransient<LoginViewModel>();
                 services.AddTransient<DashboardViewModel>();
                 services.AddTransient<ClientsViewModel>();

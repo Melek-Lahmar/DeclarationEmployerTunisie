@@ -23,6 +23,18 @@ public sealed class ApplicationDbContext : DbContext
 
     public DbSet<DeclarationEvent> DeclarationEvents => Set<DeclarationEvent>();
 
+    public DbSet<DeclarationAnnex> DeclarationAnnexes => Set<DeclarationAnnex>();
+
+    public DbSet<DeclarationBeneficiary> DeclarationBeneficiaries => Set<DeclarationBeneficiary>();
+
+    public DbSet<DeclarationLine> DeclarationLines => Set<DeclarationLine>();
+
+    public DbSet<DeclarationAnomaly> DeclarationAnomalies => Set<DeclarationAnomaly>();
+
+    public DbSet<GeneratedFile> GeneratedFiles => Set<GeneratedFile>();
+
+    public DbSet<ArchivedDocument> ArchivedDocuments => Set<ArchivedDocument>();
+
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -298,6 +310,188 @@ public sealed class ApplicationDbContext : DbContext
 
             entity.HasIndex(x => x.DeclarationId);
             entity.HasIndex(x => x.OccurredAt);
+        });
+
+        modelBuilder.Entity<DeclarationAnnex>(entity =>
+        {
+            entity.ToTable("declaration_annexes", "declaration");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
+            entity.Property(x => x.AnnexCode).HasColumnName("annex_code").HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Title).HasColumnName("title").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
+            entity.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany(x => x.Annexes)
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => new { x.DeclarationId, x.AnnexCode });
+        });
+
+        modelBuilder.Entity<DeclarationBeneficiary>(entity =>
+        {
+            entity.ToTable("declaration_beneficiaries", "declaration");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
+            entity.Property(x => x.IdentifierType).HasColumnName("identifier_type").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Identifier).HasColumnName("identifier").HasMaxLength(100).IsRequired();
+            entity.Property(x => x.FullNameOrCompanyName).HasColumnName("full_name_or_company_name").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.Address).HasColumnName("address").HasMaxLength(500);
+            entity.Property(x => x.Country).HasColumnName("country").HasMaxLength(100);
+            entity.Property(x => x.IsResident).HasColumnName("is_resident").IsRequired();
+            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
+            entity.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany(x => x.Beneficiaries)
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => new { x.DeclarationId, x.Identifier });
+        });
+
+        modelBuilder.Entity<DeclarationLine>(entity =>
+        {
+            entity.ToTable("declaration_lines", "declaration");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
+            entity.Property(x => x.AnnexId).HasColumnName("annex_id");
+            entity.Property(x => x.BeneficiaryId).HasColumnName("beneficiary_id");
+            entity.Property(x => x.OperationType).HasColumnName("operation_type").HasMaxLength(100).IsRequired();
+            entity.Property(x => x.FiscalCategory).HasColumnName("fiscal_category").HasMaxLength(100);
+            entity.Property(x => x.GrossAmount).HasColumnName("gross_amount").HasPrecision(18, 3).IsRequired();
+            entity.Property(x => x.TaxableAmount).HasColumnName("taxable_amount").HasPrecision(18, 3).IsRequired();
+            entity.Property(x => x.Rate).HasColumnName("rate").HasPrecision(9, 4).IsRequired();
+            entity.Property(x => x.WithheldAmount).HasColumnName("withheld_amount").HasPrecision(18, 3).IsRequired();
+            entity.Property(x => x.PaymentDate).HasColumnName("payment_date");
+            entity.Property(x => x.DocumentReference).HasColumnName("document_reference").HasMaxLength(100);
+            entity.Property(x => x.Notes).HasColumnName("notes").HasMaxLength(1000);
+            entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
+            entity.Property(x => x.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany(x => x.Lines)
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.Annex)
+                .WithMany()
+                .HasForeignKey(x => x.AnnexId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.Beneficiary)
+                .WithMany()
+                .HasForeignKey(x => x.BeneficiaryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => x.BeneficiaryId);
+            entity.HasIndex(x => x.AnnexId);
+            entity.HasIndex(x => x.Status);
+        });
+
+        modelBuilder.Entity<DeclarationAnomaly>(entity =>
+        {
+            entity.ToTable("declaration_anomalies", "declaration");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
+            entity.Property(x => x.Severity).HasColumnName("severity").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Code).HasColumnName("code").HasMaxLength(100).IsRequired();
+            entity.Property(x => x.Message).HasColumnName("message").HasMaxLength(1000).IsRequired();
+            entity.Property(x => x.EntityName).HasColumnName("entity_name").HasMaxLength(150);
+            entity.Property(x => x.EntityId).HasColumnName("entity_id").HasMaxLength(100);
+            entity.Property(x => x.IsResolved).HasColumnName("is_resolved").IsRequired();
+            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
+            entity.Property(x => x.ResolvedAt).HasColumnName("resolved_at");
+            entity.Property(x => x.ResolvedBy).HasColumnName("resolved_by").HasMaxLength(100);
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany(x => x.Anomalies)
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => x.Severity);
+            entity.HasIndex(x => x.IsResolved);
+        });
+
+        modelBuilder.Entity<GeneratedFile>(entity =>
+        {
+            entity.ToTable("generated_files", "declaration");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
+            entity.Property(x => x.FileType).HasColumnName("file_type").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.FileName).HasColumnName("file_name").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.RelativePath).HasColumnName("relative_path").HasMaxLength(1000).IsRequired();
+            entity.Property(x => x.Sha256Hash).HasColumnName("sha256_hash").HasMaxLength(128);
+            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
+            entity.Property(x => x.CreatedBy).HasColumnName("created_by").HasMaxLength(100);
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany(x => x.GeneratedFiles)
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => x.FileType);
+        });
+
+        modelBuilder.Entity<ArchivedDocument>(entity =>
+        {
+            entity.ToTable("archived_documents", "archive");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
+            entity.Property(x => x.ClientCompanyId).HasColumnName("client_company_id").IsRequired();
+            entity.Property(x => x.FiscalYearId).HasColumnName("fiscal_year_id").IsRequired();
+            entity.Property(x => x.DocumentType).HasColumnName("document_type").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.FileName).HasColumnName("file_name").HasMaxLength(250).IsRequired();
+            entity.Property(x => x.RelativePath).HasColumnName("relative_path").HasMaxLength(1000).IsRequired();
+            entity.Property(x => x.Sha256Hash).HasColumnName("sha256_hash").HasMaxLength(128);
+            entity.Property(x => x.ArchivedAt).HasColumnName("archived_at").IsRequired();
+            entity.Property(x => x.ArchivedBy).HasColumnName("archived_by").HasMaxLength(100);
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany(x => x.ArchivedDocuments)
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.ClientCompany)
+                .WithMany()
+                .HasForeignKey(x => x.ClientCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.FiscalYear)
+                .WithMany()
+                .HasForeignKey(x => x.FiscalYearId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => new { x.ClientCompanyId, x.FiscalYearId });
+            entity.HasIndex(x => x.DocumentType);
         });
 
         modelBuilder.Entity<AuditLog>(entity =>

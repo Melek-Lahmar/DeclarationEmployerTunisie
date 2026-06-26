@@ -60,6 +60,13 @@ Separation actuelle :
 - societes clientes
 - exercices fiscaux
 - declarations MVP
+- modele metier declaration MVP :
+  annexes,
+  beneficiaires,
+  lignes,
+  anomalies,
+  fichiers generes traces,
+  documents archives traces
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -111,6 +118,20 @@ Le projet prepare une architecture prete pour integrer les formats officiels plu
 - token uniquement en memoire cote Desktop
 - import Excel non implemente
 - moteur fiscal non implemente
+- generation officielle de fichier non implementee
 - generation PDF non implementee
-- archivage et backup non finalises
+- archivage reel et backup non finalises
 - dashboard encore partiellement MVP
+
+## Socle declaration
+
+Le modele declaration couvre maintenant les briques suivantes :
+
+- `DeclarationAnnex`
+- `DeclarationBeneficiary`
+- `DeclarationLine`
+- `DeclarationAnomaly`
+- `GeneratedFile`
+- `ArchivedDocument`
+
+Les controllers API restent minces et deleguent aux services Infrastructure/Application. Le Desktop appelle ces endpoints via `HttpClient` et affiche un detail minimal pour les beneficiaires, les lignes et les anomalies d'une declaration.

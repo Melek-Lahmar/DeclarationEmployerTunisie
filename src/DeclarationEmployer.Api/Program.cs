@@ -36,6 +36,34 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>() ?? new JwtOptions();
 
+if (string.IsNullOrWhiteSpace(jwtOptions.Issuer))
+{
+    jwtOptions.Issuer = "DeclarationEmployerTunisie";
+}
+
+if (string.IsNullOrWhiteSpace(jwtOptions.Audience))
+{
+    jwtOptions.Audience = "DeclarationEmployerTunisie.Desktop";
+}
+
+if (jwtOptions.ExpirationMinutes <= 0)
+{
+    jwtOptions.ExpirationMinutes = 60;
+}
+
+if (string.IsNullOrWhiteSpace(jwtOptions.Secret))
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        jwtOptions.Secret = "ChangeThisExampleSigningKeyOnlyForLocalDev123456789";
+    }
+    else
+    {
+        throw new InvalidOperationException(
+            "La configuration JWT est incomplete. La cle secrete est obligatoire hors Developpement.");
+    }
+}
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

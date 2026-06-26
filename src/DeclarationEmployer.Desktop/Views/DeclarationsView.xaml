@@ -166,6 +166,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="220"/>
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0"
@@ -200,6 +201,170 @@
                 </Border>
 
                 <Border Grid.Row="1"
+                        Background="White"
+                        CornerRadius="12"
+                        Padding="16"
+                        Margin="0,0,0,16"
+                        BorderBrush="#E2E8F0"
+                        BorderThickness="1">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top"
+                                    Orientation="Horizontal"
+                                    Margin="0,0,0,12">
+                            <TextBlock Text="Donnees declaration"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="#111827"
+                                       VerticalAlignment="Center"/>
+                            <Button Content="Actualiser details"
+                                    Width="140"
+                                    Height="32"
+                                    Margin="12,0,0,0"
+                                    Command="{Binding RefreshDetailsCommand}"/>
+                        </StackPanel>
+
+                        <TabControl>
+                            <TabItem Header="Beneficiaires">
+                                <Grid Margin="4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="140"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="110"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <ComboBox Grid.Row="0" Grid.Column="0" Margin="0,0,8,8"
+                                                  ItemsSource="{Binding BeneficiaryIdentifierTypes}"
+                                                  SelectedItem="{Binding BeneficiaryIdentifierType, Mode=TwoWay}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,8,8"
+                                                 Text="{Binding BeneficiaryIdentifier, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="2" Margin="0,0,8,8"
+                                                 Text="{Binding BeneficiaryName, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <CheckBox Grid.Row="0" Grid.Column="3" Margin="0,4,0,8"
+                                                  Content="Resident"
+                                                  IsChecked="{Binding BeneficiaryIsResident, Mode=TwoWay}"/>
+
+                                        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,8,0"
+                                                 Text="{Binding BeneficiaryAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Grid.Row="1" Grid.Column="2" Margin="0,0,8,0"
+                                                 Text="{Binding BeneficiaryCountry, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <Button Grid.Row="1" Grid.Column="3"
+                                                Content="Ajouter"
+                                                Height="30"
+                                                Command="{Binding AddBeneficiaryCommand}"/>
+                                    </Grid>
+
+                                    <DataGrid Grid.Row="1"
+                                              ItemsSource="{Binding SelectedBeneficiaries}"
+                                              AutoGenerateColumns="False"
+                                              IsReadOnly="True"
+                                              CanUserAddRows="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Type" Binding="{Binding IdentifierType}" Width="110"/>
+                                            <DataGridTextColumn Header="Identifiant" Binding="{Binding Identifier}" Width="120"/>
+                                            <DataGridTextColumn Header="Nom" Binding="{Binding FullNameOrCompanyName}" Width="*"/>
+                                            <DataGridTextColumn Header="Pays" Binding="{Binding Country}" Width="110"/>
+                                            <DataGridCheckBoxColumn Header="Resident" Binding="{Binding IsResident}" Width="80"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Lignes">
+                                <Grid Margin="4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="140"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="90"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBox Grid.Row="0" Grid.Column="0" Margin="0,0,8,8"
+                                                 Text="{Binding LineOperationType, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="1" Margin="0,0,8,8"
+                                                  ItemsSource="{Binding SelectedBeneficiaries}"
+                                                  SelectedItem="{Binding SelectedLineBeneficiary, Mode=TwoWay}"
+                                                  DisplayMemberPath="FullNameOrCompanyName"/>
+                                        <TextBox Grid.Row="0" Grid.Column="2" Margin="0,0,8,8"
+                                                 Text="{Binding LineGrossAmount, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="3" Margin="0,0,8,8"
+                                                 Text="{Binding LineTaxableAmount, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="4" Margin="0,0,8,8"
+                                                 Text="{Binding LineRate, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Grid.Row="0" Grid.Column="5"
+                                                 Text="{Binding LineWithheldAmount, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                        <TextBox Grid.Row="1" Grid.Column="0" Margin="0,0,8,0"
+                                                 Text="{Binding LineFiscalCategory, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,0,8,0"
+                                                 Text="{Binding LineDocumentReference, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Margin="0,0,8,0"
+                                                 Text="{Binding LineNotes, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <Button Grid.Row="1" Grid.Column="5"
+                                                Content="Ajouter"
+                                                Height="30"
+                                                Command="{Binding AddLineCommand}"/>
+                                    </Grid>
+
+                                    <DataGrid Grid.Row="1"
+                                              ItemsSource="{Binding SelectedLines}"
+                                              AutoGenerateColumns="False"
+                                              IsReadOnly="True"
+                                              CanUserAddRows="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Operation" Binding="{Binding OperationType}" Width="140"/>
+                                            <DataGridTextColumn Header="Beneficiaire" Binding="{Binding BeneficiaryId}" Width="150"/>
+                                            <DataGridTextColumn Header="Brut" Binding="{Binding GrossAmount}" Width="80"/>
+                                            <DataGridTextColumn Header="Taxable" Binding="{Binding TaxableAmount}" Width="80"/>
+                                            <DataGridTextColumn Header="Taux" Binding="{Binding Rate}" Width="70"/>
+                                            <DataGridTextColumn Header="Retenue" Binding="{Binding WithheldAmount}" Width="90"/>
+                                            <DataGridTextColumn Header="Statut" Binding="{Binding Status}" Width="90"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </TabItem>
+
+                            <TabItem Header="Anomalies">
+                                <DataGrid Margin="4"
+                                          ItemsSource="{Binding SelectedAnomalies}"
+                                          AutoGenerateColumns="False"
+                                          IsReadOnly="True"
+                                          CanUserAddRows="False">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Severite" Binding="{Binding Severity}" Width="90"/>
+                                        <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="110"/>
+                                        <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*"/>
+                                        <DataGridCheckBoxColumn Header="Resolue" Binding="{Binding IsResolved}" Width="80"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </TabItem>
+                        </TabControl>
+                    </DockPanel>
+                </Border>
+
+                <Border Grid.Row="2"
                         Background="White"
                         CornerRadius="12"
                         Padding="16"

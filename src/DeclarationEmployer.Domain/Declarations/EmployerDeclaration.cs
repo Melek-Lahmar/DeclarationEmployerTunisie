@@ -33,4 +33,16 @@ public sealed class EmployerDeclaration
     public ClientCompany? ClientCompany { get; set; }
 
     public FiscalYear? FiscalYear { get; set; }
+
+    public ICollection<DeclarationAnnex> Annexes { get; set; } = [];
+
+    public ICollection<DeclarationBeneficiary> Beneficiaries { get; set; } = [];
+
+    public ICollection<DeclarationLine> Lines { get; set; } = [];
+
+    public ICollection<DeclarationAnomaly> Anomalies { get; set; } = [];
+
+    public ICollection<GeneratedFile> GeneratedFiles { get; set; } = [];
+
+    public ICollection<ArchivedDocument> ArchivedDocuments { get; set; } = [];
 }
