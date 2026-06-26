@@ -52,6 +52,11 @@
   creation/reutilisation beneficiaire,
   synthese,
   validation codes annexes
+- validation centralisee foundation :
+  ValidationRun,
+  ValidationResult,
+  endpoints validation,
+  ignore avec justification
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -60,6 +65,7 @@
 - `AddAuthenticationAndUserRoles`
 - `AddDeclarationBusinessModel`
 - `AddFiscalReferenceFoundation`
+- `AddValidationAndAnomaliesFoundation`
 
 ## Moteur de controle
 
@@ -114,6 +120,16 @@ Elle expose la liste des lignes, la creation, la suppression, une synthese et un
 Les annexes A2 a A7 reposent sur `AnnexFoundationService` et les entites existantes `DeclarationAnnex`, `DeclarationBeneficiary` et `DeclarationLine`. Les codes acceptes sont strictement limites a `A2`, `A3`, `A4`, `A5`, `A6`, `A7`.
 
 Cette couche fournit une base CRUD/synthese non officielle pour les annexes restantes, sans pretendre couvrir les positions ou longueurs officielles EMPCCA.
+
+## Validation centralisee foundation
+
+Le module validation ajoute :
+
+- `ValidationRun`
+- `ValidationResult`
+- `ValidationService`
+
+Il reutilise `DeclarationControlService`, persiste un run et des resultats, et permet de marquer une anomalie corrigee ou ignoree. Ignorer exige une justification.
 
 ## Endpoints ajoutes ou confirms
 
@@ -174,6 +190,11 @@ Cette couche fournit une base CRUD/synthese non officielle pour les annexes rest
 - `POST /api/declarations/{declarationId}/annexes/{annexCode}/lines`
 - `DELETE /api/declarations/{declarationId}/annexes/{annexCode}/lines/{lineId}`
 - `GET /api/declarations/{declarationId}/annexes/{annexCode}/summary`
+- `POST /api/declarations/{declarationId}/validate`
+- `GET /api/declarations/{declarationId}/validation-results`
+- `GET /api/declarations/{declarationId}/errors`
+- `POST /api/validation-results/{id}/mark-corrected`
+- `POST /api/validation-results/{id}/ignore`
 
 ## Tests ajoutes
 
@@ -194,6 +215,7 @@ Cette couche fournit une base CRUD/synthese non officielle pour les annexes rest
 - tests FiscalReferenceService
 - tests AnnexA1Service
 - tests AnnexFoundationService
+- tests ValidationService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon

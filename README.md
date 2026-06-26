@@ -94,6 +94,10 @@ Separation actuelle :
   lignes generiques,
   synthese par annexe,
   mapping non confirme
+- validation centralisee foundation :
+  runs de validation,
+  resultats persistants,
+  correction/ignore avec justification
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -268,3 +272,15 @@ Les annexes A2 a A7 exposent une API foundation commune :
 Codes acceptes : `A2`, `A3`, `A4`, `A5`, `A6`, `A7`.
 
 Ces endpoints sont une base technique non officielle et conservent le message de mapping EMPCCA 2025 non confirme.
+
+## Validation centralisee foundation
+
+Le module validation expose maintenant :
+
+- `POST /api/declarations/{declarationId}/validate`
+- `GET /api/declarations/{declarationId}/validation-results`
+- `GET /api/declarations/{declarationId}/errors`
+- `POST /api/validation-results/{id}/mark-corrected`
+- `POST /api/validation-results/{id}/ignore`
+
+La validation centralisee encapsule le moteur de controle existant, cree un `ValidationRun`, materialise les anomalies en `ValidationResult` et impose une justification pour ignorer une anomalie.

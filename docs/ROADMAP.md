@@ -28,12 +28,14 @@
 - referentiel fiscal EMPCCA 2025 foundation non officiel
 - Annexe I foundation API
 - Annexes A2-A7 foundation API
+- validation centralisee foundation
 
 ## Partiellement termine
 
 - dashboard : compteurs MVP, encore incomplets
 - declarations : workflow MVP present, generation et archivage reel encore absents
 - annexes : API foundation A1-A7 presente, ecrans WPF dedies et champs officiels restants
+- validation : API foundation presente, ecran WPF dedie et workflow avance restants
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes

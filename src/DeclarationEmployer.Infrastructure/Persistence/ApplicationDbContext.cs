@@ -36,6 +36,10 @@ public sealed class ApplicationDbContext : DbContext
 
     public DbSet<ArchivedDocument> ArchivedDocuments => Set<ArchivedDocument>();
 
+    public DbSet<ValidationRun> ValidationRuns => Set<ValidationRun>();
+
+    public DbSet<ValidationResult> ValidationResults => Set<ValidationResult>();
+
     public DbSet<FiscalRuleSet> FiscalRuleSets => Set<FiscalRuleSet>();
 
     public DbSet<AnnexDefinition> AnnexDefinitions => Set<AnnexDefinition>();
@@ -501,6 +505,69 @@ public sealed class ApplicationDbContext : DbContext
             entity.HasIndex(x => x.DeclarationId);
             entity.HasIndex(x => new { x.ClientCompanyId, x.FiscalYearId });
             entity.HasIndex(x => x.DocumentType);
+        });
+
+        modelBuilder.Entity<ValidationRun>(entity =>
+        {
+            entity.ToTable("validation_runs", "validation");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
+            entity.Property(x => x.StartedAt).HasColumnName("started_at").IsRequired();
+            entity.Property(x => x.CompletedAt).HasColumnName("completed_at");
+            entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.BlockingCount).HasColumnName("blocking_count").IsRequired();
+            entity.Property(x => x.WarningCount).HasColumnName("warning_count").IsRequired();
+            entity.Property(x => x.InfoCount).HasColumnName("info_count").IsRequired();
+            entity.Property(x => x.Score).HasColumnName("score").IsRequired();
+            entity.Property(x => x.CreatedBy).HasColumnName("created_by").HasMaxLength(100);
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany()
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => x.StartedAt);
+            entity.HasIndex(x => x.Status);
+        });
+
+        modelBuilder.Entity<ValidationResult>(entity =>
+        {
+            entity.ToTable("validation_results", "validation");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.ValidationRunId).HasColumnName("validation_run_id").IsRequired();
+            entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
+            entity.Property(x => x.AnnexCode).HasColumnName("annex_code").HasMaxLength(20);
+            entity.Property(x => x.LineId).HasColumnName("line_id").HasMaxLength(100);
+            entity.Property(x => x.Severity).HasColumnName("severity").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Code).HasColumnName("code").HasMaxLength(100).IsRequired();
+            entity.Property(x => x.Message).HasColumnName("message").HasMaxLength(1000).IsRequired();
+            entity.Property(x => x.FieldName).HasColumnName("field_name").HasMaxLength(100);
+            entity.Property(x => x.Status).HasColumnName("status").HasConversion<string>().HasMaxLength(50).IsRequired();
+            entity.Property(x => x.Justification).HasColumnName("justification").HasMaxLength(1000);
+            entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
+            entity.Property(x => x.ResolvedAt).HasColumnName("resolved_at");
+
+            entity.HasOne(x => x.ValidationRun)
+                .WithMany(x => x.Results)
+                .HasForeignKey(x => x.ValidationRunId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.Declaration)
+                .WithMany()
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => x.ValidationRunId);
+            entity.HasIndex(x => x.DeclarationId);
+            entity.HasIndex(x => x.Severity);
+            entity.HasIndex(x => x.Status);
         });
 
         modelBuilder.Entity<FiscalRuleSet>(entity =>

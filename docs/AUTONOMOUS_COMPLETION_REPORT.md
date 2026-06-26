@@ -51,3 +51,18 @@ Message fiscal obligatoire :
 - API smoke test : `/api/health` OK, `/api/fiscal/annexes?year=2025` OK
 - Notes : les codes acceptes sont `A2` a `A7`; toute autre annexe est refusee.
 - Blocages : mapping officiel A2-A7 et ecrans WPF dedies restent a implementer apres confirmation metier.
+
+## Session 2026-06-26 - Validation centralisee foundation
+
+- Phase : controles et anomalies centralises foundation
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : Domain validation, Contracts Validation, Application service interface, Infrastructure service/EF, API controller, tests, documentation
+- Migration : `AddValidationAndAnomaliesFoundation`
+- Tests : `dotnet test DeclarationEmployerTunisie.sln` OK, 68/68 avant validation finale
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Build Desktop : `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` OK
+- EF : `has-pending-model-changes` OK, `dotnet ef database update` OK
+- API smoke test : `/api/health` OK
+- Notes : le service reutilise le controle existant et materialise les anomalies en resultats de validation persistants.
+- Blocages : ecran WPF dedie et workflow avance de resolution restent a finaliser.
