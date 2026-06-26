@@ -429,3 +429,51 @@
 - build solution : OK
 - build Desktop : OK
 - tests : `56/56` OK
+
+## Session suivante
+
+- Heure de debut : 2026-06-26 13:45:00 +02:00
+- Objectif : audit initial et mise a jour des instructions projet
+- Etat Git initial : working tree propre
+- Dernier commit detecte : `2f45197 Add internal declaration export generation`
+
+### Commandes executees
+
+- `git status --short`
+- `git log --oneline --decorate -10`
+- `git remote -v`
+- `git branch --show-current`
+- `dotnet restore`
+- `dotnet build`
+- `dotnet test`
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj`
+- `dotnet restore DeclarationEmployerTunisie.sln`
+- `dotnet build DeclarationEmployerTunisie.sln`
+- `dotnet test DeclarationEmployerTunisie.sln`
+- `dotnet ef dbcontext info --project src\DeclarationEmployer.Infrastructure --startup-project src\DeclarationEmployer.Api`
+- `dotnet ef migrations has-pending-model-changes --project src\DeclarationEmployer.Infrastructure --startup-project src\DeclarationEmployer.Api`
+
+### Resultats
+
+- branche courante : `main`
+- remote `origin` : OK
+- `git status --short` : propre
+- `dotnet restore` / `dotnet build` / `dotnet test` sans cible : ambigus dans ce repository a cause de plusieurs solutions
+- `dotnet restore DeclarationEmployerTunisie.sln` : OK
+- `dotnet build DeclarationEmployerTunisie.sln` : verrou transitoire `CS2012` sur `DeclarationEmployer.Infrastructure` lors d'une relance parallele
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+- `dotnet ef migrations has-pending-model-changes ...` : OK, aucun changement de modele en attente
+- `dotnet ef dbcontext info ...` : premiere tentative echouee car la build amont etait en echec, a relancer sequentiellement
+
+### Travail engage
+
+- inspection rapide de `AGENTS.md`, `Program.cs`, `ApplicationDbContext`, controllers, services, ViewModels WPF et tests
+- mise a jour complete de `AGENTS.md` pour refleter l'etat reel du produit
+- ajout des bonnes commandes explicites sur `DeclarationEmployerTunisie.sln`
+- ajout d'une note de stabilite sur l'ambiguite `dotnet build/test` sans cible et les verrous MSBuild transitoires
+
+### Decision
+
+- s'arreter sur une sous-phase stable : audit initial + instructions projet a jour
+- ne pas ouvrir tout de suite une phase metier plus large tant que l'audit sequentiel n'est pas totalement referme
