@@ -57,6 +57,9 @@ public static class DependencyInjection
         services.AddSingleton<IFiscalControlRule, MissingFiscalCategoryInfoRule>();
         services.AddSingleton<IFiscalControlEngine, FiscalControlEngine>();
         services.AddSingleton<IExcelDeclarationImportService, ExcelDeclarationImportService>();
+        services.AddSingleton<IFileHashService, FileHashService>();
+        services.AddSingleton<IDeclarationExportStorageService, DeclarationExportStorageService>();
+        services.AddSingleton<IInternalDeclarationCsvGenerator, InternalDeclarationCsvGenerator>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -76,6 +79,7 @@ public static class DependencyInjection
         services.AddScoped<IArchivedDocumentsService, ArchivedDocumentsService>();
         services.AddScoped<IDeclarationImportService, DeclarationImportService>();
         services.AddScoped<IDeclarationControlService, DeclarationControlService>();
+        services.AddScoped<IDeclarationExportService, DeclarationExportService>();
 
         return services;
     }

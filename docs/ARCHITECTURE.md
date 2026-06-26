@@ -115,6 +115,29 @@ L'implementation base de donnees reste dans `DeclarationControlService`, qui :
 
 La generation vise d'abord des exports internes structures, jamais presentes comme formats officiels tant que les specifications officielles ne sont pas fournies.
 
+Le workflow MVP de generation repose maintenant sur :
+
+- `DeclarationExportService` pour la previsualisation et la generation
+- `InternalDeclarationCsvGenerator` pour le contenu CSV
+- `DeclarationExportStorageService` pour l'ecriture dans `storage`
+- `FileHashService` pour le calcul `SHA256`
+- `GeneratedFile` pour la trace technique persistante
+
+Regles de generation MVP :
+
+- au moins une ligne exportable
+- aucune anomalie `Blocking` non resolue
+- declaration non `Closed`
+- declaration non `Archived`
+
+En cas de succes :
+
+- un fichier CSV interne est cree
+- un hash `SHA256` est calcule
+- une entree `GeneratedFile` est ajoutee
+- la declaration passe au statut `Generated`
+- audit et `DeclarationEvent` sont ecrits
+
 ## PDF
 
 Le projet `DeclarationEmployer.Reports` doit produire des rapports de controle et de synthese bases sur les donnees de declaration.
@@ -155,6 +178,20 @@ Flux actuel :
 
 Le Desktop expose un bouton de lancement de controle dans l'ecran Declarations, puis recharge les anomalies et le resume du dernier controle.
 
+## Export interne structure
+
+Flux actuel :
+
+`Declaration + lignes + beneficiaires + anomalies -> Preview export -> CSV generator -> storage -> SHA256 -> GeneratedFile`
+
+Le Desktop expose maintenant :
+
+- un bouton `Previsualiser export`
+- un bouton `Generer export interne`
+- l'affichage du hash et du chemin relatif du dernier export
+
+Le fichier produit reste strictement un export interne structure MVP.
+
 ## Stockage temporaire
 
 Le stockage temporaire d'import utilise `Storage:RootPath` puis le sous-dossier `temp/imports`.
@@ -173,6 +210,13 @@ L'import Excel ajoute :
 - audit `IMPORT_COMPLETED`
 - event `IMPORT_PREVIEWED`
 - event `IMPORT_COMPLETED`
+
+## Audit et events d'export
+
+La generation d'export ajoute :
+
+- audit `INTERNAL_EXPORT_GENERATED`
+- event `INTERNAL_EXPORT_GENERATED`
 
 ## Backup
 

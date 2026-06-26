@@ -70,6 +70,16 @@
                             Height="36"
                             Margin="6,0"
                             Command="{Binding ControlCommand}"/>
+                    <Button Content="Previsualiser export"
+                            Width="145"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding PreviewExportCommand}"/>
+                    <Button Content="Generer export interne"
+                            Width="165"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding GenerateExportCommand}"/>
                     <Button Content="Supprimer"
                             Width="95"
                             Height="36"
@@ -210,6 +220,25 @@
                                    Margin="0,4,0,0"/>
                         <TextBlock Text="{Binding LastControlResult.InfoAnomaliesCount, StringFormat=Infos : {0}, TargetNullValue=Infos : 0}"
                                    Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding ExportPreview.LinesCount, StringFormat=Lignes exportables : {0}, TargetNullValue=Lignes exportables : 0}"
+                                   Margin="0,8,0,0"/>
+                        <TextBlock Text="{Binding ExportPreview.BlockingAnomaliesCount, StringFormat=Blocages export : {0}, TargetNullValue=Blocages export : 0}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding ExportPreview.WarningAnomaliesCount, StringFormat=Warnings export : {0}, TargetNullValue=Warnings export : 0}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding ExportPreview.TotalGrossAmount, StringFormat=Total brut export : {0}, TargetNullValue=Total brut export : 0}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding ExportPreview.CanGenerate, StringFormat=Generation autorisee : {0}, TargetNullValue=Generation autorisee : False}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding LastExportResult.FileName, StringFormat=Dernier fichier : {0}, TargetNullValue=Dernier fichier : -}"
+                                   Margin="0,8,0,0"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding LastExportResult.Sha256Hash, StringFormat=SHA256 : {0}, TargetNullValue=SHA256 : -}"
+                                   Margin="0,4,0,0"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding LastExportResult.RelativePath, StringFormat=Chemin relatif : {0}, TargetNullValue=Chemin relatif : -}"
+                                   Margin="0,4,0,0"
+                                   TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
 

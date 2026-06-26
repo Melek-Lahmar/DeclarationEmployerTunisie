@@ -350,3 +350,82 @@
 - build Desktop : OK
 - tests : `44/44` OK
 - smoke test API : OK
+
+## Session suivante
+
+- Heure de debut : 2026-06-26 13:28:00 +02:00
+- Objectif : generation d'export interne structure
+- Etat Git initial : working tree propre
+- Dernier commit detecte : `adbde65 Add fiscal control engine MVP`
+
+### Commandes executees
+
+- `git status --short`
+- `git log --oneline -5`
+- `dotnet restore DeclarationEmployerTunisie.sln`
+- `dotnet build DeclarationEmployerTunisie.sln`
+- `dotnet test DeclarationEmployerTunisie.sln`
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj`
+
+### Resultats
+
+- `dotnet restore DeclarationEmployerTunisie.sln` : OK
+- `dotnet build DeclarationEmployerTunisie.sln` : OK avec un warning transitoire de copie sur `DeclarationEmployer.Import`
+- `dotnet test DeclarationEmployerTunisie.sln` : echec transitoire `CS2012` sur `DeclarationEmployer.Import`, a relancer de maniere sequentielle
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+
+### Decision
+
+- FiscalEngine MVP confirme comme deja termine
+- passage a la generation d'exports internes structures
+
+### Travail engage
+
+- ajout des contracts export :
+  `GenerateDeclarationExportRequest`,
+  `DeclarationExportPreviewDto`,
+  `DeclarationExportResultDto`
+- ajout de `IDeclarationExportService`
+- ajout de `FileHashService` pour le calcul `SHA256`
+- ajout de `DeclarationExportStorageService` pour le stockage des exports internes
+- ajout de `InternalDeclarationCsvGenerator`
+- ajout de `DeclarationExportService`
+- ajout des endpoints API :
+  `GET /api/declarations/{declarationId}/export/preview`,
+  `POST /api/declarations/{declarationId}/export/generate`
+- ajout de `DeclarationExportApiClient` et des boutons Desktop de previsualisation/generation
+- ajout des tests hash, CSV et service d'export
+- mise a jour de la documentation README / architecture / roadmap / implementation summary
+
+### Validation intermediaire
+
+- `dotnet build DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+- total tests intermediaires : `56/56` OK
+
+### Validation finale
+
+- `dotnet build-server shutdown` : OK
+- `dotnet restore DeclarationEmployerTunisie.sln` : OK
+- `dotnet build DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+- `dotnet format DeclarationEmployerTunisie.sln` : OK
+- relance post-format : `dotnet test DeclarationEmployerTunisie.sln` : OK
+- relance post-format : `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+- relance post-format : `dotnet build DeclarationEmployerTunisie.sln` : OK apres retour a une execution strictement sequentielle
+
+### Problemes rencontres
+
+- relance parallele post-format a provoque une erreur transitoire de generation WPF/XAML sur le projet Desktop
+- verification confirmee ensuite par relance sequentielle : build solution et build Desktop OK
+
+### Etat final
+
+- export interne structure MVP ajoute sans refaire Auth, import Excel ou FiscalEngine
+- preview export et generation CSV internes disponibles via API et Desktop
+- hash SHA256 et trace `GeneratedFile` en place
+- build solution : OK
+- build Desktop : OK
+- tests : `56/56` OK

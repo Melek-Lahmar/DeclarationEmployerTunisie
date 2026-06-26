@@ -30,6 +30,13 @@
   service de controle,
   endpoint API,
   bouton Desktop
+- export interne structure MVP :
+  previsualisation,
+  generation CSV,
+  stockage par client/exercice,
+  hash SHA256,
+  trace GeneratedFile,
+  integration Desktop
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -47,6 +54,18 @@ Le controle automatique MVP repose sur :
 - un service Infrastructure `DeclarationControlService`
 - une traduction des issues en `DeclarationAnomaly`
 - une mise a jour du statut de declaration vers `Controlled` lorsqu'aucune anomalie bloquante n'est detectee
+
+## Export interne structure
+
+L'export MVP repose sur :
+
+- `DeclarationExportService`
+- `InternalDeclarationCsvGenerator`
+- `DeclarationExportStorageService`
+- `FileHashService`
+- l'entite existante `GeneratedFile`
+
+Le fichier genere est un CSV interne structure. Il ne represente pas un format officiel tunisien.
 
 ## Endpoints ajoutes ou confirms
 
@@ -89,6 +108,8 @@ Le controle automatique MVP repose sur :
 - `POST /api/declarations/{declarationId}/import/excel/preview`
 - `POST /api/declarations/{declarationId}/import/excel/commit`
 - `POST /api/declarations/{declarationId}/control`
+- `GET /api/declarations/{declarationId}/export/preview`
+- `POST /api/declarations/{declarationId}/export/generate`
 
 ## Tests ajoutes
 
@@ -103,6 +124,9 @@ Le controle automatique MVP repose sur :
 - tests services import Excel
 - tests FiscalControlEngine
 - tests DeclarationControlService
+- tests FileHashService
+- tests InternalDeclarationCsvGenerator
+- tests DeclarationExportService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon
@@ -113,10 +137,11 @@ Le controle automatique MVP repose sur :
 - gestion des roles encore MVP
 - changement de mot de passe reserve aux endpoints admin dans cette phase
 - moteur fiscal generique uniquement, sans conformite officielle
+- export interne CSV uniquement, sans conformite officielle
 - generation officielle absente
 - PDF absent
 - archivage reel et backup absents
 
 ## Etat final
 
-Le repository dispose maintenant d'une base MVP d'authentification, d'audit utilisateur, d'un socle declaration employeur, d'un import Excel MVP et d'un moteur de controle generique pour les lignes de declaration.
+Le repository dispose maintenant d'une base MVP d'authentification, d'audit utilisateur, d'un socle declaration employeur, d'un import Excel MVP, d'un moteur de controle generique et d'une generation d'export interne structure pour les lignes de declaration.

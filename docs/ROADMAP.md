@@ -24,6 +24,7 @@
   - archives tracees
 - import Excel MVP
 - FiscalEngine MVP
+- export interne structure MVP
 
 ## Partiellement termine
 
@@ -33,13 +34,15 @@
 
 ## Priorites suivantes
 
-- generation d'exports internes structures
-- rapports PDF
+- rapports PDF de controle
 - archivage reel
+- backup PostgreSQL
+- dashboard avance
 
 ## Limites restantes
 
 - moteur fiscal volontairement generique, non officiel
+- export CSV interne uniquement, non officiel
 - pas de generation PDF
 - pas de generation officielle DECEMP / ANXEMP
 - pas d'archivage complet
@@ -47,7 +50,7 @@
 
 ## Prochaines versions
 
-- `0.2.x` : generation d'exports internes structures
-- `0.3.x` : rapports PDF et syntheses
-- `0.4.x` : archivage reel et maintenance
-- `0.5.x` : parametres et stabilisation
+- `0.2.x` : rapports PDF et syntheses
+- `0.3.x` : archivage reel et maintenance
+- `0.4.x` : backup PostgreSQL et parametres
+- `0.5.x` : dashboard avance et stabilisation

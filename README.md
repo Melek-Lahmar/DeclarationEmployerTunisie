@@ -75,6 +75,11 @@ Separation actuelle :
   controles automatiques des lignes,
   anomalies Blocking / Warning / Info,
   lancement manuel depuis le Desktop
+- export interne structure MVP :
+  previsualisation export,
+  generation CSV interne,
+  stockage avec hash SHA256,
+  trace `GeneratedFile`
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -84,7 +89,6 @@ Separation actuelle :
 
 ## Modules en developpement
 
-- generation d'exports internes structures
 - rapports PDF
 - archivage
 - backup PostgreSQL
@@ -181,3 +185,29 @@ Le moteur de controle automatique applique maintenant des regles generiques sur 
 - information sur categorie fiscale manquante
 
 Ce moteur reste volontairement generique. Il ne pretend pas fournir une conformite fiscale officielle tunisienne.
+
+## Export interne structure MVP
+
+Le module d'export interne permet maintenant :
+
+- de previsualiser le nombre de lignes exportables
+- de verifier les anomalies bloquantes non resolues
+- de refuser la generation si la declaration est cloturee, archivee ou bloquee par des anomalies
+- de generer un CSV interne structure
+- de stocker le fichier dans `storage/clients/{clientCode}/{year}/exports`
+- de calculer un hash `SHA256`
+- d'enregistrer une trace `GeneratedFile`
+- de positionner la declaration au statut `Generated`
+
+Conditions de generation MVP :
+
+- au moins une ligne exportable
+- aucune anomalie bloquante non resolue
+- declaration non cloturee
+- declaration non archivee
+
+Important :
+
+- cet export est un export interne structure MVP
+- ce n'est pas un format officiel tunisien
+- il ne doit pas etre presente comme fichier DGI, TEJ, DECEMP ou ANXEMP officiel

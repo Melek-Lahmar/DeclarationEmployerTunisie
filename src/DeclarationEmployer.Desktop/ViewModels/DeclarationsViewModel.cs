@@ -21,6 +21,7 @@ public sealed class DeclarationsViewModel : ObservableObject
     private readonly DeclarationAnomaliesApiClient _anomaliesApiClient;
     private readonly ImportExcelApiClient _importExcelApiClient;
     private readonly DeclarationControlApiClient _declarationControlApiClient;
+    private readonly DeclarationExportApiClient _declarationExportApiClient;
 
     private ClientCompanyDto? _selectedClient;
     private FiscalYearDto? _selectedFiscalYear;
@@ -51,6 +52,8 @@ public sealed class DeclarationsViewModel : ObservableObject
     private ExcelImportPreviewDto? _importPreview;
     private string _importResultMessage = "Aucun import lance.";
     private DeclarationControlResultDto? _lastControlResult;
+    private DeclarationExportPreviewDto? _exportPreview;
+    private DeclarationExportResultDto? _lastExportResult;
     private bool _isBusy;
     private string _statusMessage = "Pret.";
 
@@ -62,7 +65,8 @@ public sealed class DeclarationsViewModel : ObservableObject
         DeclarationLinesApiClient linesApiClient,
         DeclarationAnomaliesApiClient anomaliesApiClient,
         ImportExcelApiClient importExcelApiClient,
-        DeclarationControlApiClient declarationControlApiClient)
+        DeclarationControlApiClient declarationControlApiClient,
+        DeclarationExportApiClient declarationExportApiClient)
     {
         _clientsApiClient = clientsApiClient;
         _fiscalYearsApiClient = fiscalYearsApiClient;
@@ -72,6 +76,7 @@ public sealed class DeclarationsViewModel : ObservableObject
         _anomaliesApiClient = anomaliesApiClient;
         _importExcelApiClient = importExcelApiClient;
         _declarationControlApiClient = declarationControlApiClient;
+        _declarationExportApiClient = declarationExportApiClient;
 
         LoadCommand = new AsyncRelayCommand(LoadAsync);
         FilterByClientCommand = new AsyncRelayCommand(FilterFiscalYearsByClientAsync);
@@ -80,6 +85,8 @@ public sealed class DeclarationsViewModel : ObservableObject
         CloseCommand = new AsyncRelayCommand(CloseAsync);
         DeleteCommand = new AsyncRelayCommand(DeleteAsync);
         ControlCommand = new AsyncRelayCommand(ControlAsync);
+        PreviewExportCommand = new AsyncRelayCommand(PreviewExportAsync);
+        GenerateExportCommand = new AsyncRelayCommand(GenerateExportAsync);
         RefreshDetailsCommand = new AsyncRelayCommand(RefreshSelectedDeclarationDetailsAsync);
         AddBeneficiaryCommand = new AsyncRelayCommand(AddBeneficiaryAsync);
         AddLineCommand = new AsyncRelayCommand(AddLineAsync);
@@ -124,6 +131,10 @@ public sealed class DeclarationsViewModel : ObservableObject
     public IAsyncRelayCommand DeleteCommand { get; }
 
     public IAsyncRelayCommand ControlCommand { get; }
+
+    public IAsyncRelayCommand PreviewExportCommand { get; }
+
+    public IAsyncRelayCommand GenerateExportCommand { get; }
 
     public IAsyncRelayCommand RefreshDetailsCommand { get; }
 
@@ -311,6 +322,18 @@ public sealed class DeclarationsViewModel : ObservableObject
     {
         get => _lastControlResult;
         set => SetProperty(ref _lastControlResult, value);
+    }
+
+    public DeclarationExportPreviewDto? ExportPreview
+    {
+        get => _exportPreview;
+        set => SetProperty(ref _exportPreview, value);
+    }
+
+    public DeclarationExportResultDto? LastExportResult
+    {
+        get => _lastExportResult;
+        set => SetProperty(ref _lastExportResult, value);
     }
 
     public bool IsBusy
@@ -576,6 +599,8 @@ public sealed class DeclarationsViewModel : ObservableObject
         _importTemporaryFileToken = null;
         ImportResultMessage = "Aucun import lance.";
         LastControlResult = null;
+        ExportPreview = null;
+        LastExportResult = null;
         Title = string.Empty;
         Notes = string.Empty;
         ResetBeneficiaryForm();
@@ -612,6 +637,8 @@ public sealed class DeclarationsViewModel : ObservableObject
             ImportPreview = null;
             _importTemporaryFileToken = null;
             LastControlResult = null;
+            ExportPreview = null;
+            LastExportResult = null;
             return;
         }
 
@@ -908,6 +935,76 @@ public sealed class DeclarationsViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Erreur controle declaration : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PreviewExportAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration avant la previsualisation export.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            ExportPreview = await _declarationExportApiClient.PreviewExportAsync(SelectedDeclaration.Id);
+            StatusMessage = "Previsualisation export chargee.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur previsualisation export : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task GenerateExportAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration avant la generation export.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+
+            if (ExportPreview is null || ExportPreview.DeclarationId != SelectedDeclaration.Id)
+            {
+                ExportPreview = await _declarationExportApiClient.PreviewExportAsync(SelectedDeclaration.Id);
+            }
+
+            if (ExportPreview.LinesCount == 0)
+            {
+                StatusMessage = "Aucune ligne a exporter.";
+                return;
+            }
+
+            if (!ExportPreview.CanGenerate)
+            {
+                StatusMessage = "Des anomalies bloquantes empechent la generation.";
+                return;
+            }
+
+            LastExportResult = await _declarationExportApiClient.GenerateExportAsync(SelectedDeclaration.Id);
+            ExportPreview = await _declarationExportApiClient.PreviewExportAsync(SelectedDeclaration.Id);
+            StatusMessage = "Export interne genere avec succes.";
+
+            await LoadDeclarationsAsync();
+            await RefreshSelectedDeclarationDetailsAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur generation export : {ex.Message}";
         }
         finally
         {

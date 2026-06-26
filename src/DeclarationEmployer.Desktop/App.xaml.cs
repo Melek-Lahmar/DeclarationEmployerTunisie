@@ -84,6 +84,11 @@ public partial class App : Application
                     client.BaseAddress = new Uri("http://localhost:5050/");
                 }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
 
+                services.AddHttpClient<DeclarationExportApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
                 services.AddTransient<LoginViewModel>();
                 services.AddTransient<DashboardViewModel>();
                 services.AddTransient<ClientsViewModel>();
