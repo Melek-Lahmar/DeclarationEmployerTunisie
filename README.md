@@ -148,6 +148,14 @@ dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj
 dotnet test DeclarationEmployerTunisie.sln
 ```
 
+## Release foundation
+
+```powershell
+scripts\publish-release.ps1
+```
+
+Compiler ensuite `installer\det2025-foundation.iss` avec Inno Setup. Les secrets doivent etre fournis dans `appsettings.Local.json` ou dans l'environnement de deploiement, jamais dans Git.
+
 ## Configuration locale
 
 - exemple non sensible : `src/DeclarationEmployer.Api/appsettings.Local.example.json`

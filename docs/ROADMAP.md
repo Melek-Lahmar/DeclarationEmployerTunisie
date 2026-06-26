@@ -34,6 +34,7 @@
 - archivage foundation
 - sauvegarde PostgreSQL foundation
 - integration WPF generation/PDF/archive
+- release commerciale foundation
 
 ## Partiellement termine
 
@@ -46,6 +47,7 @@
 - archivage : recu foundation present, archive complete immutable et copie fichiers restantes
 - backup : creation/verif foundation presentes, restauration guidee restante
 - WPF : actions principales exposees dans declarations, ecrans dedies annexes/backup restants
+- release : publish et installer foundation presents, packaging signe et QA installateur restants
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes

@@ -80,6 +80,11 @@
   commandes generation foundation,
   rapports PDF,
   archivage
+- release commerciale foundation :
+  script publish,
+  squelette Inno Setup,
+  guides installation/release/backup,
+  placeholders secrets
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees

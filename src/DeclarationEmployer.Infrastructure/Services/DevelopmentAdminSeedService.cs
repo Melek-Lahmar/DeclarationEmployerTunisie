@@ -40,6 +40,11 @@ public sealed class DevelopmentAdminSeedService
         }
 
         var options = _options.Value;
+        if (string.IsNullOrWhiteSpace(options.Password))
+        {
+            throw new InvalidOperationException("DefaultAdmin:Password doit etre configure localement en Developpement.");
+        }
+
         var user = new ApplicationUser
         {
             Id = Guid.NewGuid(),

@@ -130,10 +130,12 @@ app.MapGet("/api/health", async (ApplicationDbContext db) =>
 
 app.MapGet("/api/info", () =>
 {
+    var appSection = app.Configuration.GetSection("Application");
+
     return Results.Ok(new
     {
-        name = "Declaration Employeur Tunisie",
-        version = "0.1.0",
+        name = appSection["Name"] ?? "Declaration Employeur Tunisie",
+        version = appSection["Version"] ?? "0.1.0",
         type = "Local Desktop + Local API",
         database = "PostgreSQL",
         fiscalYear = 2025,

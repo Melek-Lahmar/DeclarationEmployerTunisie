@@ -126,3 +126,17 @@ Message fiscal obligatoire :
 - Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
 - Notes : boutons generation foundation, PDF resume/generation et archivage ajoutes.
 - Blocages : ecrans dedies backup et annexes restent a construire.
+
+## Session 2026-06-26 - Release commerciale foundation
+
+- Phase : release commerciale foundation
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : scripts release, squelette Inno Setup, guides installation/release/backup, configuration non sensible
+- Migration : aucune
+- Tests : `dotnet test DeclarationEmployerTunisie.sln` OK, 74/74
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Publish API : `dotnet publish src\DeclarationEmployer.Api\DeclarationEmployer.Api.csproj -c Release` OK
+- Publish Desktop : `dotnet publish src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj -c Release` OK
+- Notes : les valeurs sensibles d'exemple sont remplacees par des placeholders; `appsettings.Local.json` reste non tracke.
+- Blocages : compilation Inno Setup non executee car l'outil externe n'est pas pilote par dotnet.
