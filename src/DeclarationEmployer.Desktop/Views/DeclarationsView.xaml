@@ -360,6 +360,83 @@
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </TabItem>
+
+                            <TabItem Header="Import Excel">
+                                <Grid Margin="4">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="170"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="140"/>
+                                            <ColumnDefinition Width="160"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBox Grid.Column="0"
+                                                 Margin="0,0,8,0"
+                                                 IsReadOnly="True"
+                                                 Text="{Binding ImportFilePath}"/>
+                                        <Button Grid.Column="1"
+                                                Margin="0,0,8,0"
+                                                Content="Choisir"
+                                                Command="{Binding BrowseImportFileCommand}"/>
+                                        <Button Grid.Column="2"
+                                                Margin="0,0,8,0"
+                                                Content="Previsualiser"
+                                                Command="{Binding PreviewImportCommand}"/>
+                                        <Button Grid.Column="3"
+                                                Content="Importer"
+                                                Command="{Binding CommitImportCommand}"/>
+                                    </Grid>
+
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                                        <CheckBox Content="Importer seulement les lignes valides"
+                                                  IsChecked="{Binding ImportOnlyValidRows, Mode=TwoWay}"/>
+                                        <TextBlock Margin="16,2,0,0"
+                                                   Text="{Binding ImportResultMessage}"
+                                                   Foreground="#374151"/>
+                                    </StackPanel>
+
+                                    <DataGrid Grid.Row="2"
+                                              Margin="0,0,0,10"
+                                              ItemsSource="{Binding ImportRows}"
+                                              AutoGenerateColumns="False"
+                                              IsReadOnly="True"
+                                              CanUserAddRows="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Ligne" Binding="{Binding RowNumber}" Width="70"/>
+                                            <DataGridCheckBoxColumn Header="Valide" Binding="{Binding IsValid}" Width="70"/>
+                                            <DataGridTextColumn Header="Type" Binding="{Binding BeneficiaryIdentifierType}" Width="110"/>
+                                            <DataGridTextColumn Header="Identifiant" Binding="{Binding BeneficiaryIdentifier}" Width="120"/>
+                                            <DataGridTextColumn Header="Beneficiaire" Binding="{Binding BeneficiaryName}" Width="180"/>
+                                            <DataGridTextColumn Header="Operation" Binding="{Binding OperationType}" Width="120"/>
+                                            <DataGridTextColumn Header="Brut" Binding="{Binding GrossAmount}" Width="90"/>
+                                            <DataGridTextColumn Header="Taxable" Binding="{Binding TaxableAmount}" Width="90"/>
+                                            <DataGridTextColumn Header="Taux" Binding="{Binding Rate}" Width="80"/>
+                                            <DataGridTextColumn Header="Retenue" Binding="{Binding WithheldAmount}" Width="90"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <DataGrid Grid.Row="3"
+                                              ItemsSource="{Binding ImportErrors}"
+                                              AutoGenerateColumns="False"
+                                              IsReadOnly="True"
+                                              CanUserAddRows="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Ligne" Binding="{Binding RowNumber}" Width="70"/>
+                                            <DataGridTextColumn Header="Colonne" Binding="{Binding ColumnName}" Width="140"/>
+                                            <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="150"/>
+                                            <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </TabItem>
                         </TabControl>
                     </DockPanel>
                 </Border>

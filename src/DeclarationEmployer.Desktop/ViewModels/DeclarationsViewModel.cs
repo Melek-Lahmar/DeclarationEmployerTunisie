@@ -1,9 +1,12 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
+using Microsoft.Win32;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DeclarationEmployer.Contracts.Cabinet;
 using DeclarationEmployer.Contracts.Declarations;
+using DeclarationEmployer.Contracts.Import;
 using DeclarationEmployer.Desktop.Services;
 
 namespace DeclarationEmployer.Desktop.ViewModels;
@@ -16,6 +19,7 @@ public sealed class DeclarationsViewModel : ObservableObject
     private readonly DeclarationBeneficiariesApiClient _beneficiariesApiClient;
     private readonly DeclarationLinesApiClient _linesApiClient;
     private readonly DeclarationAnomaliesApiClient _anomaliesApiClient;
+    private readonly ImportExcelApiClient _importExcelApiClient;
 
     private ClientCompanyDto? _selectedClient;
     private FiscalYearDto? _selectedFiscalYear;
@@ -40,6 +44,11 @@ public sealed class DeclarationsViewModel : ObservableObject
     private decimal _lineWithheldAmount;
     private string? _lineDocumentReference;
     private string? _lineNotes;
+    private string? _importFilePath;
+    private bool _importOnlyValidRows = true;
+    private string? _importTemporaryFileToken;
+    private ExcelImportPreviewDto? _importPreview;
+    private string _importResultMessage = "Aucun import lance.";
     private bool _isBusy;
     private string _statusMessage = "Pret.";
 
@@ -49,7 +58,8 @@ public sealed class DeclarationsViewModel : ObservableObject
         DeclarationsApiClient declarationsApiClient,
         DeclarationBeneficiariesApiClient beneficiariesApiClient,
         DeclarationLinesApiClient linesApiClient,
-        DeclarationAnomaliesApiClient anomaliesApiClient)
+        DeclarationAnomaliesApiClient anomaliesApiClient,
+        ImportExcelApiClient importExcelApiClient)
     {
         _clientsApiClient = clientsApiClient;
         _fiscalYearsApiClient = fiscalYearsApiClient;
@@ -57,6 +67,7 @@ public sealed class DeclarationsViewModel : ObservableObject
         _beneficiariesApiClient = beneficiariesApiClient;
         _linesApiClient = linesApiClient;
         _anomaliesApiClient = anomaliesApiClient;
+        _importExcelApiClient = importExcelApiClient;
 
         LoadCommand = new AsyncRelayCommand(LoadAsync);
         FilterByClientCommand = new AsyncRelayCommand(FilterFiscalYearsByClientAsync);
@@ -67,6 +78,9 @@ public sealed class DeclarationsViewModel : ObservableObject
         RefreshDetailsCommand = new AsyncRelayCommand(RefreshSelectedDeclarationDetailsAsync);
         AddBeneficiaryCommand = new AsyncRelayCommand(AddBeneficiaryAsync);
         AddLineCommand = new AsyncRelayCommand(AddLineAsync);
+        BrowseImportFileCommand = new RelayCommand(BrowseImportFile);
+        PreviewImportCommand = new AsyncRelayCommand(PreviewImportAsync);
+        CommitImportCommand = new AsyncRelayCommand(CommitImportAsync);
         NewCommand = new RelayCommand(NewDeclaration);
     }
 
@@ -83,6 +97,10 @@ public sealed class DeclarationsViewModel : ObservableObject
     public ObservableCollection<DeclarationLineDto> SelectedLines { get; } = [];
 
     public ObservableCollection<DeclarationAnomalyDto> SelectedAnomalies { get; } = [];
+
+    public ObservableCollection<ExcelImportRowDto> ImportRows { get; } = [];
+
+    public ObservableCollection<ExcelImportErrorDto> ImportErrors { get; } = [];
 
     public IReadOnlyList<string> StatusFilters { get; } = ["Tous", "Draft", "Validated", "Generated", "Archived", "Closed"];
 
@@ -105,6 +123,12 @@ public sealed class DeclarationsViewModel : ObservableObject
     public IAsyncRelayCommand AddBeneficiaryCommand { get; }
 
     public IAsyncRelayCommand AddLineCommand { get; }
+
+    public IRelayCommand BrowseImportFileCommand { get; }
+
+    public IAsyncRelayCommand PreviewImportCommand { get; }
+
+    public IAsyncRelayCommand CommitImportCommand { get; }
 
     public IRelayCommand NewCommand { get; }
 
@@ -250,6 +274,30 @@ public sealed class DeclarationsViewModel : ObservableObject
     {
         get => _lineNotes;
         set => SetProperty(ref _lineNotes, value);
+    }
+
+    public string? ImportFilePath
+    {
+        get => _importFilePath;
+        set => SetProperty(ref _importFilePath, value);
+    }
+
+    public bool ImportOnlyValidRows
+    {
+        get => _importOnlyValidRows;
+        set => SetProperty(ref _importOnlyValidRows, value);
+    }
+
+    public ExcelImportPreviewDto? ImportPreview
+    {
+        get => _importPreview;
+        set => SetProperty(ref _importPreview, value);
+    }
+
+    public string ImportResultMessage
+    {
+        get => _importResultMessage;
+        set => SetProperty(ref _importResultMessage, value);
     }
 
     public bool IsBusy
@@ -508,6 +556,12 @@ public sealed class DeclarationsViewModel : ObservableObject
         SelectedBeneficiaries.Clear();
         SelectedLines.Clear();
         SelectedAnomalies.Clear();
+        ImportRows.Clear();
+        ImportErrors.Clear();
+        ImportPreview = null;
+        ImportFilePath = null;
+        _importTemporaryFileToken = null;
+        ImportResultMessage = "Aucun import lance.";
         Title = string.Empty;
         Notes = string.Empty;
         ResetBeneficiaryForm();
@@ -539,6 +593,10 @@ public sealed class DeclarationsViewModel : ObservableObject
             SelectedBeneficiaries.Clear();
             SelectedLines.Clear();
             SelectedAnomalies.Clear();
+            ImportRows.Clear();
+            ImportErrors.Clear();
+            ImportPreview = null;
+            _importTemporaryFileToken = null;
             return;
         }
 
@@ -707,6 +765,111 @@ public sealed class DeclarationsViewModel : ObservableObject
         LineWithheldAmount = 0m;
         LineDocumentReference = string.Empty;
         LineNotes = string.Empty;
+    }
+
+    private void BrowseImportFile()
+    {
+        var dialog = new OpenFileDialog
+        {
+            Filter = "Fichiers Excel (*.xlsx)|*.xlsx",
+            CheckFileExists = true,
+            Multiselect = false,
+            Title = "Selectionner un fichier Excel"
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            ImportFilePath = dialog.FileName;
+            ImportResultMessage = "Fichier selectionne. Lance la previsualisation.";
+        }
+    }
+
+    private async Task PreviewImportAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration avant la previsualisation.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(ImportFilePath) || !File.Exists(ImportFilePath))
+        {
+            StatusMessage = "Selectionne un fichier Excel valide.";
+            return;
+        }
+
+        var importFilePath = ImportFilePath;
+
+        try
+        {
+            IsBusy = true;
+            var preview = await _importExcelApiClient.PreviewAsync(SelectedDeclaration.Id, importFilePath);
+            ImportPreview = preview;
+            _importTemporaryFileToken = preview.TemporaryFileToken;
+
+            ImportRows.Clear();
+            foreach (var row in preview.Rows)
+            {
+                ImportRows.Add(row);
+            }
+
+            ImportErrors.Clear();
+            foreach (var error in preview.Errors)
+            {
+                ImportErrors.Add(error);
+            }
+
+            ImportResultMessage = $"Previsualisation terminee : {preview.ValidRows} valide(s), {preview.InvalidRows} invalide(s).";
+            StatusMessage = ImportResultMessage;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur previsualisation import : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task CommitImportAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration avant l'import.";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_importTemporaryFileToken))
+        {
+            StatusMessage = "Previsualise d'abord un fichier Excel.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            var result = await _importExcelApiClient.CommitAsync(SelectedDeclaration.Id, new ExcelImportCommitRequest
+            {
+                TemporaryFileToken = _importTemporaryFileToken,
+                ImportOnlyValidRows = ImportOnlyValidRows
+            });
+
+            ImportResultMessage =
+                $"Import termine : {result.ImportedRows} ligne(s) importee(s), {result.CreatedBeneficiaries} beneficiaire(s), {result.CreatedLines} ligne(s), {result.CreatedAnomalies} anomalie(s).";
+            StatusMessage = ImportResultMessage;
+
+            await LoadDeclarationsAsync();
+            await RefreshSelectedDeclarationDetailsAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur import Excel : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private static string? ToApiStatus(string filter)

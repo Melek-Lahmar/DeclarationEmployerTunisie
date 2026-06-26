@@ -1,0 +1,2 @@
+IdentifierType,Identifier,BeneficiaryName,OperationType,FiscalCategory,GrossAmount,TaxableAmount,Rate,WithheldAmount,PaymentDate,DocumentReference,Notes,Address,Country,IsResident
+CIN,12345678,Ali Ben Salah,Honoraires,BNC,1000.000,1000.000,10,100.000,2025-03-31,DOC-2025-001,Import test,10 rue Exemple,Tunisie,true

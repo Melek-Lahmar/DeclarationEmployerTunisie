@@ -71,7 +71,23 @@ Dans cette phase MVP, les endpoints de creation, modification, changement de mot
 
 ## Import Excel
 
-Le projet `DeclarationEmployer.Import` est reserve a la lecture de fichiers Excel, la previsualisation, le mapping de colonnes et l'import transactionnel futur.
+Le projet `DeclarationEmployer.Import` lit maintenant les fichiers Excel `.xlsx` avec ClosedXML, detecte les colonnes attendues, parse les lignes, puis remonte les erreurs de structure et de valeurs.
+
+Flux MVP :
+
+- upload du fichier Excel vers l'API
+- stockage temporaire sous `storage/temp/imports`
+- previsualisation des lignes et erreurs
+- commit transactionnel des lignes valides vers :
+  - `DeclarationBeneficiary`
+  - `DeclarationLine`
+  - `DeclarationAnomaly` si des lignes invalides sont ignorees
+- audit et `DeclarationEvent`
+
+Deux etapes sont exposees :
+
+- `preview` : lecture, validation, token temporaire
+- `commit` : relecture du fichier temporaire et ecriture en base
 
 ## FiscalEngine
 
@@ -112,6 +128,25 @@ Extensibilite prevue :
 - enrichissement du controle fiscal dans `DeclarationEmployer.FiscalEngine`
 - import Excel transactionnel dans `DeclarationEmployer.Import`
 - generation d'exports puis de PDF dans les phases suivantes
+
+## Stockage temporaire
+
+Le stockage temporaire d'import utilise `Storage:RootPath` puis le sous-dossier `temp/imports`.
+
+Principes :
+
+- aucun chemin local complet n'est expose via l'API
+- seul un token temporaire controle circule entre preview et commit
+- seuls les fichiers `.xlsx` sont acceptes
+
+## Audit et events d'import
+
+L'import Excel ajoute :
+
+- audit `IMPORT_PREVIEWED`
+- audit `IMPORT_COMPLETED`
+- event `IMPORT_PREVIEWED`
+- event `IMPORT_COMPLETED`
 
 ## Backup
 

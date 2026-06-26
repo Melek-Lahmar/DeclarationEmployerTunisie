@@ -67,6 +67,10 @@ Separation actuelle :
   anomalies,
   fichiers generes traces,
   documents archives traces
+- import Excel MVP :
+  previsualisation,
+  validation structurelle,
+  import des beneficiaires et lignes valides
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -135,3 +139,29 @@ Le modele declaration couvre maintenant les briques suivantes :
 - `ArchivedDocument`
 
 Les controllers API restent minces et deleguent aux services Infrastructure/Application. Le Desktop appelle ces endpoints via `HttpClient` et affiche un detail minimal pour les beneficiaires, les lignes et les anomalies d'une declaration.
+
+## Import Excel MVP
+
+L'import Excel MVP permet maintenant :
+
+- de charger un fichier `.xlsx`
+- de previsualiser les lignes valides et invalides
+- de detecter les erreurs de structure et de donnees
+- d'importer les lignes valides dans la declaration selectionnee
+- de creer ou reutiliser les beneficiaires par declaration + identifiant
+- de creer des anomalies d'import pour les lignes invalides ignorees
+
+Colonnes obligatoires attendues :
+
+- `IdentifierType`
+- `Identifier`
+- `BeneficiaryName`
+- `OperationType`
+- `GrossAmount`
+- `TaxableAmount`
+- `Rate`
+- `WithheldAmount`
+
+Voir aussi :
+
+- `docs/templates/IMPORT_DECLARATION_EMPLOYEUR_EXCEL.md`

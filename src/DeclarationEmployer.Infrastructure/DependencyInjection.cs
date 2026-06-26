@@ -4,6 +4,7 @@ using DeclarationEmployer.Application.Auth.Validation;
 using DeclarationEmployer.Application.Cabinet.Validation;
 using DeclarationEmployer.Application.Dashboard;
 using DeclarationEmployer.Application.Declarations;
+using DeclarationEmployer.Import;
 using DeclarationEmployer.Infrastructure.Configuration;
 using DeclarationEmployer.Infrastructure.Persistence;
 using DeclarationEmployer.Infrastructure.Services;
@@ -36,14 +37,17 @@ public static class DependencyInjection
         services.AddHttpContextAccessor();
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.Configure<DefaultAdminOptions>(configuration.GetSection("DefaultAdmin"));
+        services.Configure<StorageOptions>(configuration.GetSection("Storage"));
 
         services.AddValidatorsFromAssemblyContaining<CreateClientCompanyRequestValidator>();
         services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+        services.AddSingleton<IExcelDeclarationImportService, ExcelDeclarationImportService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUsersService, UsersService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddSingleton<IPasswordService, PasswordService>();
         services.AddSingleton<IJwtTokenService, JwtTokenService>();
+        services.AddSingleton<ITemporaryFileStorageService, TemporaryFileStorageService>();
         services.AddScoped<DevelopmentAdminSeedService>();
         services.AddScoped<IClientsService, ClientsService>();
         services.AddScoped<IFiscalYearsService, FiscalYearsService>();
@@ -55,6 +59,7 @@ public static class DependencyInjection
         services.AddScoped<IDeclarationAnomaliesService, DeclarationAnomaliesService>();
         services.AddScoped<IGeneratedFilesService, GeneratedFilesService>();
         services.AddScoped<IArchivedDocumentsService, ArchivedDocumentsService>();
+        services.AddScoped<IDeclarationImportService, DeclarationImportService>();
 
         return services;
     }

@@ -201,3 +201,73 @@
 - Desktop compile
 - tests : `20/20` OK
 - commit et push a realiser apres controle Git final
+
+## Session suivante
+
+- Heure de debut : 2026-06-26 06:03:00 +02:00
+- Objectif : Import Excel MVP vers `DeclarationLine`
+- Etat Git initial : working tree propre
+- Dernier commit detecte : `69fc2f1 Add declaration business model foundation`
+
+### Commandes executees
+
+- `git status`
+- `git log --oneline -5`
+- `dotnet restore DeclarationEmployerTunisie.sln`
+- `dotnet build DeclarationEmployerTunisie.sln`
+- `dotnet test DeclarationEmployerTunisie.sln`
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj`
+
+### Resultats
+
+- `dotnet restore DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+- `dotnet build DeclarationEmployerTunisie.sln` : verrou transitoire sur `DeclarationEmployer.Contracts`, a relancer sequentiellement si necessaire
+
+### Decision
+
+- ne pas refaire Auth
+- ne pas refaire le modele declaration
+- implementer uniquement l'import Excel MVP avec ClosedXML
+
+### Travail engage
+
+- confirmation que `ClosedXML` etait deja reference dans `DeclarationEmployer.Import`
+- ajout des contracts d'import Excel
+- ajout du parseur Excel ClosedXML avec mapping anglais/francais simple
+- ajout du stockage temporaire `storage/temp/imports`
+- ajout du service `DeclarationImportService`
+- ajout des endpoints preview/commit
+- ajout de l'integration Desktop dans l'ecran Declarations
+- ajout des tests import Excel en memoire
+
+### Validation intermediaire
+
+- `dotnet build DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+
+### Validation finale
+
+- `dotnet restore DeclarationEmployerTunisie.sln` : OK
+- `dotnet build DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+- `dotnet format DeclarationEmployerTunisie.sln` : OK
+- relance post-format : build/test/Desktop OK
+- `GET http://localhost:5050/api/health` : `status=OK`, `database=Connected`
+
+### Problemes rencontres
+
+- verrou transitoire sur `DeclarationEmployer.Contracts` puis sur `DeclarationEmployer.Desktop` pendant certaines relances de build
+- fermeture explicite du fichier temporaire necessaire avant suppression apres commit import
+
+### Etat final
+
+- import Excel MVP implemente sans refaire Auth ni le socle declaration
+- parsing ClosedXML en place
+- stockage temporaire en place
+- preview/commit API en place
+- integration Desktop MVP en place
+- tests : `28/28` OK

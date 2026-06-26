@@ -22,6 +22,7 @@
   - anomalies
   - fichiers generes traces
   - archives tracees
+- import Excel MVP
 
 ## Partiellement termine
 
@@ -31,7 +32,6 @@
 
 ## Priorites suivantes
 
-- import Excel
 - FiscalEngine
 - generation d'exports internes structures
 - rapports PDF
@@ -48,7 +48,7 @@
 
 ## Prochaines versions
 
-- `0.2.x` : import Excel MVP
-- `0.3.x` : FiscalEngine et controles
+- `0.2.x` : FiscalEngine et controles automatiques
+- `0.3.x` : exports internes structures
 - `0.4.x` : exports internes structures et rapports
 - `0.5.x` : archivage reel, maintenance et parametres

@@ -19,6 +19,11 @@
   documents archives
 - endpoints API declaration detailles
 - integration Desktop minimale beneficiaires / lignes / anomalies
+- import Excel MVP :
+  parsing ClosedXML,
+  stockage temporaire,
+  preview/commit,
+  integration Desktop
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -65,6 +70,8 @@
 - `GET /api/declarations/{declarationId}/generated-files`
 - `GET /api/declarations/{declarationId}/archive`
 - `GET /api/archives`
+- `POST /api/declarations/{declarationId}/import/excel/preview`
+- `POST /api/declarations/{declarationId}/import/excel/commit`
 
 ## Tests ajoutes
 
@@ -76,6 +83,7 @@
 - tests services lignes
 - tests services anomalies
 - tests services fichiers generes et archives
+- tests services import Excel
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon
@@ -85,7 +93,6 @@
 
 - gestion des roles encore MVP
 - changement de mot de passe reserve aux endpoints admin dans cette phase
-- import Excel absent
 - moteur fiscal absent
 - generation officielle absente
 - PDF absent
@@ -93,4 +100,4 @@
 
 ## Etat final
 
-Le repository dispose maintenant d'une base MVP d'authentification, d'audit utilisateur et d'un socle declaration employeur exploitable. Le projet compile, les tests passent, le Desktop compile et la documentation couvre l'etat de cette phase.
+Le repository dispose maintenant d'une base MVP d'authentification, d'audit utilisateur, d'un socle declaration employeur exploitable et d'un import Excel MVP pour alimenter les lignes de declaration.
