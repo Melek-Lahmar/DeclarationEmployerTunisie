@@ -62,6 +62,10 @@
   fichiers foundation non officiels,
   hash SHA256,
   traces GeneratedFile
+- rapports PDF foundation :
+  QuestPDF,
+  service rapports,
+  endpoints PDF
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -140,6 +144,10 @@ Il reutilise `DeclarationControlService`, persiste un run et des resultats, et p
 
 Le module `GenerationService` ajoute une generation technique foundation non officielle. Il refuse le mode officiel, controle les anomalies bloquantes, cree des fichiers texte ASCII-safe et enregistre les traces `GeneratedFile`.
 
+## Rapports PDF foundation
+
+Le projet `DeclarationEmployer.Reports` fournit `PdfReportBuilder` via QuestPDF. `PdfReportService` expose des rapports internes pour resume, Annexe I, anomalies et generation.
+
 ## Endpoints ajoutes ou confirms
 
 - `GET /api/clients`
@@ -205,6 +213,10 @@ Le module `GenerationService` ajoute une generation technique foundation non off
 - `POST /api/validation-results/{id}/mark-corrected`
 - `POST /api/validation-results/{id}/ignore`
 - `POST /api/declarations/{declarationId}/generate`
+- `GET /api/declarations/{id}/reports/summary`
+- `GET /api/declarations/{id}/reports/annex-a1`
+- `GET /api/declarations/{id}/reports/errors`
+- `GET /api/declarations/{id}/reports/generation`
 
 ## Tests ajoutes
 
@@ -227,6 +239,7 @@ Le module `GenerationService` ajoute une generation technique foundation non off
 - tests AnnexFoundationService
 - tests ValidationService
 - tests GenerationService
+- tests PdfReportService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon

@@ -103,6 +103,11 @@ Separation actuelle :
   hash SHA256,
   traces GeneratedFile,
   blocage mode officiel
+- rapports PDF foundation :
+  resume declaration,
+  Annexe I,
+  anomalies,
+  generation
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -301,3 +306,14 @@ Il cree des fichiers texte foundation non officiels, stockes avec hash SHA256 et
 Le mode officiel est refuse tant que le mapping EMPCCA 2025 n'est pas confirme :
 
 > Génération officielle non activée : mapping EMPCCA 2025 incomplet ou non confirmé.
+
+## Rapports PDF foundation
+
+Le module PDF expose :
+
+- `GET /api/declarations/{id}/reports/summary`
+- `GET /api/declarations/{id}/reports/annex-a1`
+- `GET /api/declarations/{id}/reports/errors`
+- `GET /api/declarations/{id}/reports/generation`
+
+Ces rapports sont des documents internes foundation et non des documents fiscaux officiels.

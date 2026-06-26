@@ -78,3 +78,15 @@ Message fiscal obligatoire :
 - Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
 - Notes : le mode officiel est refuse et les fichiers generes sont des `.txt` foundation non officiels avec SHA256.
 - Blocages : format officiel EMPCCA 2025 toujours non confirme.
+
+## Session 2026-06-26 - Rapports PDF foundation
+
+- Phase : rapports PDF foundation
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : Reports, Application service interface, Infrastructure service, API controller, tests, documentation
+- Migration : aucune
+- Tests : `dotnet test DeclarationEmployerTunisie.sln` OK, 71/71
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Notes : rapports internes pour resume, Annexe I, anomalies et generation.
+- Blocages : mise en page commerciale avancee et stockage PDF archive restent a finaliser.

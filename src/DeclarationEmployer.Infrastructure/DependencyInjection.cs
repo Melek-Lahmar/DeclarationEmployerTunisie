@@ -86,6 +86,7 @@ public static class DependencyInjection
         services.AddScoped<IDeclarationExportService, DeclarationExportService>();
         services.AddScoped<IGenerationService, GenerationService>();
         services.AddScoped<IValidationService, ValidationService>();
+        services.AddScoped<IPdfReportService, PdfReportService>();
         services.AddScoped<IFiscalReferenceService, FiscalReferenceService>();
 
         return services;

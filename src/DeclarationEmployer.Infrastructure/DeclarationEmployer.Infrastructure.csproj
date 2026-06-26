@@ -5,6 +5,7 @@
     <ProjectReference Include="..\DeclarationEmployer.Application\DeclarationEmployer.Application.csproj" />
     <ProjectReference Include="..\DeclarationEmployer.FiscalEngine\DeclarationEmployer.FiscalEngine.csproj" />
     <ProjectReference Include="..\DeclarationEmployer.Import\DeclarationEmployer.Import.csproj" />
+    <ProjectReference Include="..\DeclarationEmployer.Reports\DeclarationEmployer.Reports.csproj" />
   </ItemGroup>
 
   <ItemGroup>

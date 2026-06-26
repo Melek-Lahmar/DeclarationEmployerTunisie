@@ -30,6 +30,7 @@
 - Annexes A2-A7 foundation API
 - validation centralisee foundation
 - generation fichiers foundation non officielle
+- rapports PDF foundation
 
 ## Partiellement termine
 
@@ -38,6 +39,7 @@
 - annexes : API foundation A1-A7 presente, ecrans WPF dedies et champs officiels restants
 - validation : API foundation presente, ecran WPF dedie et workflow avance restants
 - generation : API foundation presente, format officiel EMPCCA restant
+- PDF : rapports foundation presents, mise en page commerciale avancee restante
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes
