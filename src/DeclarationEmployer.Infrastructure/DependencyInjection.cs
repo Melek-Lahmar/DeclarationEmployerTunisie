@@ -73,6 +73,7 @@ public static class DependencyInjection
         services.AddScoped<IFiscalYearsService, FiscalYearsService>();
         services.AddScoped<IDashboardService, DashboardService>();
         services.AddScoped<IDeclarationsService, DeclarationsService>();
+        services.AddScoped<IAnnexA1Service, AnnexA1Service>();
         services.AddScoped<IDeclarationAnnexesService, DeclarationAnnexesService>();
         services.AddScoped<IDeclarationBeneficiariesService, DeclarationBeneficiariesService>();
         services.AddScoped<IDeclarationLinesService, DeclarationLinesService>();

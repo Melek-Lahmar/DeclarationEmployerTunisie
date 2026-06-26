@@ -26,11 +26,13 @@
 - FiscalEngine MVP
 - export interne structure MVP
 - referentiel fiscal EMPCCA 2025 foundation non officiel
+- Annexe I foundation API
 
 ## Partiellement termine
 
 - dashboard : compteurs MVP, encore incomplets
 - declarations : workflow MVP present, generation et archivage reel encore absents
+- annexes : Annexe I API foundation presente, ecran WPF dedie et champs officiels restants
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes

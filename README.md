@@ -85,6 +85,11 @@ Separation actuelle :
   annexes A1 a A7,
   champs foundation,
   readiness officiel/non officiel
+- Annexe I foundation :
+  lignes A1,
+  creation/reutilisation beneficiaire,
+  synthese,
+  controle ligne
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -234,3 +239,15 @@ Le seed 2025 cree un referentiel `EMPCCA-2025-FOUNDATION` avec les annexes A1 a 
 Message obligatoire tant que le cahier des charges officiel n'est pas integre :
 
 > Génération officielle non activée : mapping EMPCCA 2025 incomplet ou non confirmé.
+
+## Annexe I foundation
+
+Le module Annexe I expose maintenant :
+
+- `GET /api/declarations/{declarationId}/annexes/A1/lines`
+- `POST /api/declarations/{declarationId}/annexes/A1/lines`
+- `DELETE /api/declarations/{declarationId}/annexes/A1/lines/{lineId}`
+- `GET /api/declarations/{declarationId}/annexes/A1/summary`
+- `POST /api/declarations/{declarationId}/annexes/A1/validate-line/{lineId}`
+
+Cette couche utilise les entites existantes `DeclarationAnnex`, `DeclarationBeneficiary` et `DeclarationLine`. Elle ne cree pas de format officiel et garde le mapping A1 en foundation non confirmee.

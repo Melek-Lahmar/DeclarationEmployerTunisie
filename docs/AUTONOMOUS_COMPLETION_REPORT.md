@@ -21,3 +21,18 @@
 Message fiscal obligatoire :
 
 > Génération officielle non activée : mapping EMPCCA 2025 incomplet ou non confirmé.
+
+## Session 2026-06-26 - Annexe I foundation API
+
+- Phase : Annexe I foundation
+- Statut : termine
+- Date/heure : 2026-06-26 Europe/Paris
+- Fichiers modifies : Contracts AnnexA1, Application service interface, Infrastructure service, API controller, tests, documentation
+- Migration : aucune, reutilisation de `DeclarationAnnex`, `DeclarationBeneficiary` et `DeclarationLine`
+- Tests : `dotnet test DeclarationEmployerTunisie.sln` OK, 63/63
+- Build solution : `dotnet build DeclarationEmployerTunisie.sln` OK
+- Build Desktop : `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` OK
+- EF : `has-pending-model-changes` OK, aucune migration necessaire
+- API smoke test : `/api/health` OK, `/api/info` OK
+- Notes : la couche A1 cree ou reutilise l'annexe A1 et le beneficiaire, puis stocke une ligne declaration standard.
+- Blocages : ecran WPF dedie et mapping officiel A1 restent a implementer apres confirmation metier.

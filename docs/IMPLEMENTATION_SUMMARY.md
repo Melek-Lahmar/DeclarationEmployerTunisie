@@ -42,6 +42,11 @@
   seed A1 a A7,
   endpoints `/api/fiscal/*`,
   readiness officiel/non officiel
+- Annexe I foundation :
+  endpoints A1 dedies,
+  creation/reutilisation beneficiaire,
+  synthese,
+  validation ligne
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -87,6 +92,17 @@ Le referentiel fiscal 2025 repose sur :
 Le seed cree `EMPCCA-2025-FOUNDATION` avec les annexes A1 a A7 et des champs foundation non confirmes. Le mode officiel reste bloque avec le message :
 
 > Génération officielle non activée : mapping EMPCCA 2025 incomplet ou non confirmé.
+
+## Annexe I foundation
+
+L'Annexe I foundation repose sur une facade dediee au-dessus des entites existantes :
+
+- `DeclarationAnnex` avec `AnnexCode = A1`
+- `DeclarationBeneficiary`
+- `DeclarationLine`
+- `AnnexA1Service`
+
+Elle expose la liste des lignes, la creation, la suppression, une synthese et un controle ligne. La structure reste non officielle tant que le mapping EMPCCA 2025 n'est pas confirme.
 
 ## Endpoints ajoutes ou confirms
 
@@ -138,6 +154,11 @@ Le seed cree `EMPCCA-2025-FOUNDATION` avec les annexes A1 a A7 et des champs fou
 - `GET /api/fiscal/annexes/{annexCode}/fields`
 - `GET /api/fiscal/rates`
 - `GET /api/fiscal/readiness`
+- `GET /api/declarations/{declarationId}/annexes/A1/lines`
+- `POST /api/declarations/{declarationId}/annexes/A1/lines`
+- `DELETE /api/declarations/{declarationId}/annexes/A1/lines/{lineId}`
+- `GET /api/declarations/{declarationId}/annexes/A1/summary`
+- `POST /api/declarations/{declarationId}/annexes/A1/validate-line/{lineId}`
 
 ## Tests ajoutes
 
@@ -156,6 +177,7 @@ Le seed cree `EMPCCA-2025-FOUNDATION` avec les annexes A1 a A7 et des champs fou
 - tests InternalDeclarationCsvGenerator
 - tests DeclarationExportService
 - tests FiscalReferenceService
+- tests AnnexA1Service
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon
