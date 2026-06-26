@@ -23,24 +23,23 @@
   - fichiers generes traces
   - archives tracees
 - import Excel MVP
+- FiscalEngine MVP
 
 ## Partiellement termine
 
 - dashboard : compteurs MVP, encore incomplets
-- declarations : workflow MVP present, import et generation encore absents
+- declarations : workflow MVP present, generation et archivage reel encore absents
 - documentation : base pro ajoutee, a enrichir au fil des phases
 
 ## Priorites suivantes
 
-- FiscalEngine
 - generation d'exports internes structures
 - rapports PDF
 - archivage reel
 
 ## Limites restantes
 
-- pas d'import Excel fonctionnel
-- pas de moteur fiscal actif
+- moteur fiscal volontairement generique, non officiel
 - pas de generation PDF
 - pas de generation officielle DECEMP / ANXEMP
 - pas d'archivage complet
@@ -48,7 +47,7 @@
 
 ## Prochaines versions
 
-- `0.2.x` : FiscalEngine et controles automatiques
-- `0.3.x` : exports internes structures
-- `0.4.x` : exports internes structures et rapports
-- `0.5.x` : archivage reel, maintenance et parametres
+- `0.2.x` : generation d'exports internes structures
+- `0.3.x` : rapports PDF et syntheses
+- `0.4.x` : archivage reel et maintenance
+- `0.5.x` : parametres et stabilisation

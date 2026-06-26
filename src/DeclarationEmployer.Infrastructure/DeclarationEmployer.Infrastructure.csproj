@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DeclarationEmployer.Domain\DeclarationEmployer.Domain.csproj" />
     <ProjectReference Include="..\DeclarationEmployer.Application\DeclarationEmployer.Application.csproj" />
+    <ProjectReference Include="..\DeclarationEmployer.FiscalEngine\DeclarationEmployer.FiscalEngine.csproj" />
     <ProjectReference Include="..\DeclarationEmployer.Import\DeclarationEmployer.Import.csproj" />
   </ItemGroup>
 

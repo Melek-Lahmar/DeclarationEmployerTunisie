@@ -20,6 +20,7 @@ public sealed class DeclarationsViewModel : ObservableObject
     private readonly DeclarationLinesApiClient _linesApiClient;
     private readonly DeclarationAnomaliesApiClient _anomaliesApiClient;
     private readonly ImportExcelApiClient _importExcelApiClient;
+    private readonly DeclarationControlApiClient _declarationControlApiClient;
 
     private ClientCompanyDto? _selectedClient;
     private FiscalYearDto? _selectedFiscalYear;
@@ -49,6 +50,7 @@ public sealed class DeclarationsViewModel : ObservableObject
     private string? _importTemporaryFileToken;
     private ExcelImportPreviewDto? _importPreview;
     private string _importResultMessage = "Aucun import lance.";
+    private DeclarationControlResultDto? _lastControlResult;
     private bool _isBusy;
     private string _statusMessage = "Pret.";
 
@@ -59,7 +61,8 @@ public sealed class DeclarationsViewModel : ObservableObject
         DeclarationBeneficiariesApiClient beneficiariesApiClient,
         DeclarationLinesApiClient linesApiClient,
         DeclarationAnomaliesApiClient anomaliesApiClient,
-        ImportExcelApiClient importExcelApiClient)
+        ImportExcelApiClient importExcelApiClient,
+        DeclarationControlApiClient declarationControlApiClient)
     {
         _clientsApiClient = clientsApiClient;
         _fiscalYearsApiClient = fiscalYearsApiClient;
@@ -68,6 +71,7 @@ public sealed class DeclarationsViewModel : ObservableObject
         _linesApiClient = linesApiClient;
         _anomaliesApiClient = anomaliesApiClient;
         _importExcelApiClient = importExcelApiClient;
+        _declarationControlApiClient = declarationControlApiClient;
 
         LoadCommand = new AsyncRelayCommand(LoadAsync);
         FilterByClientCommand = new AsyncRelayCommand(FilterFiscalYearsByClientAsync);
@@ -75,6 +79,7 @@ public sealed class DeclarationsViewModel : ObservableObject
         LockCommand = new AsyncRelayCommand(LockAsync);
         CloseCommand = new AsyncRelayCommand(CloseAsync);
         DeleteCommand = new AsyncRelayCommand(DeleteAsync);
+        ControlCommand = new AsyncRelayCommand(ControlAsync);
         RefreshDetailsCommand = new AsyncRelayCommand(RefreshSelectedDeclarationDetailsAsync);
         AddBeneficiaryCommand = new AsyncRelayCommand(AddBeneficiaryAsync);
         AddLineCommand = new AsyncRelayCommand(AddLineAsync);
@@ -117,6 +122,8 @@ public sealed class DeclarationsViewModel : ObservableObject
     public IAsyncRelayCommand CloseCommand { get; }
 
     public IAsyncRelayCommand DeleteCommand { get; }
+
+    public IAsyncRelayCommand ControlCommand { get; }
 
     public IAsyncRelayCommand RefreshDetailsCommand { get; }
 
@@ -298,6 +305,12 @@ public sealed class DeclarationsViewModel : ObservableObject
     {
         get => _importResultMessage;
         set => SetProperty(ref _importResultMessage, value);
+    }
+
+    public DeclarationControlResultDto? LastControlResult
+    {
+        get => _lastControlResult;
+        set => SetProperty(ref _lastControlResult, value);
     }
 
     public bool IsBusy
@@ -562,6 +575,7 @@ public sealed class DeclarationsViewModel : ObservableObject
         ImportFilePath = null;
         _importTemporaryFileToken = null;
         ImportResultMessage = "Aucun import lance.";
+        LastControlResult = null;
         Title = string.Empty;
         Notes = string.Empty;
         ResetBeneficiaryForm();
@@ -597,6 +611,7 @@ public sealed class DeclarationsViewModel : ObservableObject
             ImportErrors.Clear();
             ImportPreview = null;
             _importTemporaryFileToken = null;
+            LastControlResult = null;
             return;
         }
 
@@ -865,6 +880,34 @@ public sealed class DeclarationsViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Erreur import Excel : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task ControlAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration a controler.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            LastControlResult = await _declarationControlApiClient.ControlAsync(SelectedDeclaration.Id);
+            StatusMessage =
+                $"Controle termine : {LastControlResult.BlockingAnomaliesCount} bloquante(s), {LastControlResult.WarningAnomaliesCount} avertissement(s), {LastControlResult.InfoAnomaliesCount} info(s).";
+
+            await LoadDeclarationsAsync();
+            await RefreshSelectedDeclarationDetailsAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur controle declaration : {ex.Message}";
         }
         finally
         {

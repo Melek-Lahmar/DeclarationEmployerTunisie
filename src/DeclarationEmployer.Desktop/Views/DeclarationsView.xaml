@@ -65,6 +65,11 @@
                             Height="36"
                             Margin="6,0"
                             Command="{Binding CloseCommand}"/>
+                    <Button Content="Lancer controle"
+                            Width="120"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding ControlCommand}"/>
                     <Button Content="Supprimer"
                             Width="95"
                             Height="36"
@@ -196,6 +201,14 @@
                         <TextBlock Text="{Binding SelectedSummary.GeneratedFilesCount, StringFormat=Fichiers generes : {0}, TargetNullValue=Fichiers generes : 0}"
                                    Margin="0,4,0,0"/>
                         <TextBlock Text="{Binding SelectedSummary.BlockingAnomaliesCount, StringFormat=Anomalies bloquantes : {0}, TargetNullValue=Anomalies bloquantes : 0}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding LastControlResult.CheckedLinesCount, StringFormat=Lignes controlees : {0}, TargetNullValue=Lignes controlees : 0}"
+                                   Margin="0,8,0,0"/>
+                        <TextBlock Text="{Binding LastControlResult.BlockingAnomaliesCount, StringFormat=Blocage controle : {0}, TargetNullValue=Blocage controle : 0}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding LastControlResult.WarningAnomaliesCount, StringFormat=Avertissements : {0}, TargetNullValue=Avertissements : 0}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding LastControlResult.InfoAnomaliesCount, StringFormat=Infos : {0}, TargetNullValue=Infos : 0}"
                                    Margin="0,4,0,0"/>
                     </StackPanel>
                 </Border>

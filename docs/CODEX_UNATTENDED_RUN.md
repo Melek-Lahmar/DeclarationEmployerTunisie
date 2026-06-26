@@ -271,3 +271,82 @@
 - preview/commit API en place
 - integration Desktop MVP en place
 - tests : `28/28` OK
+
+## Session suivante
+
+- Heure de debut : 2026-06-26 06:13:00 +02:00
+- Objectif : FiscalEngine MVP
+- Etat Git initial : working tree propre
+- Dernier commit detecte : `fc72278 Add Excel import MVP for declaration lines`
+
+### Commandes executees
+
+- `git status`
+- `git log --oneline -5`
+- `dotnet restore DeclarationEmployerTunisie.sln`
+- `dotnet build DeclarationEmployerTunisie.sln`
+- `dotnet test DeclarationEmployerTunisie.sln`
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj`
+
+### Resultats
+
+- `dotnet restore DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build DeclarationEmployerTunisie.sln` : relance sequentielle requise a cause d'un verrou transitoire sur `DeclarationEmployer.Contracts`
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : relance sequentielle requise a cause du meme verrou
+
+### Decision
+
+- Import Excel MVP confirme comme deja termine
+- passage au moteur de controle automatique
+
+### Travail engage
+
+- suppression du placeholder `Class1.cs` dans `DeclarationEmployer.FiscalEngine`
+- ajout du moteur pur FiscalEngine :
+  `FiscalControlContext`,
+  `FiscalControlLine`,
+  `FiscalControlIssue`,
+  `FiscalControlResult`,
+  `IFiscalControlRule`,
+  `IFiscalControlEngine`
+- ajout des regles MVP de controle generique
+- ajout du service `IDeclarationControlService` / `DeclarationControlService`
+- ajout du DTO `DeclarationControlResultDto`
+- ajout de l'endpoint API `POST /api/declarations/{declarationId}/control`
+- ajout du client Desktop et du bouton `Lancer controle`
+- ajout des tests `FiscalControlEngineTests` et `DeclarationControlServiceTests`
+- mise a jour de la documentation produit et architecture
+
+### Validation intermediaire
+
+- `dotnet build DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- total tests intermediaires : `44/44` OK
+
+### Notes techniques
+
+- les verrous transitoires `CS2012` sur les DLL Desktop/Contracts restent occasionnels lors de relances trop rapproches
+- la validation finale doit etre executee de maniere sequentielle
+
+### Validation finale
+
+- `dotnet build-server shutdown` : OK
+- `dotnet restore DeclarationEmployerTunisie.sln` : OK
+- `dotnet build DeclarationEmployerTunisie.sln` : OK
+- `dotnet test DeclarationEmployerTunisie.sln` : OK
+- `dotnet build src\DeclarationEmployer.Desktop\DeclarationEmployer.Desktop.csproj` : OK
+- `dotnet format DeclarationEmployerTunisie.sln` : OK
+- relance post-format : build OK
+- relance post-format : tests OK
+- `GET http://localhost:5050/api/health` : `status=OK`, `database=Connected`
+- `GET http://localhost:5050/api/info` : OK
+
+### Etat final
+
+- FiscalEngine MVP ajoute sans refaire Auth, import Excel ou le modele declaration
+- controle automatique declenchable depuis l'API et le Desktop
+- build solution : OK
+- build Desktop : OK
+- tests : `44/44` OK
+- smoke test API : OK

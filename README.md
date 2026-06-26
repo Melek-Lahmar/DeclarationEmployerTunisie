@@ -34,8 +34,8 @@ Separation actuelle :
 - `DeclarationEmployer.Infrastructure` : EF Core, DbContext, services concrets, persistance
 - `DeclarationEmployer.Api` : controllers, middleware, configuration, DI
 - `DeclarationEmployer.Desktop` : vues WPF, ViewModels, clients API
-- `DeclarationEmployer.Import` : futur import Excel
-- `DeclarationEmployer.FiscalEngine` : futur moteur de controle
+- `DeclarationEmployer.Import` : import Excel et prevalidation
+- `DeclarationEmployer.FiscalEngine` : moteur de controle generique
 - `DeclarationEmployer.Reports` : future generation PDF
 - `DeclarationEmployer.Tests` : tests unitaires et de services
 
@@ -51,7 +51,7 @@ Separation actuelle :
 - Serilog
 - CommunityToolkit.Mvvm
 - xUnit
-- ClosedXML (cible)
+- ClosedXML
 - QuestPDF ou alternative stable (cible)
 
 ## Modules disponibles
@@ -71,6 +71,10 @@ Separation actuelle :
   previsualisation,
   validation structurelle,
   import des beneficiaires et lignes valides
+- FiscalEngine MVP :
+  controles automatiques des lignes,
+  anomalies Blocking / Warning / Info,
+  lancement manuel depuis le Desktop
 - authentification JWT MVP
 - login Desktop simple
 - utilisateurs et roles MVP
@@ -80,8 +84,6 @@ Separation actuelle :
 
 ## Modules en developpement
 
-- import Excel
-- moteur de controle fiscal
 - generation d'exports internes structures
 - rapports PDF
 - archivage
@@ -120,8 +122,7 @@ Le projet prepare une architecture prete pour integrer les formats officiels plu
 
 - gestion des roles simple, surtout orientee Admin pour les endpoints utilisateurs
 - token uniquement en memoire cote Desktop
-- import Excel non implemente
-- moteur fiscal non implemente
+- moteur fiscal volontairement generique, sans conformite officielle
 - generation officielle de fichier non implementee
 - generation PDF non implementee
 - archivage reel et backup non finalises
@@ -165,3 +166,18 @@ Colonnes obligatoires attendues :
 Voir aussi :
 
 - `docs/templates/IMPORT_DECLARATION_EMPLOYEUR_EXCEL.md`
+
+## FiscalEngine MVP
+
+Le moteur de controle automatique applique maintenant des regles generiques sur les `DeclarationLine` existantes :
+
+- montants negatifs interdits
+- taux hors borne interdit
+- retenue superieure au montant imposable interdite
+- beneficiaire requis
+- type d'operation requis
+- date de paiement dans l'exercice
+- avertissements sur taux zero, reference absente, retenue sans imposable
+- information sur categorie fiscale manquante
+
+Ce moteur reste volontairement generique. Il ne pretend pas fournir une conformite fiscale officielle tunisienne.

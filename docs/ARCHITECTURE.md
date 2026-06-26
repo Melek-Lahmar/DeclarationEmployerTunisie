@@ -16,8 +16,8 @@ Flux principal :
 - `DeclarationEmployer.Infrastructure` : persistance EF Core, services concrets, audit technique
 - `DeclarationEmployer.Api` : endpoints HTTP, middleware, configuration et injection
 - `DeclarationEmployer.Desktop` : vues, ViewModels, navigation, clients API
-- `DeclarationEmployer.Import` : import Excel et mapping futur
-- `DeclarationEmployer.FiscalEngine` : moteur de controles parametrables futur
+- `DeclarationEmployer.Import` : import Excel et prevalidation
+- `DeclarationEmployer.FiscalEngine` : moteur de controles parametrables
 - `DeclarationEmployer.Reports` : generation de rapports PDF future
 - `DeclarationEmployer.Tests` : couverture unitaires et services
 
@@ -91,7 +91,25 @@ Deux etapes sont exposees :
 
 ## FiscalEngine
 
-Le projet `DeclarationEmployer.FiscalEngine` doit accueillir les regles de controle parametrables par annee, sans inventer de conformite fiscale officielle.
+Le projet `DeclarationEmployer.FiscalEngine` contient maintenant un moteur pur, sans EF Core ni acces base :
+
+- `FiscalControlContext`
+- `FiscalControlLine`
+- `FiscalControlIssue`
+- `FiscalControlResult`
+- `IFiscalControlRule`
+- `IFiscalControlEngine`
+
+Les regles MVP sont executees en memoire, puis l'Infrastructure traduit les issues en `DeclarationAnomaly`.
+
+L'implementation base de donnees reste dans `DeclarationControlService`, qui :
+
+- charge la declaration et ses lignes
+- construit le contexte pur
+- execute le moteur
+- remplace les anciennes anomalies non resolues issues du controle
+- met a jour le statut `Controlled` si aucune anomalie bloquante
+- ecrit audit et `DeclarationEvent`
 
 ## Generation
 
@@ -128,6 +146,14 @@ Extensibilite prevue :
 - enrichissement du controle fiscal dans `DeclarationEmployer.FiscalEngine`
 - import Excel transactionnel dans `DeclarationEmployer.Import`
 - generation d'exports puis de PDF dans les phases suivantes
+
+## Controle automatique
+
+Flux actuel :
+
+`DeclarationLine en base -> FiscalControlContext -> FiscalControlEngine -> FiscalControlIssue -> DeclarationAnomaly`
+
+Le Desktop expose un bouton de lancement de controle dans l'ecran Declarations, puis recharge les anomalies et le resume du dernier controle.
 
 ## Stockage temporaire
 

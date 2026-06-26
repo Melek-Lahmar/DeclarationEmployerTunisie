@@ -4,6 +4,8 @@ using DeclarationEmployer.Application.Auth.Validation;
 using DeclarationEmployer.Application.Cabinet.Validation;
 using DeclarationEmployer.Application.Dashboard;
 using DeclarationEmployer.Application.Declarations;
+using DeclarationEmployer.FiscalEngine;
+using DeclarationEmployer.FiscalEngine.Rules;
 using DeclarationEmployer.Import;
 using DeclarationEmployer.Infrastructure.Configuration;
 using DeclarationEmployer.Infrastructure.Persistence;
@@ -41,6 +43,19 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssemblyContaining<CreateClientCompanyRequestValidator>();
         services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+        services.AddSingleton<IFiscalControlRule, GrossAmountMustBePositiveOrZeroRule>();
+        services.AddSingleton<IFiscalControlRule, TaxableAmountMustBePositiveOrZeroRule>();
+        services.AddSingleton<IFiscalControlRule, WithheldAmountMustBePositiveOrZeroRule>();
+        services.AddSingleton<IFiscalControlRule, RateMustBeBetweenZeroAndHundredRule>();
+        services.AddSingleton<IFiscalControlRule, WithheldAmountMustNotExceedTaxableAmountRule>();
+        services.AddSingleton<IFiscalControlRule, BeneficiaryRequiredRule>();
+        services.AddSingleton<IFiscalControlRule, OperationTypeRequiredRule>();
+        services.AddSingleton<IFiscalControlRule, PaymentDateMustBeInsideFiscalYearRule>();
+        services.AddSingleton<IFiscalControlRule, ZeroRateWarningRule>();
+        services.AddSingleton<IFiscalControlRule, MissingDocumentReferenceWarningRule>();
+        services.AddSingleton<IFiscalControlRule, ZeroTaxableWithWithheldAmountWarningRule>();
+        services.AddSingleton<IFiscalControlRule, MissingFiscalCategoryInfoRule>();
+        services.AddSingleton<IFiscalControlEngine, FiscalControlEngine>();
         services.AddSingleton<IExcelDeclarationImportService, ExcelDeclarationImportService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IUsersService, UsersService>();
@@ -60,6 +75,7 @@ public static class DependencyInjection
         services.AddScoped<IGeneratedFilesService, GeneratedFilesService>();
         services.AddScoped<IArchivedDocumentsService, ArchivedDocumentsService>();
         services.AddScoped<IDeclarationImportService, DeclarationImportService>();
+        services.AddScoped<IDeclarationControlService, DeclarationControlService>();
 
         return services;
     }

@@ -24,6 +24,12 @@
   stockage temporaire,
   preview/commit,
   integration Desktop
+- FiscalEngine MVP :
+  moteur pur,
+  regles generiques,
+  service de controle,
+  endpoint API,
+  bouton Desktop
 - documentation de base et exemple de configuration locale
 
 ## Migrations ajoutees
@@ -31,6 +37,16 @@
 - `AddDeclarationsModule`
 - `AddAuthenticationAndUserRoles`
 - `AddDeclarationBusinessModel`
+
+## Moteur de controle
+
+Le controle automatique MVP repose sur :
+
+- un moteur pur dans `DeclarationEmployer.FiscalEngine`
+- des regles generiques executees en memoire sur les lignes de declaration
+- un service Infrastructure `DeclarationControlService`
+- une traduction des issues en `DeclarationAnomaly`
+- une mise a jour du statut de declaration vers `Controlled` lorsqu'aucune anomalie bloquante n'est detectee
 
 ## Endpoints ajoutes ou confirms
 
@@ -72,6 +88,7 @@
 - `GET /api/archives`
 - `POST /api/declarations/{declarationId}/import/excel/preview`
 - `POST /api/declarations/{declarationId}/import/excel/commit`
+- `POST /api/declarations/{declarationId}/control`
 
 ## Tests ajoutes
 
@@ -84,6 +101,8 @@
 - tests services anomalies
 - tests services fichiers generes et archives
 - tests services import Excel
+- tests FiscalControlEngine
+- tests DeclarationControlService
 - test dashboard de base
 - tests Auth login
 - tests Users creation / doublon
@@ -93,11 +112,11 @@
 
 - gestion des roles encore MVP
 - changement de mot de passe reserve aux endpoints admin dans cette phase
-- moteur fiscal absent
+- moteur fiscal generique uniquement, sans conformite officielle
 - generation officielle absente
 - PDF absent
 - archivage reel et backup absents
 
 ## Etat final
 
-Le repository dispose maintenant d'une base MVP d'authentification, d'audit utilisateur, d'un socle declaration employeur exploitable et d'un import Excel MVP pour alimenter les lignes de declaration.
+Le repository dispose maintenant d'une base MVP d'authentification, d'audit utilisateur, d'un socle declaration employeur, d'un import Excel MVP et d'un moteur de controle generique pour les lignes de declaration.
