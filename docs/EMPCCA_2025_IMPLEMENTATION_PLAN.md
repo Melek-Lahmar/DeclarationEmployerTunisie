@@ -362,3 +362,27 @@ Une phase n'est stable que si :
 - EF ne signale aucune migration manquante apres une modification du modele ;
 - aucun secret, export runtime ou document client n'est suivi par Git.
 
+## 14. Avancement d'implementation
+
+### Socle livre
+
+- formatter fixed-width avec padding, millimes, taux `999V99`, dates, ASCII strict et
+  controle de longueur ;
+- definitions d'enregistrements validant la continuite exacte des positions ;
+- modeles persistants specialises A1 a A7 et migration additive ;
+- code acte, numero d'ordre, activite/emploi beneficiaire et metadonnees de fichiers ;
+- workflows API detailles A1, A2 et A5 sous `/api/declarations/{id}/empcca/annexes` ;
+- generateurs techniques A1, A2 et A5 de 399 caracteres avec totaux calcules ;
+- generateur technique DECEMP de 51 lignes de 38 caracteres ;
+- garde centrale qui interdit de marquer ces artefacts comme officiels.
+
+### Verrous maintenus volontairement
+
+- Tous les `EmpccaGenerationArtifact` produits sont `IsOfficial = false`.
+- DECEMP01-49 utilise encore une disposition technique commune pour les tests de
+  longueur ; chaque disposition individuelle doit etre encodee depuis les pages 15 a
+  31 avant activation.
+- DECEMP00 utilise l'inference positions 1-3 pour le type puis 4-15 pour l'identifiant,
+  car le tableau source fait se chevaucher D000 et D001 a la position 3.
+- Le CIN A1 suit temporairement le tableau ANXBEN01 (8 chiffres + 5 espaces), avec un
+  blocage explicite tant que la contradiction avec la notice page 67 n'est pas levee.
