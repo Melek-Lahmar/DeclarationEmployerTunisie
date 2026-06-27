@@ -38,6 +38,11 @@ public sealed class CabinetServicesTests
             {
                 Code = " cli01 ",
                 RaisonSociale = " Societe Test ",
+                MatriculeFiscal = "1234567",
+                Cle = "a",
+                Categorie = "m",
+                Activite = "Services",
+                Adresse = "Route de Tunis",
                 Ville = "Sfax"
             },
             "127.0.0.1");
@@ -75,13 +80,95 @@ public sealed class CabinetServicesTests
         var request = new CreateClientCompanyRequest
         {
             Code = "CLI01",
-            RaisonSociale = "Societe Test"
+            RaisonSociale = "Societe Test",
+            MatriculeFiscal = "1234567",
+            Cle = "A",
+            Categorie = "M",
+            Activite = "Services",
+            Adresse = "Route de Tunis",
+            Ville = "Sfax"
         };
 
         await service.CreateAsync(request, null);
         var act = () => service.CreateAsync(request, null);
 
         await act.Should().ThrowAsync<ApplicationConflictException>();
+    }
+
+    [Fact]
+    public async Task CreateClient_WithValidReferenceFields_ShouldCreateClientAndDefaultEstablishment()
+    {
+        await using var db = CreateDbContext();
+        var service = CreateClientsService(db);
+
+        var client = await service.CreateAsync(ValidClientRequest(), null);
+
+        client.MatriculeFiscal.Should().Be("7654321");
+        client.Cle.Should().Be("B");
+        client.Categorie.Should().Be("M");
+        client.Etablissement.Should().Be("000");
+        client.Adresse.Should().Be("RTE EL AIN KM 3");
+        client.NumeroAdresse.Should().Be("0");
+    }
+
+    [Theory]
+    [InlineData("", "SOCIETE TEST", "7654321", "B", "M")]
+    [InlineData("TEST002", "", "7654321", "B", "M")]
+    [InlineData("TEST002", "SOCIETE TEST", "ABC", "B", "M")]
+    [InlineData("TEST002", "SOCIETE TEST", "7654321", "B", "E")]
+    public async Task CreateClient_WithInvalidFiscalReference_ShouldFail(
+        string code, string name, string identifier, string key, string category)
+    {
+        await using var db = CreateDbContext();
+        var request = ValidClientRequest();
+        request.Code = code;
+        request.RaisonSociale = name;
+        request.MatriculeFiscal = identifier;
+        request.Cle = key;
+        request.Categorie = category;
+
+        var act = () => CreateClientsService(db).CreateAsync(request, null);
+
+        await act.Should().ThrowAsync<FluentValidation.ValidationException>();
+    }
+
+    [Fact]
+    public async Task UpdateDeactivateSearchAndFilterClient_ShouldPersistExpectedState()
+    {
+        await using var db = CreateDbContext();
+        var service = CreateClientsService(db);
+        var created = await service.CreateAsync(ValidClientRequest(), null);
+
+        var updated = await service.UpdateAsync(created.Id, new UpdateClientCompanyRequest
+        {
+            Code = created.Code,
+            RaisonSociale = created.RaisonSociale,
+            MatriculeFiscal = created.MatriculeFiscal,
+            Cle = created.Cle,
+            Categorie = created.Categorie,
+            CodeTva = "A",
+            Etablissement = "000",
+            Activite = "SERVICES INFORMATIQUES",
+            Ville = "SFAX",
+            Adresse = "RTE GREMDA KM 2",
+            NumeroAdresse = "12",
+            CodePostal = "3012",
+            Telephone = "22222222",
+            IsActive = true
+        }, null);
+
+        updated.Adresse.Should().Be("RTE GREMDA KM 2");
+        updated.Telephone.Should().Be("22222222");
+        (await service.GetAllAsync(false, "TEST002", "active")).Should().ContainSingle();
+        (await service.GetAllAsync(false, "SOCIETE TEST", "active")).Should().ContainSingle();
+        (await service.GetAllAsync(false, "7654321", "active")).Should().ContainSingle();
+        (await service.GetAllAsync(false, "SFAX", "active")).Should().ContainSingle();
+
+        await service.DeleteAsync(created.Id, null);
+
+        (await service.GetAllAsync(false, null, "active")).Should().BeEmpty();
+        (await service.GetAllAsync(true, null, "inactive")).Should().ContainSingle(x => !x.IsActive);
+        db.AuditLogs.Should().Contain(x => x.Action == "CLIENT_DEACTIVATED");
     }
 
     [Fact]
@@ -391,6 +478,36 @@ public sealed class CabinetServicesTests
     public async Task UserDto_DoesNotContainPasswordHash()
     {
         typeof(UserDto).GetProperty("PasswordHash").Should().BeNull();
+    }
+
+    private static ClientsService CreateClientsService(ApplicationDbContext db)
+    {
+        return new ClientsService(
+            db,
+            new FakeCurrentUserService(),
+            new TestHostEnvironment(),
+            new CreateClientCompanyRequestValidator(),
+            new UpdateClientCompanyRequestValidator());
+    }
+
+    private static CreateClientCompanyRequest ValidClientRequest()
+    {
+        return new CreateClientCompanyRequest
+        {
+            Code = "TEST002",
+            RaisonSociale = "SOCIETE TEST CHAMPS REFERENCE",
+            MatriculeFiscal = "7654321",
+            Cle = "B",
+            Categorie = "M",
+            CodeTva = "A",
+            Etablissement = "",
+            Activite = "SERVICES INFORMATIQUES",
+            Ville = "SFAX",
+            Adresse = "RTE EL AIN KM 3",
+            NumeroAdresse = "0",
+            CodePostal = "3012",
+            Telephone = "98415573"
+        };
     }
 
     private static ApplicationDbContext CreateDbContext()

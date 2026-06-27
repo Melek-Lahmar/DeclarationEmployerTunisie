@@ -23,6 +23,24 @@ Si le titre est vide, il devient :
 La declaration creee est rechargee, selectionnee et conservee dans l'etat Desktop
 partage. Son resume et son historique sont ensuite charges automatiquement.
 
+## Module Societes clientes
+
+Le formulaire moderne reprend les champs de la reference metier : Code, Raison
+sociale, Identifiant, Clef, Categorie, Code TVA, N° d'etablissement, Activite,
+Ville, Rue, N° Rue, Code Postale, Tel et Societe active.
+
+Le mapping technique conserve la compatibilite existante : `MatriculeFiscal`
+correspond a Identifiant, `Adresse` a Rue et `NumeroAdresse` a N° Rue. La clef,
+la categorie et le code TVA sont normalises en majuscules. Le numero
+d'etablissement prend `000` quand il est omis.
+
+- `Nouveau` vide la saisie et initialise l'etablissement a `000`, le N° Rue a
+  `0` et le statut a actif.
+- `Enregistrer` cree ou modifie selon qu'une ligne est selectionnee.
+- `Desactiver` effectue une suppression logique apres confirmation.
+- La recherche couvre Code, Raison sociale, Identifiant et Ville.
+- Le filtre propose Tous, Actifs et Inactifs.
+
 ## Boutons de l'ecran Declarations
 
 - `Rafraichir` recharge les filtres et declarations.

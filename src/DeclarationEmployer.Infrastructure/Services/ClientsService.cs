@@ -158,10 +158,10 @@ public sealed class ClientsService : IClientsService
             Code = code,
             RaisonSociale = request.RaisonSociale.Trim(),
             MatriculeFiscal = Normalize(request.MatriculeFiscal),
-            Cle = Normalize(request.Cle),
-            Categorie = Normalize(request.Categorie),
-            CodeTva = Normalize(request.CodeTva),
-            Etablissement = Normalize(request.Etablissement),
+            Cle = NormalizeUpper(request.Cle),
+            Categorie = NormalizeUpper(request.Categorie),
+            CodeTva = NormalizeUpper(request.CodeTva),
+            Etablissement = Normalize(request.Etablissement) ?? "000",
             Activite = Normalize(request.Activite),
             Adresse = Normalize(request.Adresse),
             Ville = Normalize(request.Ville),
@@ -213,10 +213,10 @@ public sealed class ClientsService : IClientsService
         entity.Code = code;
         entity.RaisonSociale = request.RaisonSociale.Trim();
         entity.MatriculeFiscal = Normalize(request.MatriculeFiscal);
-        entity.Cle = Normalize(request.Cle);
-        entity.Categorie = Normalize(request.Categorie);
-        entity.CodeTva = Normalize(request.CodeTva);
-        entity.Etablissement = Normalize(request.Etablissement);
+        entity.Cle = NormalizeUpper(request.Cle);
+        entity.Categorie = NormalizeUpper(request.Categorie);
+        entity.CodeTva = NormalizeUpper(request.CodeTva);
+        entity.Etablissement = Normalize(request.Etablissement) ?? "000";
         entity.Activite = Normalize(request.Activite);
         entity.Adresse = Normalize(request.Adresse);
         entity.Ville = Normalize(request.Ville);
@@ -322,6 +322,11 @@ public sealed class ClientsService : IClientsService
         return string.IsNullOrWhiteSpace(value)
             ? null
             : value.Trim();
+    }
+
+    private static string? NormalizeUpper(string? value)
+    {
+        return Normalize(value)?.ToUpperInvariant();
     }
 
     private void AddAudit(

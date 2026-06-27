@@ -23,6 +23,7 @@ public sealed class ClientsViewModel : ObservableObject
     private string? _activite;
     private string? _adresse;
     private string? _ville;
+    private string? _numeroAdresse;
     private string? _codePostal;
     private string? _telephone;
     private bool _isActive = true;
@@ -125,6 +126,12 @@ public sealed class ClientsViewModel : ObservableObject
         set => SetProperty(ref _ville, value);
     }
 
+    public string? NumeroAdresse
+    {
+        get => _numeroAdresse;
+        set => SetProperty(ref _numeroAdresse, value);
+    }
+
     public string? CodePostal
     {
         get => _codePostal;
@@ -208,11 +215,12 @@ public sealed class ClientsViewModel : ObservableObject
         MatriculeFiscal = string.Empty;
         Cle = string.Empty;
         Categorie = string.Empty;
-        CodeTva = "000";
+        CodeTva = string.Empty;
         Etablissement = "000";
         Activite = string.Empty;
         Adresse = string.Empty;
         Ville = string.Empty;
+        NumeroAdresse = "0";
         CodePostal = string.Empty;
         Telephone = string.Empty;
         IsActive = true;
@@ -242,7 +250,7 @@ public sealed class ClientsViewModel : ObservableObject
             {
                 StatusMessage = "Création de la société...";
 
-                await _apiClient.CreateAsync(new CreateClientCompanyRequest
+                var saved = await _apiClient.CreateAsync(new CreateClientCompanyRequest
                 {
                     Code = Code,
                     RaisonSociale = RaisonSociale,
@@ -254,17 +262,20 @@ public sealed class ClientsViewModel : ObservableObject
                     Activite = Activite,
                     Adresse = Adresse,
                     Ville = Ville,
+                    NumeroAdresse = NumeroAdresse,
                     CodePostal = CodePostal,
                     Telephone = Telephone
                 });
 
+                await LoadAsync();
+                SelectedClient = Clients.FirstOrDefault(x => x.Id == saved.Id);
                 StatusMessage = "Société créée avec succès.";
             }
             else
             {
                 StatusMessage = "Modification de la société...";
 
-                await _apiClient.UpdateAsync(_editingId.Value, new UpdateClientCompanyRequest
+                var saved = await _apiClient.UpdateAsync(_editingId.Value, new UpdateClientCompanyRequest
                 {
                     Code = Code,
                     RaisonSociale = RaisonSociale,
@@ -276,16 +287,16 @@ public sealed class ClientsViewModel : ObservableObject
                     Activite = Activite,
                     Adresse = Adresse,
                     Ville = Ville,
+                    NumeroAdresse = NumeroAdresse,
                     CodePostal = CodePostal,
                     Telephone = Telephone,
                     IsActive = IsActive
                 });
 
+                await LoadAsync();
+                SelectedClient = Clients.FirstOrDefault(x => x.Id == saved.Id);
                 StatusMessage = "Société modifiée avec succès.";
             }
-
-            await LoadAsync();
-            NewClient();
         }
         catch (Exception ex)
         {
@@ -358,6 +369,7 @@ public sealed class ClientsViewModel : ObservableObject
         Activite = SelectedClient.Activite;
         Adresse = SelectedClient.Adresse;
         Ville = SelectedClient.Ville;
+        NumeroAdresse = SelectedClient.NumeroAdresse;
         CodePostal = SelectedClient.CodePostal;
         Telephone = SelectedClient.Telephone;
         IsActive = SelectedClient.IsActive;

@@ -109,7 +109,7 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,12,10">
-                    <TextBlock Text="Code société" FontWeight="SemiBold"/>
+                    <TextBlock Text="Code" FontWeight="SemiBold"/>
                     <TextBox Text="{Binding Code, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
                 </StackPanel>
 
@@ -119,12 +119,12 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,12,10">
-                    <TextBlock Text="Matricule fiscal" FontWeight="SemiBold"/>
+                    <TextBlock Text="Identifiant" FontWeight="SemiBold"/>
                     <TextBox Text="{Binding MatriculeFiscal, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="0" Grid.Column="3" Margin="0,0,0,10">
-                    <TextBlock Text="Clé" FontWeight="SemiBold"/>
+                    <TextBlock Text="Clef" FontWeight="SemiBold"/>
                     <TextBox Text="{Binding Cle, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
                 </StackPanel>
 
@@ -144,12 +144,12 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="1" Grid.Column="3" Margin="0,0,0,10">
-                    <TextBlock Text="Établissement" FontWeight="SemiBold"/>
+                    <TextBlock Text="N° d'établissement" FontWeight="SemiBold"/>
                     <TextBox Text="{Binding Etablissement, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,12,10">
-                    <TextBlock Text="Adresse" FontWeight="SemiBold"/>
+                    <TextBlock Text="Rue" FontWeight="SemiBold"/>
                     <TextBox Text="{Binding Adresse, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
                 </StackPanel>
 
@@ -159,17 +159,22 @@
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Grid.Column="3" Margin="0,0,0,10">
-                    <TextBlock Text="Code postal" FontWeight="SemiBold"/>
+                    <TextBlock Text="Code Postale" FontWeight="SemiBold"/>
                     <TextBox Text="{Binding CodePostal, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
                 </StackPanel>
 
                 <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,12,0">
-                    <TextBlock Text="Téléphone" FontWeight="SemiBold"/>
+                    <TextBlock Text="Tel" FontWeight="SemiBold"/>
                     <TextBox Text="{Binding Telephone, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
                 </StackPanel>
 
+                <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,0,12,0">
+                    <TextBlock Text="N° Rue" FontWeight="SemiBold"/>
+                    <TextBox Text="{Binding NumeroAdresse, UpdateSourceTrigger=PropertyChanged}" Height="32"/>
+                </StackPanel>
+
                 <CheckBox Grid.Row="3"
-                          Grid.Column="1"
+                          Grid.Column="2"
                           Content="Société active"
                           VerticalAlignment="Center"
                           IsChecked="{Binding IsActive}"/>
@@ -191,14 +196,18 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="110"/>
                 <DataGridTextColumn Header="Raison sociale" Binding="{Binding RaisonSociale}" Width="260"/>
-                <DataGridTextColumn Header="Matricule fiscal" Binding="{Binding MatriculeFiscal}" Width="130"/>
-                <DataGridTextColumn Header="Clé" Binding="{Binding Cle}" Width="70"/>
+                <DataGridTextColumn Header="Identifiant" Binding="{Binding MatriculeFiscal}" Width="110"/>
+                <DataGridTextColumn Header="Clef" Binding="{Binding Cle}" Width="60"/>
                 <DataGridTextColumn Header="Catégorie" Binding="{Binding Categorie}" Width="90"/>
                 <DataGridTextColumn Header="TVA" Binding="{Binding CodeTva}" Width="80"/>
-                <DataGridTextColumn Header="Étab." Binding="{Binding Etablissement}" Width="80"/>
+                <DataGridTextColumn Header="N° établissement" Binding="{Binding Etablissement}" Width="120"/>
+                <DataGridTextColumn Header="Activité" Binding="{Binding Activite}" Width="180"/>
                 <DataGridTextColumn Header="Ville" Binding="{Binding Ville}" Width="120"/>
-                <DataGridTextColumn Header="Téléphone" Binding="{Binding Telephone}" Width="120"/>
-                <DataGridCheckBoxColumn Header="Actif" Binding="{Binding IsActive}" Width="70"/>
+                <DataGridTextColumn Header="Rue" Binding="{Binding Adresse}" Width="220"/>
+                <DataGridTextColumn Header="N° Rue" Binding="{Binding NumeroAdresse}" Width="80"/>
+                <DataGridTextColumn Header="Code Postale" Binding="{Binding CodePostal}" Width="100"/>
+                <DataGridTextColumn Header="Tel" Binding="{Binding Telephone}" Width="110"/>
+                <DataGridCheckBoxColumn Header="Active" Binding="{Binding IsActive}" Width="70"/>
             </DataGrid.Columns>
         </DataGrid>
 
