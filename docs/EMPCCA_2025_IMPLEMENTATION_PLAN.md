@@ -376,6 +376,9 @@ Une phase n'est stable que si :
 - generateurs techniques A3, A4, A6 et A7 de 399 caracteres avec totaux calcules ;
 - generateur technique DECEMP de 51 lignes de 38 caracteres ;
 - garde centrale qui interdit de marquer ces artefacts comme officiels.
+- workflow Desktop de creation de declaration avec titre automatique, selection
+  automatique, resume, historique et etat de declaration courante partage ;
+- creation automatique des sept entrees d'annexe lors de la creation d'une declaration.
 
 ### Verrous maintenus volontairement
 
