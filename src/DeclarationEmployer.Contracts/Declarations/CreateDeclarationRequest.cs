@@ -6,6 +6,8 @@ public sealed class CreateDeclarationRequest
 
     public Guid FiscalYearId { get; set; }
 
+    public int ActCode { get; set; }
+
     public string? Title { get; set; }
 
     public string? Notes { get; set; }

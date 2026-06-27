@@ -14,6 +14,10 @@ public sealed class DeclarationBeneficiary
 
     public string? Address { get; set; }
 
+    public string? Activity { get; set; }
+
+    public string? JobTitle { get; set; }
+
     public string? Country { get; set; }
 
     public bool IsResident { get; set; } = true;

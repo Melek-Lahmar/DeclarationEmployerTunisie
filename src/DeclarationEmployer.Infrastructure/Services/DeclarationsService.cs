@@ -122,6 +122,7 @@ public sealed class DeclarationsService : IDeclarationsService
             ClientCompanyId = request.ClientCompanyId,
             FiscalYearId = request.FiscalYearId,
             Year = fiscalYear.Year,
+            ActCode = (DeclarationActCode)request.ActCode,
             Status = DeclarationStatus.Draft,
             Title = title,
             Notes = Normalize(request.Notes),
@@ -158,6 +159,7 @@ public sealed class DeclarationsService : IDeclarationsService
         EnsureEditable(entity);
 
         entity.Title = request.Title.Trim();
+        entity.ActCode = (DeclarationActCode)request.ActCode;
         entity.Notes = Normalize(request.Notes);
         entity.UpdatedAt = DateTimeOffset.UtcNow;
 
@@ -312,6 +314,7 @@ public sealed class DeclarationsService : IDeclarationsService
             ClientRaisonSociale = entity.ClientCompany?.RaisonSociale,
             FiscalYearId = entity.FiscalYearId,
             Year = entity.Year,
+            ActCode = (int)entity.ActCode,
             Status = entity.Status.ToString(),
             Title = entity.Title,
             Notes = entity.Notes,

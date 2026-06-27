@@ -24,6 +24,8 @@ public sealed class ClientCompany
 
     public string? Ville { get; set; }
 
+    public string? NumeroAdresse { get; set; }
+
     public string? CodePostal { get; set; }
 
     public string? Telephone { get; set; }

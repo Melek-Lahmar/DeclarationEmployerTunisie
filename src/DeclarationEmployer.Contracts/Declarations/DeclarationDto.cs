@@ -14,6 +14,8 @@ public sealed class DeclarationDto
 
     public int Year { get; set; }
 
+    public int ActCode { get; set; }
+
     public string Status { get; set; } = string.Empty;
 
     public string Title { get; set; } = string.Empty;

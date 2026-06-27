@@ -3,6 +3,7 @@ using DeclarationEmployer.Domain.Auth;
 using DeclarationEmployer.Domain.Backup;
 using DeclarationEmployer.Domain.Cabinet;
 using DeclarationEmployer.Domain.Declarations;
+using DeclarationEmployer.Domain.Declarations.Empcca;
 using DeclarationEmployer.Domain.Fiscal;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,6 +32,20 @@ public sealed class ApplicationDbContext : DbContext
 
     public DbSet<DeclarationLine> DeclarationLines => Set<DeclarationLine>();
 
+    public DbSet<AnnexA1Detail> AnnexA1Details => Set<AnnexA1Detail>();
+
+    public DbSet<AnnexA2Detail> AnnexA2Details => Set<AnnexA2Detail>();
+
+    public DbSet<AnnexA3Detail> AnnexA3Details => Set<AnnexA3Detail>();
+
+    public DbSet<AnnexA4Detail> AnnexA4Details => Set<AnnexA4Detail>();
+
+    public DbSet<AnnexA5Detail> AnnexA5Details => Set<AnnexA5Detail>();
+
+    public DbSet<AnnexA6Detail> AnnexA6Details => Set<AnnexA6Detail>();
+
+    public DbSet<AnnexA7Detail> AnnexA7Details => Set<AnnexA7Detail>();
+
     public DbSet<DeclarationAnomaly> DeclarationAnomalies => Set<DeclarationAnomaly>();
 
     public DbSet<GeneratedFile> GeneratedFiles => Set<GeneratedFile>();
@@ -58,6 +73,7 @@ public sealed class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
 
         modelBuilder.Entity<ApplicationUser>(entity =>
         {
@@ -158,6 +174,10 @@ public sealed class ApplicationDbContext : DbContext
                 .HasColumnName("ville")
                 .HasMaxLength(100);
 
+            entity.Property(x => x.NumeroAdresse)
+                .HasColumnName("numero_adresse")
+                .HasMaxLength(20);
+
             entity.Property(x => x.CodePostal)
                 .HasColumnName("code_postal")
                 .HasMaxLength(20);
@@ -236,6 +256,11 @@ public sealed class ApplicationDbContext : DbContext
 
             entity.Property(x => x.Year)
                 .HasColumnName("year")
+                .IsRequired();
+
+            entity.Property(x => x.ActCode)
+                .HasColumnName("act_code")
+                .HasConversion<int>()
                 .IsRequired();
 
             entity.Property(x => x.Status)
@@ -365,6 +390,8 @@ public sealed class ApplicationDbContext : DbContext
             entity.Property(x => x.Identifier).HasColumnName("identifier").HasMaxLength(100).IsRequired();
             entity.Property(x => x.FullNameOrCompanyName).HasColumnName("full_name_or_company_name").HasMaxLength(250).IsRequired();
             entity.Property(x => x.Address).HasColumnName("address").HasMaxLength(500);
+            entity.Property(x => x.Activity).HasColumnName("activity").HasMaxLength(250);
+            entity.Property(x => x.JobTitle).HasColumnName("job_title").HasMaxLength(250);
             entity.Property(x => x.Country).HasColumnName("country").HasMaxLength(100);
             entity.Property(x => x.IsResident).HasColumnName("is_resident").IsRequired();
             entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
@@ -463,6 +490,12 @@ public sealed class ApplicationDbContext : DbContext
             entity.Property(x => x.FileName).HasColumnName("file_name").HasMaxLength(250).IsRequired();
             entity.Property(x => x.RelativePath).HasColumnName("relative_path").HasMaxLength(1000).IsRequired();
             entity.Property(x => x.Sha256Hash).HasColumnName("sha256_hash").HasMaxLength(128);
+            entity.Property(x => x.AnnexNumber).HasColumnName("annex_number");
+            entity.Property(x => x.IsOfficial).HasColumnName("is_official").IsRequired();
+            entity.Property(x => x.ValidationStatus).HasColumnName("validation_status").HasMaxLength(50);
+            entity.Property(x => x.LineCount).HasColumnName("line_count");
+            entity.Property(x => x.ExpectedLineLength).HasColumnName("expected_line_length");
+            entity.Property(x => x.Encoding).HasColumnName("encoding").HasMaxLength(50);
             entity.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
             entity.Property(x => x.CreatedBy).HasColumnName("created_by").HasMaxLength(100);
 

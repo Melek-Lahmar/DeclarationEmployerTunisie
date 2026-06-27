@@ -12,6 +12,8 @@ public sealed class EmployerDeclaration
 
     public int Year { get; set; }
 
+    public DeclarationActCode ActCode { get; set; } = DeclarationActCode.Spontaneous;
+
     public DeclarationStatus Status { get; set; } = DeclarationStatus.Draft;
 
     public string Title { get; set; } = string.Empty;

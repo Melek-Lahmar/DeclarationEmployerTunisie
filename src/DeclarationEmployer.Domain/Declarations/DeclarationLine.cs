@@ -1,5 +1,7 @@
 namespace DeclarationEmployer.Domain.Declarations;
 
+using DeclarationEmployer.Domain.Declarations.Empcca;
+
 public sealed class DeclarationLine
 {
     public Guid Id { get; set; } = Guid.NewGuid();
@@ -39,4 +41,18 @@ public sealed class DeclarationLine
     public DeclarationAnnex? Annex { get; set; }
 
     public DeclarationBeneficiary? Beneficiary { get; set; }
+
+    public AnnexA1Detail? AnnexA1Detail { get; set; }
+
+    public AnnexA2Detail? AnnexA2Detail { get; set; }
+
+    public AnnexA3Detail? AnnexA3Detail { get; set; }
+
+    public AnnexA4Detail? AnnexA4Detail { get; set; }
+
+    public AnnexA5Detail? AnnexA5Detail { get; set; }
+
+    public AnnexA6Detail? AnnexA6Detail { get; set; }
+
+    public AnnexA7Detail? AnnexA7Detail { get; set; }
 }

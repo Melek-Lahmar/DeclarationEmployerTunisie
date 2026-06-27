@@ -13,6 +13,9 @@ public sealed class CreateDeclarationRequestValidator : AbstractValidator<Create
         RuleFor(x => x.FiscalYearId)
             .NotEmpty();
 
+        RuleFor(x => x.ActCode)
+            .InclusiveBetween(0, 2);
+
         RuleFor(x => x.Title)
             .MaximumLength(250);
 

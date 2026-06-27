@@ -23,6 +23,7 @@ public sealed class UpdateClientCompanyRequestValidator : AbstractValidator<Upda
         RuleFor(x => x.Activite).MaximumLength(250);
         RuleFor(x => x.Adresse).MaximumLength(500);
         RuleFor(x => x.Ville).MaximumLength(100);
+        RuleFor(x => x.NumeroAdresse).MaximumLength(20);
         RuleFor(x => x.CodePostal).MaximumLength(20);
         RuleFor(x => x.Telephone).MaximumLength(50);
     }

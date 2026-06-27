@@ -7,6 +7,9 @@ public sealed class UpdateDeclarationRequestValidator : AbstractValidator<Update
 {
     public UpdateDeclarationRequestValidator()
     {
+        RuleFor(x => x.ActCode)
+            .InclusiveBetween(0, 2);
+
         RuleFor(x => x.Title)
             .NotEmpty()
             .MaximumLength(250);

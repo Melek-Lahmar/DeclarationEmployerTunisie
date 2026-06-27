@@ -22,6 +22,8 @@ public sealed class UpdateClientCompanyRequest
 
     public string? Ville { get; set; }
 
+    public string? NumeroAdresse { get; set; }
+
     public string? CodePostal { get; set; }
 
     public string? Telephone { get; set; }

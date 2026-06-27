@@ -14,6 +14,18 @@ public sealed class GeneratedFile
 
     public string? Sha256Hash { get; set; }
 
+    public int? AnnexNumber { get; set; }
+
+    public bool IsOfficial { get; set; }
+
+    public string? ValidationStatus { get; set; }
+
+    public int? LineCount { get; set; }
+
+    public int? ExpectedLineLength { get; set; }
+
+    public string? Encoding { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
     public string? CreatedBy { get; set; }

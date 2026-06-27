@@ -165,6 +165,7 @@ public sealed class ClientsService : IClientsService
             Activite = Normalize(request.Activite),
             Adresse = Normalize(request.Adresse),
             Ville = Normalize(request.Ville),
+            NumeroAdresse = Normalize(request.NumeroAdresse),
             CodePostal = Normalize(request.CodePostal),
             Telephone = Normalize(request.Telephone),
             IsActive = true,
@@ -219,6 +220,7 @@ public sealed class ClientsService : IClientsService
         entity.Activite = Normalize(request.Activite);
         entity.Adresse = Normalize(request.Adresse);
         entity.Ville = Normalize(request.Ville);
+        entity.NumeroAdresse = Normalize(request.NumeroAdresse);
         entity.CodePostal = Normalize(request.CodePostal);
         entity.Telephone = Normalize(request.Telephone);
         entity.IsActive = request.IsActive;
@@ -307,6 +309,7 @@ public sealed class ClientsService : IClientsService
             Activite = entity.Activite,
             Adresse = entity.Adresse,
             Ville = entity.Ville,
+            NumeroAdresse = entity.NumeroAdresse,
             CodePostal = entity.CodePostal,
             Telephone = entity.Telephone,
             IsActive = entity.IsActive,
