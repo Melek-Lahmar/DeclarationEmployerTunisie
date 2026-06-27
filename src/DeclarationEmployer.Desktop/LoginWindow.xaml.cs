@@ -1,32 +1,24 @@
 using System.Windows;
 using DeclarationEmployer.Desktop.ViewModels;
 using DeclarationEmployer.Desktop.Views;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DeclarationEmployer.Desktop;
 
 public partial class LoginWindow : Window
 {
     private readonly LoginViewModel _viewModel;
-    private readonly IServiceProvider _serviceProvider;
 
-    public LoginWindow(
-        LoginView loginView,
-        LoginViewModel viewModel,
-        IServiceProvider serviceProvider)
+    public LoginWindow(LoginView loginView)
     {
         InitializeComponent();
-        _viewModel = viewModel;
-        _serviceProvider = serviceProvider;
+        _viewModel = (LoginViewModel)loginView.DataContext;
         LoginContent.Content = loginView;
         _viewModel.LoginSucceeded += OnLoginSucceeded;
     }
 
     private void OnLoginSucceeded()
     {
-        var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
-        mainWindow.Show();
-        Close();
+        DialogResult = true;
     }
 
     protected override void OnClosed(EventArgs e)

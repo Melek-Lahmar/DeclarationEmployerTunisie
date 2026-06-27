@@ -19,7 +19,7 @@ public sealed class LoginViewModel : ObservableObject
     {
         _authApiClient = authApiClient;
         _sessionService = sessionService;
-        LoginCommand = new AsyncRelayCommand(LoginAsync);
+        LoginCommand = new AsyncRelayCommand(LoginAsync, () => !IsBusy);
     }
 
     public event Action? LoginSucceeded;
@@ -41,7 +41,13 @@ public sealed class LoginViewModel : ObservableObject
     public bool IsBusy
     {
         get => _isBusy;
-        set => SetProperty(ref _isBusy, value);
+        private set
+        {
+            if (SetProperty(ref _isBusy, value))
+            {
+                LoginCommand.NotifyCanExecuteChanged();
+            }
+        }
     }
 
     public string StatusMessage
@@ -52,6 +58,11 @@ public sealed class LoginViewModel : ObservableObject
 
     public async Task LoginAsync()
     {
+        if (IsBusy)
+        {
+            return;
+        }
+
         try
         {
             IsBusy = true;

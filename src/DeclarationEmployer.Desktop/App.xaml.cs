@@ -13,6 +13,9 @@ public partial class App : Application
 
     protected override async void OnStartup(StartupEventArgs e)
     {
+        base.OnStartup(e);
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices(services =>
             {
@@ -121,17 +124,18 @@ public partial class App : Application
 
         await _host.StartAsync();
 
-        var sessionService = _host.Services.GetRequiredService<SessionService>();
-        if (sessionService.IsAuthenticated)
+        var loginWindow = _host.Services.GetRequiredService<LoginWindow>();
+        var loginResult = loginWindow.ShowDialog();
+
+        if (loginResult == true)
         {
             _host.Services.GetRequiredService<MainWindow>().Show();
+            ShutdownMode = ShutdownMode.OnLastWindowClose;
         }
         else
         {
-            _host.Services.GetRequiredService<LoginWindow>().Show();
+            Shutdown();
         }
-
-        base.OnStartup(e);
     }
 
     protected override async void OnExit(ExitEventArgs e)

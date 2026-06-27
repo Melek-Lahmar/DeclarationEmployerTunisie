@@ -61,7 +61,12 @@ public partial class MainWindow : Window
     {
         _sessionService.Clear();
         var loginWindow = _serviceProvider.GetRequiredService<LoginWindow>();
-        loginWindow.Show();
+
+        if (loginWindow.ShowDialog() == true)
+        {
+            _serviceProvider.GetRequiredService<MainWindow>().Show();
+        }
+
         Close();
     }
 }
