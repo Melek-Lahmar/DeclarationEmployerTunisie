@@ -40,3 +40,22 @@ dotnet ef migrations has-pending-model-changes --project src\DeclarationEmployer
 - [ ] Desactiver apres confirmation ; verifier son absence dans Actifs et sa
   presence dans Inactifs.
 - [ ] Redemarrer le Desktop et verifier que les donnees persistent.
+
+## Module Societes clientes - correction update, desactivation et suppression
+
+- [ ] Lancer l'API : `dotnet run --project src\DeclarationEmployer.Api --urls http://localhost:5050`.
+- [ ] Lancer le Desktop : `dotnet run --project src\DeclarationEmployer.Desktop`.
+- [ ] Se connecter en admin puis ouvrir `Societes clientes`.
+- [ ] Selectionner `STE MARWA DE CONFECTION`.
+- [ ] Verifier les valeurs chargees : Identifiant `0580165`, NÂ° etablissement `000`,
+  Code Postale `3012`, NÂ° Rue `0`.
+- [ ] Modifier Rue en `000 RTE EL AIN KM 3 SFAX 3051 MODIFIE` et Tel en `98415574`.
+- [ ] Cliquer `Enregistrer` et verifier l'absence d'erreur API 400.
+- [ ] Verifier le message de succes et la mise a jour de la grille.
+- [ ] Verifier que l'identifiant reste `0580165` et que l'etablissement reste `000`.
+- [ ] Cliquer `Desactiver`, confirmer, puis verifier la disparition dans `Actifs`,
+  la presence dans `Inactifs` et la presence continue dans `Tous`.
+- [ ] Creer une societe de test sans declaration puis verifier que `Supprimer`
+  la retire de la grille.
+- [ ] Tenter de supprimer une societe liee a une declaration et verifier le message
+  invitant a utiliser `Desactiver`.

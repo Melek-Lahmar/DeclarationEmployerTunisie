@@ -1,7 +1,9 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using DeclarationEmployer.Contracts.Cabinet;
+using DeclarationEmployer.Contracts.Common;
 
 namespace DeclarationEmployer.Desktop.Services;
 
@@ -93,6 +95,18 @@ public sealed class ClientsApiClient
         return result ?? throw new InvalidOperationException("Réponse API vide après modification.");
     }
 
+    public async Task DeactivateAsync(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsync(
+            $"api/clients/{id}/deactivate",
+            content: null,
+            cancellationToken);
+
+        await EnsureSuccessAsync(response, cancellationToken);
+    }
+
     public async Task DeleteAsync(
         Guid id,
         CancellationToken cancellationToken = default)
@@ -114,9 +128,60 @@ public sealed class ClientsApiClient
         }
 
         var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        var message = TryBuildFriendlyMessage(content);
 
-        throw new InvalidOperationException(
-            $"Erreur API {(int)response.StatusCode} - {response.ReasonPhrase} : {content}");
+        throw new InvalidOperationException(message);
+    }
+
+    private static string TryBuildFriendlyMessage(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return "L'API a retourné une erreur sans détail.";
+        }
+
+        try
+        {
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<JsonElement>>(content, JsonOptions);
+            var error = apiResponse?.Error;
+
+            if (error is null)
+            {
+                return content;
+            }
+
+            var lines = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(error.Message))
+            {
+                lines.Add(error.Message);
+            }
+
+            var details = error.ValidationErrors ?? error.Details;
+            if (details is not null)
+            {
+                foreach (var entry in details.OrderBy(x => x.Key))
+                {
+                    foreach (var detail in entry.Value)
+                    {
+                        if (!string.IsNullOrWhiteSpace(detail))
+                        {
+                            lines.Add($"- {detail}");
+                        }
+                    }
+                }
+            }
+
+            if (lines.Count == 0)
+            {
+                return content;
+            }
+
+            return string.Join(Environment.NewLine, lines);
+        }
+        catch (JsonException)
+        {
+            return content;
+        }
     }
 }
-

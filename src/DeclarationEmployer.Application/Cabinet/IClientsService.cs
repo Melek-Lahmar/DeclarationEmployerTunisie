@@ -42,6 +42,11 @@ public interface IClientsService
         string? ipAddress,
         CancellationToken cancellationToken = default);
 
+    Task DeactivateAsync(
+        Guid id,
+        string? ipAddress,
+        CancellationToken cancellationToken = default);
+
     Task DeleteAsync(
         Guid id,
         string? ipAddress,

@@ -147,11 +147,11 @@ public sealed class CabinetServicesTests
             Cle = created.Cle,
             Categorie = created.Categorie,
             CodeTva = "A",
-            Etablissement = "000",
+            Etablissement = "0",
             Activite = "SERVICES INFORMATIQUES",
             Ville = "SFAX",
             Adresse = "RTE GREMDA KM 2",
-            NumeroAdresse = "12",
+            NumeroAdresse = null,
             CodePostal = "3012",
             Telephone = "22222222",
             IsActive = true
@@ -159,16 +159,114 @@ public sealed class CabinetServicesTests
 
         updated.Adresse.Should().Be("RTE GREMDA KM 2");
         updated.Telephone.Should().Be("22222222");
+        updated.Etablissement.Should().Be("000");
+        updated.NumeroAdresse.Should().Be("0");
         (await service.GetAllAsync(false, "TEST002", "active")).Should().ContainSingle();
         (await service.GetAllAsync(false, "SOCIETE TEST", "active")).Should().ContainSingle();
         (await service.GetAllAsync(false, "7654321", "active")).Should().ContainSingle();
         (await service.GetAllAsync(false, "SFAX", "active")).Should().ContainSingle();
 
-        await service.DeleteAsync(created.Id, null);
+        await service.DeactivateAsync(created.Id, null);
 
         (await service.GetAllAsync(false, null, "active")).Should().BeEmpty();
         (await service.GetAllAsync(true, null, "inactive")).Should().ContainSingle(x => !x.IsActive);
         db.AuditLogs.Should().Contain(x => x.Action == "CLIENT_DEACTIVATED");
+    }
+
+    [Fact]
+    public async Task UpdateClient_ShouldKeepLeadingZeroIdentifier_AndPersistModifiedFields()
+    {
+        await using var db = CreateDbContext();
+        var service = CreateClientsService(db);
+        var created = await service.CreateAsync(new CreateClientCompanyRequest
+        {
+            Code = "2",
+            RaisonSociale = "STE MARWA DE CONFECTION",
+            MatriculeFiscal = "0580165",
+            Cle = "Y",
+            Categorie = "M",
+            CodeTva = "A",
+            Etablissement = "000",
+            Activite = "FAB.ARTICLES EN TEXTILE",
+            Adresse = "000 RTE EL AIN KM 3 SFAX 3051",
+            Ville = "SFAX",
+            NumeroAdresse = "0",
+            CodePostal = "3012",
+            Telephone = "98415573"
+        }, null);
+
+        var updated = await service.UpdateAsync(created.Id, new UpdateClientCompanyRequest
+        {
+            Code = "2",
+            RaisonSociale = "STE MARWA DE CONFECTION",
+            MatriculeFiscal = "0580165",
+            Cle = "Y",
+            Categorie = "M",
+            CodeTva = "A",
+            Etablissement = "0",
+            Activite = "FAB.ARTICLES EN TEXTILE",
+            Adresse = "000 RTE EL AIN KM 3 SFAX 3051 MODIFIE",
+            Ville = "SFAX",
+            NumeroAdresse = "0",
+            CodePostal = "3012",
+            Telephone = "98415574",
+            IsActive = true
+        }, null);
+
+        updated.MatriculeFiscal.Should().Be("0580165");
+        updated.Etablissement.Should().Be("000");
+        updated.CodePostal.Should().Be("3012");
+        updated.Adresse.Should().Be("000 RTE EL AIN KM 3 SFAX 3051 MODIFIE");
+        updated.Telephone.Should().Be("98415574");
+    }
+
+    [Fact]
+    public async Task DeleteClient_WithoutDeclarations_ShouldDelete()
+    {
+        await using var db = CreateDbContext();
+        var service = CreateClientsService(db);
+        var created = await service.CreateAsync(ValidClientRequest(), null);
+
+        await service.DeleteAsync(created.Id, null);
+
+        (await service.GetByIdAsync(created.Id)).Should().BeNull();
+        db.AuditLogs.Should().Contain(x => x.Action == "CLIENT_DELETED");
+    }
+
+    [Fact]
+    public async Task DeleteClient_WithDeclarations_ShouldReturnBusinessError()
+    {
+        await using var db = CreateDbContext();
+        var service = CreateClientsService(db);
+        var client = await service.CreateAsync(ValidClientRequest(), null);
+        var fiscalYear = new FiscalYear
+        {
+            Id = Guid.NewGuid(),
+            ClientCompanyId = client.Id,
+            Year = 2025,
+            IsClosed = false,
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+        db.FiscalYears.Add(fiscalYear);
+        db.Declarations.Add(new EmployerDeclaration
+        {
+            Id = Guid.NewGuid(),
+            ClientCompanyId = client.Id,
+            FiscalYearId = fiscalYear.Id,
+            Year = 2025,
+            ActCode = DeclarationActCode.Spontaneous,
+            Status = DeclarationStatus.Draft,
+            Title = "Declaration test",
+            IsLocked = false,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        await db.SaveChangesAsync();
+
+        var act = () => service.DeleteAsync(client.Id, null);
+
+        await act.Should()
+            .ThrowAsync<ApplicationConflictException>()
+            .WithMessage("*Elle ne peut pas être supprimée*");
     }
 
     [Fact]

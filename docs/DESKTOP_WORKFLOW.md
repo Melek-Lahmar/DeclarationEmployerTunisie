@@ -25,19 +25,23 @@ partage. Son resume et son historique sont ensuite charges automatiquement.
 
 ## Module Societes clientes
 
-Le formulaire moderne reprend les champs de la reference metier : Code, Raison
-sociale, Identifiant, Clef, Categorie, Code TVA, N° d'etablissement, Activite,
-Ville, Rue, N° Rue, Code Postale, Tel et Societe active.
+Le formulaire moderne reprend les champs de la reference metier dans cet ordre :
+Code, Raison sociale, Identifiant, Clef, Categorie, Code TVA, N° d'etablissement,
+Activite, Rue, Ville, Code Postale, Tel, N° Rue et Societe active.
 
 Le mapping technique conserve la compatibilite existante : `MatriculeFiscal`
 correspond a Identifiant, `Adresse` a Rue et `NumeroAdresse` a N° Rue. La clef,
-la categorie et le code TVA sont normalises en majuscules. Le numero
-d'etablissement prend `000` quand il est omis.
+la categorie et le code TVA sont normalises en majuscules. Les champs fiscaux
+restent des chaines pour conserver les zéros initiaux.
 
 - `Nouveau` vide la saisie et initialise l'etablissement a `000`, le N° Rue a
   `0` et le statut a actif.
-- `Enregistrer` cree ou modifie selon qu'une ligne est selectionnee.
-- `Desactiver` effectue une suppression logique apres confirmation.
+- `Enregistrer` cree ou modifie selon qu'une ligne est selectionnee. Un
+  etablissement saisi comme `0` est normalise en `000` avant l'appel API.
+- `Desactiver` effectue une desactivation logique apres confirmation.
+- `Supprimer` retire physiquement la societe seulement si elle n'est liee a
+  aucune declaration ni donnee fiscale ; sinon l'utilisateur est oriente vers
+  `Desactiver`.
 - La recherche couvre Code, Raison sociale, Identifiant et Ville.
 - Le filtre propose Tous, Actifs et Inactifs.
 

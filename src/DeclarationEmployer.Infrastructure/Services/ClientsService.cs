@@ -112,7 +112,7 @@ public sealed class ClientsService : IClientsService
             Client = client,
             FiscalYearsCount = fiscalYears.Count,
             LastFiscalYear = fiscalYears.Count == 0 ? null : fiscalYears.Max(x => x.Year),
-            DeclarationsCount = 0,
+            DeclarationsCount = await _db.Declarations.CountAsync(x => x.ClientCompanyId == id, cancellationToken),
             LastAuditAction = lastAudit?.Action,
             LastAuditAt = lastAudit?.OccurredAt
         };
@@ -141,11 +141,11 @@ public sealed class ClientsService : IClientsService
         string? ipAddress,
         CancellationToken cancellationToken = default)
     {
+        NormalizeReferenceFields(request);
         await _createValidator.ValidateAndThrowAsync(request, cancellationToken);
 
         var code = request.Code.Trim().ToUpperInvariant();
-        var exists = await _db.Clients
-            .AnyAsync(x => x.Code == code, cancellationToken);
+        var exists = await _db.Clients.AnyAsync(x => x.Code == code, cancellationToken);
 
         if (exists)
         {
@@ -191,10 +191,10 @@ public sealed class ClientsService : IClientsService
         string? ipAddress,
         CancellationToken cancellationToken = default)
     {
+        NormalizeReferenceFields(request);
         await _updateValidator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var entity = await _db.Clients
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var entity = await _db.Clients.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         if (entity is null)
         {
@@ -202,8 +202,7 @@ public sealed class ClientsService : IClientsService
         }
 
         var code = request.Code.Trim().ToUpperInvariant();
-        var duplicateCode = await _db.Clients
-            .AnyAsync(x => x.Code == code && x.Id != id, cancellationToken);
+        var duplicateCode = await _db.Clients.AnyAsync(x => x.Code == code && x.Id != id, cancellationToken);
 
         if (duplicateCode)
         {
@@ -237,17 +236,21 @@ public sealed class ClientsService : IClientsService
         return ToDto(entity);
     }
 
-    public async Task DeleteAsync(
+    public async Task DeactivateAsync(
         Guid id,
         string? ipAddress,
         CancellationToken cancellationToken = default)
     {
-        var entity = await _db.Clients
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        var entity = await _db.Clients.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
         if (entity is null)
         {
             throw new ApplicationNotFoundException("Société cliente introuvable.");
+        }
+
+        if (!entity.IsActive)
+        {
+            throw new ApplicationConflictException("Cette société est déjà inactive.");
         }
 
         entity.IsActive = false;
@@ -256,6 +259,40 @@ public sealed class ClientsService : IClientsService
             nameof(ClientCompany),
             entity.Id.ToString(),
             $"Désactivation société cliente : {entity.Code} - {entity.RaisonSociale}",
+            ipAddress);
+
+        await _db.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeleteAsync(
+        Guid id,
+        string? ipAddress,
+        CancellationToken cancellationToken = default)
+    {
+        var entity = await _db.Clients.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+
+        if (entity is null)
+        {
+            throw new ApplicationNotFoundException("Société cliente introuvable.");
+        }
+
+        var hasDeclarations = await _db.Declarations.AnyAsync(x => x.ClientCompanyId == id, cancellationToken);
+        var hasFiscalData =
+            await _db.FiscalYears.AnyAsync(x => x.ClientCompanyId == id, cancellationToken)
+            || await _db.ArchivedDocuments.AnyAsync(x => x.ClientCompanyId == id, cancellationToken);
+
+        if (hasDeclarations || hasFiscalData)
+        {
+            throw new ApplicationConflictException(
+                "Cette société est liée à des déclarations. Elle ne peut pas être supprimée. Vous pouvez la désactiver.");
+        }
+
+        _db.Clients.Remove(entity);
+        AddAudit(
+            "CLIENT_DELETED",
+            nameof(ClientCompany),
+            entity.Id.ToString(),
+            $"Suppression société cliente : {entity.Code} - {entity.RaisonSociale}",
             ipAddress);
 
         await _db.SaveChangesAsync(cancellationToken);
@@ -283,7 +320,7 @@ public sealed class ClientsService : IClientsService
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            var term = search.Trim().ToLower();
+            var term = search.Trim().ToLowerInvariant();
             query = query.Where(x =>
                 x.Code.ToLower().Contains(term) ||
                 x.RaisonSociale.ToLower().Contains(term) ||
@@ -327,6 +364,74 @@ public sealed class ClientsService : IClientsService
     private static string? NormalizeUpper(string? value)
     {
         return Normalize(value)?.ToUpperInvariant();
+    }
+
+    private static void NormalizeReferenceFields(CreateClientCompanyRequest request)
+    {
+        request.Code = request.Code.Trim();
+        request.RaisonSociale = request.RaisonSociale.Trim();
+        request.MatriculeFiscal = NormalizeDigits(request.MatriculeFiscal, 7);
+        request.Cle = NormalizeUpper(request.Cle);
+        request.Categorie = NormalizeUpper(request.Categorie);
+        request.CodeTva = NormalizeUpper(request.CodeTva);
+        request.Etablissement = NormalizeEstablishment(request.Etablissement);
+        request.Activite = Normalize(request.Activite);
+        request.Adresse = Normalize(request.Adresse);
+        request.Ville = Normalize(request.Ville);
+        request.NumeroAdresse = NormalizeStreetNumber(request.NumeroAdresse);
+        request.CodePostal = NormalizeDigits(request.CodePostal, 4);
+        request.Telephone = Normalize(request.Telephone);
+    }
+
+    private static void NormalizeReferenceFields(UpdateClientCompanyRequest request)
+    {
+        request.Code = request.Code.Trim();
+        request.RaisonSociale = request.RaisonSociale.Trim();
+        request.MatriculeFiscal = NormalizeDigits(request.MatriculeFiscal, 7);
+        request.Cle = NormalizeUpper(request.Cle);
+        request.Categorie = NormalizeUpper(request.Categorie);
+        request.CodeTva = NormalizeUpper(request.CodeTva);
+        request.Etablissement = NormalizeEstablishment(request.Etablissement);
+        request.Activite = Normalize(request.Activite);
+        request.Adresse = Normalize(request.Adresse);
+        request.Ville = Normalize(request.Ville);
+        request.NumeroAdresse = NormalizeStreetNumber(request.NumeroAdresse);
+        request.CodePostal = NormalizeDigits(request.CodePostal, 4);
+        request.Telephone = Normalize(request.Telephone);
+    }
+
+    private static string? NormalizeDigits(string? value, int expectedLength)
+    {
+        var normalized = Normalize(value);
+
+        if (normalized is null)
+        {
+            return null;
+        }
+
+        return normalized.All(char.IsDigit) && normalized.Length < expectedLength
+            ? normalized.PadLeft(expectedLength, '0')
+            : normalized;
+    }
+
+    private static string NormalizeEstablishment(string? value)
+    {
+        var normalized = Normalize(value);
+
+        if (normalized is null)
+        {
+            return "000";
+        }
+
+        return normalized.All(char.IsDigit) && normalized.Length < 3
+            ? normalized.PadLeft(3, '0')
+            : normalized;
+    }
+
+    private static string NormalizeStreetNumber(string? value)
+    {
+        var normalized = Normalize(value);
+        return string.IsNullOrWhiteSpace(normalized) ? "0" : normalized;
     }
 
     private void AddAudit(

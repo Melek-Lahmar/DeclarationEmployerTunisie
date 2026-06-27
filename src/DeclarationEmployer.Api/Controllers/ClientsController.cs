@@ -120,6 +120,19 @@ public sealed class ClientsController : ControllerBase
         return Ok(client);
     }
 
+    [HttpPost("{id:guid}/deactivate")]
+    public async Task<IActionResult> Deactivate(
+        Guid id,
+        CancellationToken cancellationToken = default)
+    {
+        await _clientsService.DeactivateAsync(
+            id,
+            HttpContext.Connection.RemoteIpAddress?.ToString(),
+            cancellationToken);
+
+        return NoContent();
+    }
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(
         Guid id,
