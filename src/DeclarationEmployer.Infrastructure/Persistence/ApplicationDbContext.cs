@@ -416,6 +416,7 @@ public sealed class ApplicationDbContext : DbContext
             entity.Property(x => x.DeclarationId).HasColumnName("declaration_id").IsRequired();
             entity.Property(x => x.AnnexId).HasColumnName("annex_id");
             entity.Property(x => x.BeneficiaryId).HasColumnName("beneficiary_id");
+            entity.Property(x => x.OrderNumber).HasColumnName("order_number");
             entity.Property(x => x.OperationType).HasColumnName("operation_type").HasMaxLength(100).IsRequired();
             entity.Property(x => x.FiscalCategory).HasColumnName("fiscal_category").HasMaxLength(100);
             entity.Property(x => x.GrossAmount).HasColumnName("gross_amount").HasPrecision(18, 3).IsRequired();

@@ -12,6 +12,8 @@ public sealed class DeclarationLine
 
     public Guid? BeneficiaryId { get; set; }
 
+    public int? OrderNumber { get; set; }
+
     public string OperationType { get; set; } = string.Empty;
 
     public string? FiscalCategory { get; set; }
