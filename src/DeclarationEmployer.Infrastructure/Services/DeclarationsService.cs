@@ -102,6 +102,11 @@ public sealed class DeclarationsService : IDeclarationsService
             throw new ApplicationConflictException("L'exercice fiscal ne correspond pas a cette societe.");
         }
 
+        var client = await _db.Clients
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == request.ClientCompanyId, cancellationToken)
+            ?? throw new ApplicationNotFoundException("Societe cliente introuvable.");
+
         var exists = await _db.Declarations
             .AnyAsync(x => x.ClientCompanyId == request.ClientCompanyId &&
                            x.FiscalYearId == request.FiscalYearId,
@@ -113,7 +118,7 @@ public sealed class DeclarationsService : IDeclarationsService
         }
 
         var title = string.IsNullOrWhiteSpace(request.Title)
-            ? $"Declaration employeur {fiscalYear.Year}"
+            ? $"Declaration employeur {fiscalYear.Year} - {client.RaisonSociale}"
             : request.Title.Trim();
 
         var entity = new EmployerDeclaration
@@ -129,6 +134,27 @@ public sealed class DeclarationsService : IDeclarationsService
             CreatedBy = GetAuditUserName(),
             CreatedAt = DateTimeOffset.UtcNow
         };
+
+        var annexTitles = new[]
+        {
+            "Annexe I - Salaires, traitements, pensions et CSS",
+            "Annexe II - Honoraires, commissions, loyers et residents",
+            "Annexe III - Capitaux mobiliers et interets",
+            "Annexe IV - Non-residents et personnes non etablies",
+            "Annexe V - Acquisitions, TVA et retenue 3 %",
+            "Annexe VI - Ristournes, ventes, jeux et especes",
+            "Annexe VII - Montants payes pour autrui"
+        };
+        for (var index = 0; index < annexTitles.Length; index++)
+        {
+            entity.Annexes.Add(new DeclarationAnnex
+            {
+                DeclarationId = entity.Id,
+                AnnexCode = $"A{index + 1}",
+                Title = annexTitles[index],
+                Status = DeclarationAnnexStatus.Draft
+            });
+        }
 
         _db.Declarations.Add(entity);
         AddEvent(entity.Id, "DECLARATION_CREATED", $"Creation declaration {entity.Year}.");

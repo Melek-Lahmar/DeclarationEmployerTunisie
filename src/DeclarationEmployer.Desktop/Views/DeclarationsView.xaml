@@ -20,8 +20,8 @@
                 Padding="18"
                 BorderBrush="#E2E8F0"
                 BorderThickness="1">
-            <DockPanel>
-                <StackPanel DockPanel.Dock="Left">
+            <StackPanel>
+                <StackPanel>
                     <TextBlock Text="Declarations employeur"
                                FontSize="26"
                                FontWeight="SemiBold"
@@ -32,10 +32,8 @@
                                FontSize="13"/>
                 </StackPanel>
 
-                <StackPanel DockPanel.Dock="Right"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Right">
-                    <Button Content="Actualiser"
+                <WrapPanel Margin="0,14,0,0">
+                    <Button Content="Rafraichir"
                             Width="110"
                             Height="36"
                             Margin="6,0"
@@ -45,13 +43,18 @@
                             Height="36"
                             Margin="6,0"
                             Command="{Binding FilterByClientCommand}"/>
-                    <Button Content="Nouveau"
-                            Width="95"
+                    <Button Content="Nouveau formulaire"
+                            Width="140"
                             Height="36"
                             Margin="6,0"
                             Command="{Binding NewCommand}"/>
-                    <Button Content="Enregistrer"
-                            Width="105"
+                    <Button Content="Creer declaration"
+                            Width="150"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding CreateDeclarationCommand}"/>
+                    <Button Content="Enregistrer modifications"
+                            Width="180"
                             Height="36"
                             Margin="6,0"
                             Command="{Binding SaveCommand}"/>
@@ -110,8 +113,8 @@
                             Height="36"
                             Margin="6,0"
                             Command="{Binding DeleteCommand}"/>
-                </StackPanel>
-            </DockPanel>
+                </WrapPanel>
+            </StackPanel>
         </Border>
 
         <Border Grid.Row="1"

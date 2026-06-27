@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using System.Windows;
 using Microsoft.Win32;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -27,6 +28,7 @@ public sealed class DeclarationsViewModel : ObservableObject
     private readonly GenerationApiClient _generationApiClient;
     private readonly ArchiveApiClient _archiveApiClient;
     private readonly ReportsApiClient _reportsApiClient;
+    private readonly CurrentDeclarationService _currentDeclarationService;
 
     private ClientCompanyDto? _selectedClient;
     private FiscalYearDto? _selectedFiscalYear;
@@ -75,7 +77,8 @@ public sealed class DeclarationsViewModel : ObservableObject
         DeclarationExportApiClient declarationExportApiClient,
         GenerationApiClient generationApiClient,
         ArchiveApiClient archiveApiClient,
-        ReportsApiClient reportsApiClient)
+        ReportsApiClient reportsApiClient,
+        CurrentDeclarationService currentDeclarationService)
     {
         _clientsApiClient = clientsApiClient;
         _fiscalYearsApiClient = fiscalYearsApiClient;
@@ -89,10 +92,12 @@ public sealed class DeclarationsViewModel : ObservableObject
         _generationApiClient = generationApiClient;
         _archiveApiClient = archiveApiClient;
         _reportsApiClient = reportsApiClient;
+        _currentDeclarationService = currentDeclarationService;
 
         LoadCommand = new AsyncRelayCommand(LoadAsync);
         FilterByClientCommand = new AsyncRelayCommand(FilterFiscalYearsByClientAsync);
         SaveCommand = new AsyncRelayCommand(SaveAsync);
+        CreateDeclarationCommand = new AsyncRelayCommand(CreateDeclarationAsync);
         LockCommand = new AsyncRelayCommand(LockAsync);
         CloseCommand = new AsyncRelayCommand(CloseAsync);
         DeleteCommand = new AsyncRelayCommand(DeleteAsync);
@@ -140,6 +145,8 @@ public sealed class DeclarationsViewModel : ObservableObject
     public IAsyncRelayCommand FilterByClientCommand { get; }
 
     public IAsyncRelayCommand SaveCommand { get; }
+
+    public IAsyncRelayCommand CreateDeclarationCommand { get; }
 
     public IAsyncRelayCommand LockCommand { get; }
 
@@ -202,6 +209,15 @@ public sealed class DeclarationsViewModel : ObservableObject
         {
             if (SetProperty(ref _selectedDeclaration, value))
             {
+                if (value is null)
+                {
+                    _currentDeclarationService.Clear();
+                }
+                else
+                {
+                    _currentDeclarationService.Set(value);
+                }
+
                 LoadSelectedDeclarationIntoForm();
             }
         }
@@ -392,7 +408,9 @@ public sealed class DeclarationsViewModel : ObservableObject
 
             await LoadDeclarationsAsync();
 
-            StatusMessage = $"{Declarations.Count} declaration(s) chargee(s).";
+            StatusMessage = Declarations.Count == 0
+                ? "Aucune declaration trouvee. Selectionnez une societe et un exercice, puis cliquez sur Creer declaration."
+                : $"{Declarations.Count} declaration(s) chargee(s).";
         }
         catch (Exception ex)
         {
@@ -472,13 +490,13 @@ public sealed class DeclarationsViewModel : ObservableObject
     {
         if (SelectedClient is null)
         {
-            StatusMessage = "Selectionne une societe cliente.";
+            StatusMessage = "Veuillez selectionner une societe cliente.";
             return;
         }
 
         if (SelectedFiscalYear is null)
         {
-            StatusMessage = "Selectionne un exercice fiscal.";
+            StatusMessage = "Veuillez selectionner un exercice fiscal.";
             return;
         }
 
@@ -521,6 +539,57 @@ public sealed class DeclarationsViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Erreur sauvegarde : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task CreateDeclarationAsync()
+    {
+        if (SelectedClient is null)
+        {
+            StatusMessage = "Veuillez selectionner une societe cliente.";
+            return;
+        }
+
+        if (SelectedFiscalYear is null)
+        {
+            StatusMessage = "Veuillez selectionner un exercice fiscal.";
+            return;
+        }
+
+        var title = string.IsNullOrWhiteSpace(Title)
+            ? $"Declaration employeur {SelectedFiscalYear.Year} - {SelectedClient.RaisonSociale}"
+            : Title.Trim();
+
+        try
+        {
+            IsBusy = true;
+            var created = await _declarationsApiClient.CreateAsync(new CreateDeclarationRequest
+            {
+                ClientCompanyId = SelectedClient.Id,
+                FiscalYearId = SelectedFiscalYear.Id,
+                ActCode = 0,
+                Title = title,
+                Notes = Notes
+            });
+
+            await LoadDeclarationsAsync();
+            SelectedDeclaration = Declarations.FirstOrDefault(x => x.Id == created.Id) ?? created;
+            _editingId = created.Id;
+            Title = created.Title;
+            await RefreshSelectedDeclarationDetailsAsync();
+            StatusMessage = "Declaration creee avec succes.";
+        }
+        catch (HttpRequestException)
+        {
+            StatusMessage = "Impossible de joindre l'API locale. Verifiez que l'API est lancee sur http://localhost:5050.";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Impossible de creer la declaration : {ex.Message}";
         }
         finally
         {

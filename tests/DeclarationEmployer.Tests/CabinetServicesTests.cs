@@ -222,12 +222,13 @@ public sealed class CabinetServicesTests
             new CreateDeclarationRequest
             {
                 ClientCompanyId = clientId,
-                FiscalYearId = fiscalYearId,
-                Title = "Declaration employeur 2025"
+                FiscalYearId = fiscalYearId
             },
             null);
 
         declaration.Status.Should().Be(DeclarationStatus.Draft.ToString());
+        declaration.Title.Should().Be("Declaration employeur 2025 - Societe Test");
+        db.DeclarationAnnexes.Should().HaveCount(7);
         db.AuditLogs.Should().Contain(x => x.Action == "DECLARATION_CREATED");
 
         var duplicateAct = () => service.CreateAsync(

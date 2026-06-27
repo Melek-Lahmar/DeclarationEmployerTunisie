@@ -20,6 +20,7 @@ public partial class App : Application
             .ConfigureServices(services =>
             {
                 services.AddSingleton<SessionService>();
+                services.AddSingleton<CurrentDeclarationService>();
                 services.AddTransient<AuthorizationHeaderHandler>();
 
                 services.AddHttpClient<AuthApiClient>(client =>
