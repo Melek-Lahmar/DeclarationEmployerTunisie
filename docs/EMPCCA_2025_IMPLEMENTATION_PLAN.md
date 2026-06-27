@@ -373,6 +373,7 @@ Une phase n'est stable que si :
 - code acte, numero d'ordre, activite/emploi beneficiaire et metadonnees de fichiers ;
 - workflows API detailles A1, A2 et A5 sous `/api/declarations/{id}/empcca/annexes` ;
 - generateurs techniques A1, A2 et A5 de 399 caracteres avec totaux calcules ;
+- generateurs techniques A3, A4, A6 et A7 de 399 caracteres avec totaux calcules ;
 - generateur technique DECEMP de 51 lignes de 38 caracteres ;
 - garde centrale qui interdit de marquer ces artefacts comme officiels.
 
@@ -386,3 +387,7 @@ Une phase n'est stable que si :
   car le tableau source fait se chevaucher D000 et D001 a la position 3.
 - Le CIN A1 suit temporairement le tableau ANXBEN01 (8 chiffres + 5 espaces), avec un
   blocage explicite tant que la contradiction avec la notice page 67 n'est pas levee.
+- ANXFIN07 initialise la position 240 a zero, mais conserve un blocage car cette
+  position n'est pas decrite dans le tableau source.
+- Le type A7 `29` est implemente d'apres la liste page 65, tout en restant bloquant car
+  la definition A712 indique contradictoirement `1 jusqu'a 28`.

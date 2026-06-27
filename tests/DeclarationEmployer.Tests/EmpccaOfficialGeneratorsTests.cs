@@ -92,6 +92,37 @@ public sealed class EmpccaOfficialGeneratorsTests
             .WithMessage("Generation officielle bloquee*");
     }
 
+    [Fact]
+    public void RemainingAnnexGenerators_ProduceThreeRecordsOf399Characters()
+    {
+        var beneficiary = FiscalBeneficiary();
+        var a3 = new OfficialAnnex3Generator().Generate(Declarant(),
+            [new EmpccaAnnexA3Record(1, beneficiary, new AnnexA3Detail { SavingsAccountInterest = 100, WithheldAmount = 10, NetPaidAmount = 90 })]);
+        var a4 = new OfficialAnnex4Generator().Generate(Declarant(),
+            [new EmpccaAnnexA4Record(1, beneficiary, new AnnexA4Detail { AmountType = 1, ProfessionalAmountRate = 10, ProfessionalAmount = 100, WithheldAmount = 10, NetPaidAmount = 90 })]);
+        var a6 = new OfficialAnnex6Generator().Generate(Declarant(),
+            [new EmpccaAnnexA6Record(1, beneficiary, new AnnexA6Detail { RebateType = 1, RebateAmount = 100 })]);
+        var a7 = new OfficialAnnex7Generator().Generate(Declarant(),
+            [new EmpccaAnnexA7Record(1, beneficiary, new AnnexA7Detail { PaidAmountType = 2, PaidAmount = 100, WithheldAmount = 10, NetPaidAmount = 90 })]);
+
+        new[] { a3, a4, a6, a7 }.Should().OnlyContain(result =>
+            result.Lines.Count == 3 && result.Lines.All(line => line.Length == 399));
+        a3.Lines[^1].Substring(283, 15).Should().Be("000000000010000");
+        a4.Lines[^1].Substring(369, 15).Should().Be("000000000010000");
+        a6.Lines[^1].Substring(239, 15).Should().Be("000000000100000");
+        a7.Lines[^1].Substring(255, 15).Should().Be("000000000010000");
+    }
+
+    [Fact]
+    public void Annex7Generator_Type29RemainsExplicitlyBlocked()
+    {
+        var result = new OfficialAnnex7Generator().Generate(Declarant(),
+            [new EmpccaAnnexA7Record(1, FiscalBeneficiary(), new AnnexA7Detail { PaidAmountType = 29 })]);
+
+        result.BlockingIssues.Should().Contain(x => x.Contains("type A7 29", StringComparison.Ordinal));
+        result.IsOfficial.Should().BeFalse();
+    }
+
     private static EmpccaDeclarant Declarant() => new(
         "1234567", "A", "B", "000", 2025, 0,
         "COMPANY", "ACCOUNTING", "TUNIS", "MAIN STREET", "10", "1000");
