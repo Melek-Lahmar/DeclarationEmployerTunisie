@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using DeclarationEmployer.Contracts.Cabinet;
 using DeclarationEmployer.Contracts.Declarations;
 using DeclarationEmployer.Contracts.Import;
+using DeclarationEmployer.Contracts.Generation;
 using DeclarationEmployer.Desktop.Services;
 
 namespace DeclarationEmployer.Desktop.ViewModels;
@@ -58,6 +59,7 @@ public sealed class DeclarationsViewModel : ObservableObject
     private DeclarationControlResultDto? _lastControlResult;
     private DeclarationExportPreviewDto? _exportPreview;
     private DeclarationExportResultDto? _lastExportResult;
+    private EmpccaGenerationPreviewDto? _empccaPreview;
     private bool _isBusy;
     private string _statusMessage = "Pret.";
 
@@ -98,6 +100,7 @@ public sealed class DeclarationsViewModel : ObservableObject
         PreviewExportCommand = new AsyncRelayCommand(PreviewExportAsync);
         GenerateExportCommand = new AsyncRelayCommand(GenerateExportAsync);
         GenerateFoundationCommand = new AsyncRelayCommand(GenerateFoundationAsync);
+        PreviewEmpccaCommand = new AsyncRelayCommand(PreviewEmpccaAsync);
         ArchiveCommand = new AsyncRelayCommand(ArchiveAsync);
         OpenSummaryReportCommand = new AsyncRelayCommand(OpenSummaryReportAsync);
         OpenGenerationReportCommand = new AsyncRelayCommand(OpenGenerationReportAsync);
@@ -151,6 +154,8 @@ public sealed class DeclarationsViewModel : ObservableObject
     public IAsyncRelayCommand GenerateExportCommand { get; }
 
     public IAsyncRelayCommand GenerateFoundationCommand { get; }
+
+    public IAsyncRelayCommand PreviewEmpccaCommand { get; }
 
     public IAsyncRelayCommand ArchiveCommand { get; }
 
@@ -356,6 +361,12 @@ public sealed class DeclarationsViewModel : ObservableObject
     {
         get => _lastExportResult;
         set => SetProperty(ref _lastExportResult, value);
+    }
+
+    public EmpccaGenerationPreviewDto? EmpccaPreview
+    {
+        get => _empccaPreview;
+        set => SetProperty(ref _empccaPreview, value);
     }
 
     public bool IsBusy
@@ -1053,6 +1064,32 @@ public sealed class DeclarationsViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusMessage = $"Erreur generation foundation : {ex.Message}";
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    private async Task PreviewEmpccaAsync()
+    {
+        if (SelectedDeclaration is null)
+        {
+            StatusMessage = "Selectionne une declaration avant la previsualisation EMPCCA.";
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            EmpccaPreview = await _generationApiClient.GetEmpccaPreviewAsync(SelectedDeclaration.Id);
+            StatusMessage = EmpccaPreview.CanGenerateOfficial
+                ? $"Previsualisation EMPCCA valide : {EmpccaPreview.Files.Count} fichier(s)."
+                : $"EMPCCA bloque : {EmpccaPreview.BlockingIssues.Count} anomalie(s) bloquante(s).";
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Erreur previsualisation EMPCCA : {ex.Message}";
         }
         finally
         {

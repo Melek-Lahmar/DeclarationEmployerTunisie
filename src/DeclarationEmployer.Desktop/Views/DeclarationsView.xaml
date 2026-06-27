@@ -85,6 +85,11 @@
                             Height="36"
                             Margin="6,0"
                             Command="{Binding GenerateFoundationCommand}"/>
+                    <Button Content="Verifier EMPCCA"
+                            Width="135"
+                            Height="36"
+                            Margin="6,0"
+                            Command="{Binding PreviewEmpccaCommand}"/>
                     <Button Content="PDF resume"
                             Width="105"
                             Height="36"
@@ -249,6 +254,12 @@
                         <TextBlock Text="{Binding ExportPreview.TotalGrossAmount, StringFormat=Total brut export : {0}, TargetNullValue=Total brut export : 0}"
                                    Margin="0,4,0,0"/>
                         <TextBlock Text="{Binding ExportPreview.CanGenerate, StringFormat=Generation autorisee : {0}, TargetNullValue=Generation autorisee : False}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding EmpccaPreview.Files.Count, StringFormat=Fichiers EMPCCA prevus : {0}, TargetNullValue=Fichiers EMPCCA prevus : 0}"
+                                   Margin="0,8,0,0"/>
+                        <TextBlock Text="{Binding EmpccaPreview.BlockingIssues.Count, StringFormat=Blocages EMPCCA : {0}, TargetNullValue=Blocages EMPCCA : 0}"
+                                   Margin="0,4,0,0"/>
+                        <TextBlock Text="{Binding EmpccaPreview.CanGenerateOfficial, StringFormat=Mode officiel autorise : {0}, TargetNullValue=Mode officiel autorise : False}"
                                    Margin="0,4,0,0"/>
                         <TextBlock Text="{Binding LastExportResult.FileName, StringFormat=Dernier fichier : {0}, TargetNullValue=Dernier fichier : -}"
                                    Margin="0,8,0,0"

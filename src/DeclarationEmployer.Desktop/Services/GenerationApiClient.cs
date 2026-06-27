@@ -26,4 +26,15 @@ public sealed class GenerationApiClient
             DeclarationApiClientSupport.JsonOptions,
             cancellationToken) ?? throw new InvalidOperationException("Reponse API generation vide.");
     }
+
+    public async Task<EmpccaGenerationPreviewDto> GetEmpccaPreviewAsync(
+        Guid declarationId,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _httpClient.GetFromJsonAsync<EmpccaGenerationPreviewDto>(
+            $"api/declarations/{declarationId}/empcca/generation-preview",
+            DeclarationApiClientSupport.JsonOptions,
+            cancellationToken);
+        return result ?? throw new InvalidOperationException("Reponse API previsualisation EMPCCA vide.");
+    }
 }

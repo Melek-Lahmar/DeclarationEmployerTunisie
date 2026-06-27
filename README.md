@@ -170,6 +170,14 @@ Compiler ensuite `installer\det2025-foundation.iss` avec Inno Setup. Les secrets
 
 Le projet prepare une architecture prete pour integrer les formats officiels plus tard. Les exports actuels ou futurs non relies a une specification officielle doivent etre presentes comme des exports internes structures, jamais comme des fichiers officiels DGI ou TEJ.
 
+Le socle EMPCCA 2025 detaille est documente dans :
+
+- `docs/EMPCCA_2025_IMPLEMENTATION_PLAN.md`
+- `docs/EMPCCA_2025_OFFICIAL_GENERATION.md`
+
+Les generateurs fixed-width et la previsualisation API restent volontairement bloques
+en mode non officiel tant que les ambiguites reglementaires recensees ne sont pas levees.
+
 ## Limites actuelles
 
 - gestion des roles simple, surtout orientee Admin pour les endpoints utilisateurs

@@ -39,7 +39,7 @@ public sealed class EmpccaGenerationPreviewService : DeclarationServiceBase, IEm
 
         var artifacts = new List<EmpccaGenerationArtifact>();
         AddAnnexArtifacts(declarant, lines, artifacts);
-        artifacts.Insert(0, BuildDecemp(declarant, artifacts, lines));
+        artifacts.Insert(0, SafeGenerate("DECEMP_25", () => BuildDecemp(declarant, artifacts, lines)));
 
         var blocking = artifacts.SelectMany(x => x.BlockingIssues).ToList();
         blocking.AddRange(await Db.DeclarationAnomalies
@@ -88,13 +88,13 @@ public sealed class EmpccaGenerationPreviewService : DeclarationServiceBase, IEm
         var a7 = lines.Where(x => x.AnnexA7Detail is not null).Select(x =>
             new EmpccaAnnexA7Record(x.OrderNumber ?? 0, Beneficiary(x), x.AnnexA7Detail!)).ToList();
 
-        if (a1.Count > 0) artifacts.Add(new OfficialAnnex1Generator().Generate(declarant, a1));
-        if (a2.Count > 0) artifacts.Add(new OfficialAnnex2Generator().Generate(declarant, a2));
-        if (a3.Count > 0) artifacts.Add(new OfficialAnnex3Generator().Generate(declarant, a3));
-        if (a4.Count > 0) artifacts.Add(new OfficialAnnex4Generator().Generate(declarant, a4));
-        if (a5.Count > 0) artifacts.Add(new OfficialAnnex5Generator().Generate(declarant, a5));
-        if (a6.Count > 0) artifacts.Add(new OfficialAnnex6Generator().Generate(declarant, a6));
-        if (a7.Count > 0) artifacts.Add(new OfficialAnnex7Generator().Generate(declarant, a7));
+        if (a1.Count > 0) artifacts.Add(SafeGenerate("ANXEMP_1_25_1", () => new OfficialAnnex1Generator().Generate(declarant, a1)));
+        if (a2.Count > 0) artifacts.Add(SafeGenerate("ANXEMP_2_25_1", () => new OfficialAnnex2Generator().Generate(declarant, a2)));
+        if (a3.Count > 0) artifacts.Add(SafeGenerate("ANXEMP_3_25_1", () => new OfficialAnnex3Generator().Generate(declarant, a3)));
+        if (a4.Count > 0) artifacts.Add(SafeGenerate("ANXEMP_4_25_1", () => new OfficialAnnex4Generator().Generate(declarant, a4)));
+        if (a5.Count > 0) artifacts.Add(SafeGenerate("ANXEMP_5_25_1", () => new OfficialAnnex5Generator().Generate(declarant, a5)));
+        if (a6.Count > 0) artifacts.Add(SafeGenerate("ANXEMP_6_25_1", () => new OfficialAnnex6Generator().Generate(declarant, a6)));
+        if (a7.Count > 0) artifacts.Add(SafeGenerate("ANXEMP_7_25_1", () => new OfficialAnnex7Generator().Generate(declarant, a7)));
     }
 
     private static EmpccaGenerationArtifact BuildDecemp(
@@ -132,5 +132,18 @@ public sealed class EmpccaGenerationPreviewService : DeclarationServiceBase, IEm
         };
         return new EmpccaBeneficiary(type, beneficiary.Identifier, beneficiary.FullNameOrCompanyName,
             beneficiary.JobTitle ?? beneficiary.Activity ?? string.Empty, beneficiary.Address ?? string.Empty);
+    }
+
+    private static EmpccaGenerationArtifact SafeGenerate(string fileName, Func<EmpccaGenerationArtifact> generate)
+    {
+        try
+        {
+            return generate();
+        }
+        catch (ArgumentException exception)
+        {
+            return new EmpccaGenerationArtifact(fileName, Array.Empty<string>(), false,
+                [$"Donnees incompatibles avec le format {fileName} : {exception.Message}"]);
+        }
     }
 }
