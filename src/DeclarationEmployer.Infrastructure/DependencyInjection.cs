@@ -78,6 +78,7 @@ public static class DependencyInjection
         services.AddScoped<IAnnexA1Service, AnnexA1Service>();
         services.AddScoped<IAnnexFoundationService, AnnexFoundationService>();
         services.AddScoped<IEmpccaPriorityAnnexService, EmpccaPriorityAnnexService>();
+        services.AddScoped<IEmpccaGenerationPreviewService, EmpccaGenerationPreviewService>();
         services.AddScoped<IDeclarationAnnexesService, DeclarationAnnexesService>();
         services.AddScoped<IDeclarationBeneficiariesService, DeclarationBeneficiariesService>();
         services.AddScoped<IDeclarationLinesService, DeclarationLinesService>();
