@@ -89,3 +89,23 @@ dotnet ef migrations has-pending-model-changes --project src\DeclarationEmployer
 - [ ] Verifier que `Deconnexion` fonctionne toujours.
 - [ ] Verifier que l'utilisateur, la version locale et `API : localhost:5050`
   restent visibles en bas du sidebar.
+
+## Test Desktop Annexes A1 a A7
+
+- [ ] Lancer l'API : `dotnet run --project src\DeclarationEmployer.Api --urls http://localhost:5050`.
+- [ ] Lancer le Desktop : `dotnet run --project src\DeclarationEmployer.Desktop`.
+- [ ] Se connecter avec `admin`.
+- [ ] Creer ou selectionner une societe, un exercice puis une declaration employeur.
+- [ ] Ouvrir `Annexe > A1` et verifier l'affichage du contexte
+  societe / exercice / declaration / statut / validation.
+- [ ] Cliquer `Nouveau` et verifier la proposition automatique du prochain NÂ° ordre.
+- [ ] Ajouter une ligne A1 avec beneficiaire, periode, revenu imposable, retenues et net servi.
+- [ ] Enregistrer, verifier la presence dans la grille puis reselectionner la ligne.
+- [ ] Modifier au moins un montant A1 puis reenregistrer.
+- [ ] Lancer `Controler annexe` et verifier l'affichage des messages de validation.
+- [ ] Supprimer la ligne de test A1 apres confirmation.
+- [ ] Ouvrir `Annexe > A2`, ajouter une ligne resident, enregistrer puis verifier la grille et le resume.
+- [ ] Ouvrir `Annexe > A5`, ajouter une ligne avec `Retenue 3% plateformes`, enregistrer puis verifier la grille et le resume.
+- [ ] Ouvrir successivement `Annexe > A3`, `A4`, `A6`, `A7` et verifier que les ecrans s'ouvrent sans crash.
+- [ ] Ajouter au moins une ligne simple dans A3, A4, A6 et A7 puis verifier que chaque ligne reste visible uniquement dans son annexe.
+- [ ] Verifier que `Retour aux declarations` renvoie au module `Declarations employeur`.

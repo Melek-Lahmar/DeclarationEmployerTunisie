@@ -21,6 +21,18 @@ public sealed class EmpccaPriorityAnnexController : ControllerBase
         Guid declarationId, CreateEmpccaAnnexA1LineRequest request, CancellationToken cancellationToken) =>
         Ok(await _service.CreateA1LineAsync(declarationId, request, cancellationToken));
 
+    [HttpPut("A1/lines/{lineId:guid}")]
+    public async Task<ActionResult<EmpccaAnnexA1LineDto>> UpdateA1Line(
+        Guid declarationId, Guid lineId, CreateEmpccaAnnexA1LineRequest request, CancellationToken cancellationToken) =>
+        Ok(await _service.UpdateA1LineAsync(declarationId, lineId, request, cancellationToken));
+
+    [HttpDelete("A1/lines/{lineId:guid}")]
+    public async Task<IActionResult> DeleteA1Line(Guid declarationId, Guid lineId, CancellationToken cancellationToken)
+    {
+        await _service.DeleteA1LineAsync(declarationId, lineId, cancellationToken);
+        return NoContent();
+    }
+
     [HttpGet("A1/summary")]
     public async Task<ActionResult<EmpccaAnnexA1SummaryDto>> GetA1Summary(Guid declarationId, CancellationToken cancellationToken) =>
         Ok(await _service.GetA1SummaryAsync(declarationId, cancellationToken));
@@ -38,6 +50,18 @@ public sealed class EmpccaPriorityAnnexController : ControllerBase
         Guid declarationId, CreateEmpccaAnnexA2LineRequest request, CancellationToken cancellationToken) =>
         Ok(await _service.CreateA2LineAsync(declarationId, request, cancellationToken));
 
+    [HttpPut("A2/lines/{lineId:guid}")]
+    public async Task<ActionResult<EmpccaAnnexA2LineDto>> UpdateA2Line(
+        Guid declarationId, Guid lineId, CreateEmpccaAnnexA2LineRequest request, CancellationToken cancellationToken) =>
+        Ok(await _service.UpdateA2LineAsync(declarationId, lineId, request, cancellationToken));
+
+    [HttpDelete("A2/lines/{lineId:guid}")]
+    public async Task<IActionResult> DeleteA2Line(Guid declarationId, Guid lineId, CancellationToken cancellationToken)
+    {
+        await _service.DeleteA2LineAsync(declarationId, lineId, cancellationToken);
+        return NoContent();
+    }
+
     [HttpGet("A2/summary")]
     public async Task<ActionResult<EmpccaAnnexA2SummaryDto>> GetA2Summary(Guid declarationId, CancellationToken cancellationToken) =>
         Ok(await _service.GetA2SummaryAsync(declarationId, cancellationToken));
@@ -54,6 +78,18 @@ public sealed class EmpccaPriorityAnnexController : ControllerBase
     public async Task<ActionResult<EmpccaAnnexA5LineDto>> CreateA5Line(
         Guid declarationId, CreateEmpccaAnnexA5LineRequest request, CancellationToken cancellationToken) =>
         Ok(await _service.CreateA5LineAsync(declarationId, request, cancellationToken));
+
+    [HttpPut("A5/lines/{lineId:guid}")]
+    public async Task<ActionResult<EmpccaAnnexA5LineDto>> UpdateA5Line(
+        Guid declarationId, Guid lineId, CreateEmpccaAnnexA5LineRequest request, CancellationToken cancellationToken) =>
+        Ok(await _service.UpdateA5LineAsync(declarationId, lineId, request, cancellationToken));
+
+    [HttpDelete("A5/lines/{lineId:guid}")]
+    public async Task<IActionResult> DeleteA5Line(Guid declarationId, Guid lineId, CancellationToken cancellationToken)
+    {
+        await _service.DeleteA5LineAsync(declarationId, lineId, cancellationToken);
+        return NoContent();
+    }
 
     [HttpGet("A5/summary")]
     public async Task<ActionResult<EmpccaAnnexA5SummaryDto>> GetA5Summary(Guid declarationId, CancellationToken cancellationToken) =>

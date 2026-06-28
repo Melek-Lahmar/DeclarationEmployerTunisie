@@ -14,6 +14,18 @@ La generation existante reste une generation `FOUNDATION_NON_OFFICIEL` tant que 
 definitions, rapprochements DECEMP et tests de conformite decrits ici ne sont pas
 termines.
 
+### 1.1 Avancement Desktop annexe
+
+Depuis cette phase, le Desktop dispose d'un workbench de saisie annexe A1 a A7
+branche au contexte declaration actif.
+
+- A1, A2 et A5 : CRUD detaille + resume + validation.
+- A3, A4, A6 et A7 : CRUD detaille + resume + validation de base.
+
+Ce workbench aide a preparer les donnees EMPCCA, mais il ne leve pas le statut
+`FOUNDATION_NON_OFFICIEL` tant que la conformite officielle complete n'est pas
+confirmee.
+
 ## 2. Sources analysees
 
 ### 2.1 Cahier des charges

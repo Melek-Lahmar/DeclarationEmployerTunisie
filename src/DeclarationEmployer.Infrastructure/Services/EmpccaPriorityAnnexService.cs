@@ -78,6 +78,49 @@ public sealed class EmpccaPriorityAnnexService : DeclarationServiceBase, IEmpcca
         return ToA1Dto(line);
     }
 
+    public async Task<EmpccaAnnexA1LineDto> UpdateA1LineAsync(
+        Guid declarationId,
+        Guid lineId,
+        CreateEmpccaAnnexA1LineRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        await ValidateAsync(_a1Validator, request, cancellationToken);
+        await GetEditableDeclarationAsync(declarationId, cancellationToken);
+        var line = await GetExistingLineAsync(declarationId, "A1", lineId, cancellationToken);
+        await EnsureOrderIsUniqueAsync(declarationId, "A1", request.OrderNumber, lineId, cancellationToken);
+        var beneficiary = await EnsureBeneficiaryAsync(declarationId, request.Beneficiary, cancellationToken);
+        var detail = line.AnnexA1Detail ?? new AnnexA1Detail { LineId = line.Id };
+        ApplyBaseLine(line, beneficiary.Id, request.OrderNumber, "EMPCCA-A1", request.GrossTaxableIncome, request.TaxableIncome,
+            request.CommonRegimeWithheldAmount + request.ForeignEmployeeWithheldAmount + request.SocialSolidarityContribution);
+        detail.FamilySituation = request.FamilySituation;
+        detail.DependentChildrenCount = request.DependentChildrenCount;
+        detail.WorkPeriodStart = request.WorkPeriodStart;
+        detail.WorkPeriodEnd = request.WorkPeriodEnd;
+        detail.WorkPeriodDays = request.WorkPeriodDays;
+        detail.TaxableIncome = request.TaxableIncome;
+        detail.BenefitsInKind = request.BenefitsInKind;
+        detail.GrossTaxableIncome = request.GrossTaxableIncome;
+        detail.ReinvestedIncome = request.ReinvestedIncome;
+        detail.CommonRegimeWithheldAmount = request.CommonRegimeWithheldAmount;
+        detail.ForeignEmployeeWithheldAmount = request.ForeignEmployeeWithheldAmount;
+        detail.SocialSolidarityContribution = request.SocialSolidarityContribution;
+        detail.NetPaidAmount = request.NetPaidAmount;
+        line.AnnexA1Detail = detail;
+        line.Beneficiary = beneficiary;
+        await Db.SaveChangesAsync(cancellationToken);
+        return ToA1Dto(line);
+    }
+
+    public async Task DeleteA1LineAsync(Guid declarationId, Guid lineId, CancellationToken cancellationToken = default)
+    {
+        await GetEditableDeclarationAsync(declarationId, cancellationToken);
+        var line = await GetExistingLineAsync(declarationId, "A1", lineId, cancellationToken);
+        Db.DeclarationLines.Remove(line);
+        AddAudit("EMPCCA_A1_LINE_DELETED", nameof(DeclarationLine), line.Id.ToString(), "Suppression ligne detaillee EMPCCA A1.");
+        AddEvent(declarationId, "EMPCCA_A1_LINE_DELETED", $"Suppression ligne A1 numero {line.OrderNumber}.");
+        await Db.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<EmpccaAnnexA1SummaryDto> GetA1SummaryAsync(Guid declarationId, CancellationToken cancellationToken = default)
     {
         var details = await QueryLines(declarationId, "A1").Where(x => x.AnnexA1Detail != null)
@@ -145,6 +188,44 @@ public sealed class EmpccaPriorityAnnexService : DeclarationServiceBase, IEmpcca
         return ToA2Dto(line);
     }
 
+    public async Task<EmpccaAnnexA2LineDto> UpdateA2LineAsync(Guid declarationId, Guid lineId, CreateEmpccaAnnexA2LineRequest request, CancellationToken cancellationToken = default)
+    {
+        await ValidateAsync(_a2Validator, request, cancellationToken);
+        await GetEditableDeclarationAsync(declarationId, cancellationToken);
+        var line = await GetExistingLineAsync(declarationId, "A2", lineId, cancellationToken);
+        await EnsureOrderIsUniqueAsync(declarationId, "A2", request.OrderNumber, lineId, cancellationToken);
+        var beneficiary = await EnsureBeneficiaryAsync(declarationId, request.Beneficiary, cancellationToken);
+        var gross = request.GrossProfessionalAmount + request.RealRegimeFeesAmount + request.BoardAndSecuritiesAmount
+            + request.OccasionalWorkAmount + request.RealEstateCapitalGainAmount + request.HotelRentAmount + request.ArtistRemunerationAmount;
+        var detail = line.AnnexA2Detail ?? new AnnexA2Detail { LineId = line.Id };
+        ApplyBaseLine(line, beneficiary.Id, request.OrderNumber, "EMPCCA-A2", gross, gross, request.WithheldAmount);
+        detail.AmountType = request.AmountType;
+        detail.GrossProfessionalAmount = request.GrossProfessionalAmount;
+        detail.RealRegimeFeesAmount = request.RealRegimeFeesAmount;
+        detail.BoardAndSecuritiesAmount = request.BoardAndSecuritiesAmount;
+        detail.OccasionalWorkAmount = request.OccasionalWorkAmount;
+        detail.RealEstateCapitalGainAmount = request.RealEstateCapitalGainAmount;
+        detail.HotelRentAmount = request.HotelRentAmount;
+        detail.ArtistRemunerationAmount = request.ArtistRemunerationAmount;
+        detail.PublicSectorVatWithheldAmount = request.PublicSectorVatWithheldAmount;
+        detail.WithheldAmount = request.WithheldAmount;
+        detail.NetPaidAmount = request.NetPaidAmount;
+        line.AnnexA2Detail = detail;
+        line.Beneficiary = beneficiary;
+        await Db.SaveChangesAsync(cancellationToken);
+        return ToA2Dto(line);
+    }
+
+    public async Task DeleteA2LineAsync(Guid declarationId, Guid lineId, CancellationToken cancellationToken = default)
+    {
+        await GetEditableDeclarationAsync(declarationId, cancellationToken);
+        var line = await GetExistingLineAsync(declarationId, "A2", lineId, cancellationToken);
+        Db.DeclarationLines.Remove(line);
+        AddAudit("EMPCCA_A2_LINE_DELETED", nameof(DeclarationLine), line.Id.ToString(), "Suppression ligne detaillee EMPCCA A2.");
+        AddEvent(declarationId, "EMPCCA_A2_LINE_DELETED", $"Suppression ligne A2 numero {line.OrderNumber}.");
+        await Db.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<EmpccaAnnexA2SummaryDto> GetA2SummaryAsync(Guid declarationId, CancellationToken cancellationToken = default)
     {
         var details = await QueryLines(declarationId, "A2").Where(x => x.AnnexA2Detail != null)
@@ -204,6 +285,41 @@ public sealed class EmpccaPriorityAnnexService : DeclarationServiceBase, IEmpcca
         return ToA5Dto(line);
     }
 
+    public async Task<EmpccaAnnexA5LineDto> UpdateA5LineAsync(Guid declarationId, Guid lineId, CreateEmpccaAnnexA5LineRequest request, CancellationToken cancellationToken = default)
+    {
+        await ValidateAsync(_a5Validator, request, cancellationToken);
+        await GetEditableDeclarationAsync(declarationId, cancellationToken);
+        var line = await GetExistingLineAsync(declarationId, "A5", lineId, cancellationToken);
+        await EnsureOrderIsUniqueAsync(declarationId, "A5", request.OrderNumber, lineId, cancellationToken);
+        var beneficiary = await EnsureBeneficiaryAsync(declarationId, request.Beneficiary, cancellationToken);
+        var gross = request.PurchasesFromTenPercentCompanies + request.PurchasesFromFifteenPercentCompanies
+            + request.PurchasesFromTwoThirdsDeductionBusinesses + request.PurchasesFromOtherBusinesses;
+        var detail = line.AnnexA5Detail ?? new AnnexA5Detail { LineId = line.Id };
+        ApplyBaseLine(line, beneficiary.Id, request.OrderNumber, "EMPCCA-A5", gross, gross, request.WithheldAmount);
+        detail.PurchasesFromTenPercentCompanies = request.PurchasesFromTenPercentCompanies;
+        detail.PurchasesFromFifteenPercentCompanies = request.PurchasesFromFifteenPercentCompanies;
+        detail.PurchasesFromTwoThirdsDeductionBusinesses = request.PurchasesFromTwoThirdsDeductionBusinesses;
+        detail.PurchasesFromOtherBusinesses = request.PurchasesFromOtherBusinesses;
+        detail.VatWithheldAmount = request.VatWithheldAmount;
+        detail.DeliveryPlatformThreePercentWithheldAmount = request.DeliveryPlatformThreePercentWithheldAmount;
+        detail.WithheldAmount = request.WithheldAmount;
+        detail.NetPaidAmount = request.NetPaidAmount;
+        line.AnnexA5Detail = detail;
+        line.Beneficiary = beneficiary;
+        await Db.SaveChangesAsync(cancellationToken);
+        return ToA5Dto(line);
+    }
+
+    public async Task DeleteA5LineAsync(Guid declarationId, Guid lineId, CancellationToken cancellationToken = default)
+    {
+        await GetEditableDeclarationAsync(declarationId, cancellationToken);
+        var line = await GetExistingLineAsync(declarationId, "A5", lineId, cancellationToken);
+        Db.DeclarationLines.Remove(line);
+        AddAudit("EMPCCA_A5_LINE_DELETED", nameof(DeclarationLine), line.Id.ToString(), "Suppression ligne detaillee EMPCCA A5.");
+        AddEvent(declarationId, "EMPCCA_A5_LINE_DELETED", $"Suppression ligne A5 numero {line.OrderNumber}.");
+        await Db.SaveChangesAsync(cancellationToken);
+    }
+
     public async Task<EmpccaAnnexA5SummaryDto> GetA5SummaryAsync(Guid declarationId, CancellationToken cancellationToken = default)
     {
         var details = await QueryLines(declarationId, "A5").Where(x => x.AnnexA5Detail != null)
@@ -235,6 +351,33 @@ public sealed class EmpccaPriorityAnnexService : DeclarationServiceBase, IEmpcca
     {
         if (await QueryLines(declarationId, annexCode).AnyAsync(x => x.OrderNumber == orderNumber, cancellationToken))
             throw new ApplicationConflictException($"Le numero d'ordre {orderNumber} existe deja dans {annexCode}.");
+    }
+
+    private async Task EnsureOrderIsUniqueAsync(Guid declarationId, string annexCode, int orderNumber, Guid lineId, CancellationToken cancellationToken)
+    {
+        if (await QueryLines(declarationId, annexCode).AnyAsync(x => x.OrderNumber == orderNumber && x.Id != lineId, cancellationToken))
+            throw new ApplicationConflictException($"Le numero d'ordre {orderNumber} existe deja dans {annexCode}.");
+    }
+
+    private async Task<DeclarationLine> GetExistingLineAsync(Guid declarationId, string annexCode, Guid lineId, CancellationToken cancellationToken)
+    {
+        IQueryable<DeclarationLine> query = QueryLines(declarationId, annexCode);
+        query = annexCode switch
+        {
+            "A1" => query.Include(x => x.AnnexA1Detail),
+            "A2" => query.Include(x => x.AnnexA2Detail),
+            "A5" => query.Include(x => x.AnnexA5Detail),
+            _ => query
+        };
+
+        var line = await query.FirstOrDefaultAsync(x => x.Id == lineId, cancellationToken);
+
+        if (line is null)
+        {
+            throw new ApplicationNotFoundException($"Ligne {annexCode} introuvable.");
+        }
+
+        return line;
     }
 
     private async Task<DeclarationAnnex> EnsureAnnexAsync(Guid declarationId, string code, string title, CancellationToken cancellationToken)
@@ -287,6 +430,17 @@ public sealed class EmpccaPriorityAnnexService : DeclarationServiceBase, IEmpcca
         var result = await validator.ValidateAsync(request, cancellationToken);
         if (!result.IsValid)
             throw new ApplicationConflictException(string.Join(" ", result.Errors.Select(x => x.ErrorMessage).Distinct()));
+    }
+
+    private static void ApplyBaseLine(DeclarationLine line, Guid beneficiaryId, int orderNumber, string operationType, decimal gross, decimal taxable, decimal withheld)
+    {
+        line.BeneficiaryId = beneficiaryId;
+        line.OrderNumber = orderNumber;
+        line.OperationType = operationType;
+        line.GrossAmount = gross;
+        line.TaxableAmount = taxable;
+        line.WithheldAmount = withheld;
+        line.UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     private static List<string> ValidateOrders(IEnumerable<int> values, string annexCode)

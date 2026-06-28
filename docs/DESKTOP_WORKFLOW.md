@@ -77,6 +77,42 @@ le placeholder affiche :
 
 `Veuillez creer ou selectionner une declaration employeur avant de continuer.`
 
+## Ecrans Annexes A1 a A7
+
+Le menu `Annexe` ouvre maintenant un ecran de saisie professionnel par annexe,
+avec le meme style DET 2025 que le reste du Desktop.
+
+Chaque ecran affiche en haut :
+
+- la societe cliente ;
+- l'exercice fiscal ;
+- la declaration active ;
+- le statut de declaration ;
+- l'etat de validation de l'annexe ;
+- le resume des totaux.
+
+Workflow attendu :
+
+1. selectionner une declaration dans `Declarations employeur` ;
+2. ouvrir `Annexe > A1` a `Annexe > A7` ;
+3. cliquer `Nouveau` pour proposer le prochain NÂ° d'ordre ;
+4. saisir le beneficiaire et les montants ;
+5. cliquer `Enregistrer` pour creer ou modifier ;
+6. cliquer `Controler annexe` pour voir les blocages et warnings ;
+7. cliquer `Supprimer` pour retirer la ligne selectionnee ;
+8. cliquer `Retour aux declarations` pour revenir au dossier actif.
+
+Etat actuel des annexes :
+
+- `A1`, `A2` et `A5` utilisent les endpoints EMPCCA detailles avec CRUD complet
+  create / update / delete / summary / validate.
+- `A3`, `A4`, `A6` et `A7` sont egalement accessibles dans le meme workbench et
+  supportent la saisie, la modification, la suppression, le resume et un controle
+  de base.
+
+Le contexte declaration est obligatoire. Sans declaration active, l'ecran annexe
+ne tente aucun enregistrement.
+
 ## Boutons de l'ecran Declarations
 
 - `Rafraichir` recharge les filtres et declarations.
@@ -91,5 +127,6 @@ plus etroits.
 ## Limites actuelles
 
 - Une seule declaration est autorisee par couple societe/exercice.
-- Les ecrans specialises de saisie A1/A2/A5 restent a finaliser.
+- Les ecrans annexes utilisent un workbench unique ; ils sont fonctionnels mais
+  peuvent encore etre raffines visuellement annexe par annexe.
 - La qualification officielle EMPCCA reste bloquee par les ambiguities documentees.

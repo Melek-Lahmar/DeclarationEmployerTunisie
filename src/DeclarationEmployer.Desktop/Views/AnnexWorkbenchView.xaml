@@ -1,0 +1,434 @@
+<UserControl x:Class="DeclarationEmployer.Desktop.Views.AnnexWorkbenchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="760"
+             d:DesignWidth="1200">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </UserControl.Resources>
+
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="260"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="White" CornerRadius="12" Padding="18" BorderBrush="#E2E8F0" BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="{Binding Title}" FontSize="26" FontWeight="SemiBold" Foreground="#111827"/>
+                <TextBlock Text="{Binding Description}" Margin="0,6,0,0" Foreground="#6B7280" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="18" Margin="0,0,16,0" BorderBrush="#E2E8F0" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,12,10">
+                        <TextBlock Text="Societe cliente" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding CompanyName}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,12,10">
+                        <TextBlock Text="Exercice fiscal" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding FiscalYear}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,10">
+                        <TextBlock Text="Statut declaration" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding DeclarationStatus}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,12,0">
+                        <TextBlock Text="Declaration employeur" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding DeclarationTitle}" Margin="0,4,0,0" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="2">
+                        <TextBlock Text="Validation" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding ValidationStatus}" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="18" BorderBrush="#E2E8F0" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Resume annexe" FontSize="18" FontWeight="SemiBold" Foreground="#111827"/>
+                    <TextBlock Text="{Binding LineCount, StringFormat=Lignes : {0}}" Margin="0,12,0,0"/>
+                    <TextBlock Text="{Binding GrossTotal, StringFormat=Total brut : {0:N3}}" Margin="0,6,0,0"/>
+                    <TextBlock Text="{Binding WithheldTotal, StringFormat=Total retenue : {0:N3}}" Margin="0,6,0,0"/>
+                    <TextBlock Text="{Binding NetTotal, StringFormat=Total net : {0:N3}}" Margin="0,6,0,0"/>
+                    <Button Content="Changer declaration" Height="34" Margin="0,14,0,0" Command="{Binding OpenDeclarationsCommand}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Margin="0,16,0,0" Background="White" CornerRadius="12" Padding="18" BorderBrush="#E2E8F0" BorderThickness="1">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top">
+                    <WrapPanel>
+                        <Button Content="Nouveau" Width="110" Height="36" Margin="0,0,10,10" Command="{Binding NewCommand}"/>
+                        <Button Content="Enregistrer" Width="120" Height="36" Margin="0,0,10,10" Command="{Binding SaveCommand}"/>
+                        <Button Content="Supprimer" Width="110" Height="36" Margin="0,0,10,10" Command="{Binding DeleteCommand}"/>
+                        <Button Content="Rafraichir" Width="110" Height="36" Margin="0,0,10,10" Command="{Binding RefreshCommand}"/>
+                        <Button Content="Controler annexe" Width="140" Height="36" Margin="0,0,10,10" Command="{Binding ValidateCommand}"/>
+                        <Button Content="Retour aux declarations" Width="180" Height="36" Margin="0,0,10,10" Command="{Binding OpenDeclarationsCommand}"/>
+                    </WrapPanel>
+                </StackPanel>
+
+                <DataGrid ItemsSource="{Binding Lines}"
+                          SelectedItem="{Binding SelectedLine, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          Background="White"
+                          BorderThickness="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="N° ordre" Binding="{Binding OrderNumber}" Width="80"/>
+                        <DataGridTextColumn Header="Type identifiant" Binding="{Binding IdentifierType}" Width="140"/>
+                        <DataGridTextColumn Header="Identifiant" Binding="{Binding Identifier}" Width="140"/>
+                        <DataGridTextColumn Header="Nom / RS" Binding="{Binding BeneficiaryName}" Width="220"/>
+                        <DataGridTextColumn Header="Activite / Emploi" Binding="{Binding Activity}" Width="180"/>
+                        <DataGridTextColumn Header="Montant principal" Binding="{Binding GrossAmount}" Width="120"/>
+                        <DataGridTextColumn Header="Retenue" Binding="{Binding WithheldAmount}" Width="110"/>
+                        <DataGridTextColumn Header="Net servi" Binding="{Binding NetAmount}" Width="110"/>
+                        <DataGridTextColumn Header="Statut" Binding="{Binding Status}" Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Row="3" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="White" CornerRadius="12" Padding="18" Margin="0,0,16,0" BorderBrush="#E2E8F0" BorderThickness="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Beneficiaire" FontSize="18" FontWeight="SemiBold" Foreground="#111827"/>
+
+                        <Grid Margin="0,12,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="170"/>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,10,10">
+                                <TextBlock Text="N° ordre" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding OrderNumber, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,10,10">
+                                <TextBlock Text="Type identifiant" FontWeight="SemiBold"/>
+                                <ComboBox ItemsSource="{Binding CurrentIdentifierTypes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding BeneficiaryIdentifierType, Mode=TwoWay}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Margin="0,0,10,10">
+                                <TextBlock Text="Identifiant" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding BeneficiaryIdentifier, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Margin="0,0,0,10">
+                                <TextBlock Text="Nom / Raison sociale" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding BeneficiaryName, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Margin="0,0,10,10">
+                                <TextBlock Text="Activite" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding BeneficiaryActivity, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" Margin="0,0,0,10">
+                                <TextBlock Text="Emploi" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding BeneficiaryJobTitle, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Margin="0,0,0,16">
+                            <TextBlock Text="Adresse" FontWeight="SemiBold"/>
+                            <TextBox Text="{Binding BeneficiaryAddress, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+
+                        <TextBlock Text="Montants / retenues" FontSize="18" FontWeight="SemiBold" Foreground="#111827"/>
+
+                        <StackPanel Visibility="{Binding IsA1, Converter={StaticResource BoolToVisibility}}">
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="140"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10">
+                                    <TextBlock Text="Situation familiale" FontWeight="SemiBold"/>
+                                    <ComboBox ItemsSource="{Binding FamilySituationOptions}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding FamilySituation, Mode=TwoWay}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10">
+                                    <TextBlock Text="Nombre d'enfant" FontWeight="SemiBold"/>
+                                    <TextBox Text="{Binding DependentChildrenCount}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10">
+                                    <TextBlock Text="Date du" FontWeight="SemiBold"/>
+                                    <DatePicker SelectedDate="{Binding WorkPeriodStart, Mode=TwoWay}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="3" Margin="0,0,0,10">
+                                    <TextBlock Text="Date au" FontWeight="SemiBold"/>
+                                    <DatePicker SelectedDate="{Binding WorkPeriodEnd, Mode=TwoWay}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="140"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Nb jours" FontWeight="SemiBold"/><TextBox Text="{Binding WorkPeriodDays}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Revenu imposable" FontWeight="SemiBold"/><TextBox Text="{Binding TaxableIncome}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Avantages en nature" FontWeight="SemiBold"/><TextBox Text="{Binding BenefitsInKind}"/></StackPanel>
+                                <StackPanel Grid.Column="3" Margin="0,0,10,10"><TextBlock Text="Total revenu brut" FontWeight="SemiBold"/><TextBox Text="{Binding GrossTaxableIncome}"/></StackPanel>
+                                <StackPanel Grid.Column="4" Margin="0,0,0,10"><TextBlock Text="Revenu reinvesti" FontWeight="SemiBold"/><TextBox Text="{Binding ReinvestedIncome}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Retenue regime commun" FontWeight="SemiBold"/><TextBox Text="{Binding CommonRegimeWithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Retenue taux 20%" FontWeight="SemiBold"/><TextBox Text="{Binding ForeignEmployeeWithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="CSS" FontWeight="SemiBold"/><TextBox Text="{Binding SocialSolidarityContribution}"/></StackPanel>
+                                <StackPanel Grid.Column="3" Margin="0,0,0,10"><TextBlock Text="Net servi" FontWeight="SemiBold"/><TextBox Text="{Binding A1NetPaidAmount}"/></StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding IsA2, Converter={StaticResource BoolToVisibility}}">
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="140"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Type des montants" FontWeight="SemiBold"/><ComboBox ItemsSource="{Binding A2AmountTypes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding A2AmountType, Mode=TwoWay}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Honoraires 3%" FontWeight="SemiBold"/><TextBox Text="{Binding GrossProfessionalAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Remunerations et primes" FontWeight="SemiBold"/><TextBox Text="{Binding RealRegimeFeesAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3"><TextBlock Text="Salaries 15%" FontWeight="SemiBold"/><TextBox Text="{Binding BoardAndSecuritiesAmount}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="160"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Travail occasionnel" FontWeight="SemiBold"/><TextBox Text="{Binding OccasionalWorkAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Plus-value immobiliere" FontWeight="SemiBold"/><TextBox Text="{Binding RealEstateCapitalGainAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Loyer hotels" FontWeight="SemiBold"/><TextBox Text="{Binding HotelRentAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3" Margin="0,0,10,10"><TextBlock Text="Artistes createurs" FontWeight="SemiBold"/><TextBox Text="{Binding ArtistRemunerationAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="4"><TextBlock Text="Retenue TVA" FontWeight="SemiBold"/><TextBox Text="{Binding PublicSectorVatWithheldAmount}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Montant des retenues" FontWeight="SemiBold"/><TextBox Text="{Binding A2WithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1"><TextBlock Text="Montant net servi" FontWeight="SemiBold"/><TextBox Text="{Binding A2NetPaidAmount}"/></StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding IsA3, Converter={StaticResource BoolToVisibility}}">
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="220"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Interets comptes speciaux" FontWeight="SemiBold"/><TextBox Text="{Binding SavingsAccountInterest}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Autres capitaux" FontWeight="SemiBold"/><TextBox Text="{Binding OtherMovableCapitalIncome}"/></StackPanel>
+                                <StackPanel Grid.Column="2"><TextBlock Text="Prets non residents" FontWeight="SemiBold"/><TextBox Text="{Binding NonEstablishedBankLoanInterest}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Montant des retenues" FontWeight="SemiBold"/><TextBox Text="{Binding A3WithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1"><TextBlock Text="Montant net servi" FontWeight="SemiBold"/><TextBox Text="{Binding A3NetPaidAmount}"/></StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding IsA4, Converter={StaticResource BoolToVisibility}}">
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="160"/>
+                                    <ColumnDefinition Width="160"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Type des montants" FontWeight="SemiBold"/><ComboBox ItemsSource="{Binding A4AmountTypes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding A4AmountType, Mode=TwoWay}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Honoraires taux" FontWeight="SemiBold"/><TextBox Text="{Binding ProfessionalAmountRate}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Honoraires montant" FontWeight="SemiBold"/><TextBox Text="{Binding ProfessionalAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3"><TextBlock Text="Travaux ≤ 6 mois taux" FontWeight="SemiBold"/><TextBox Text="{Binding ConstructionWorkRate}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Travaux montant" FontWeight="SemiBold"/><TextBox Text="{Binding ConstructionWorkAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Plus-value immo taux" FontWeight="SemiBold"/><TextBox Text="{Binding A4RealEstateCapitalGainRate}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Plus-value immo montant" FontWeight="SemiBold"/><TextBox Text="{Binding A4RealEstateCapitalGainAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3"><TextBlock Text="Valeur mobiliere taux" FontWeight="SemiBold"/><TextBox Text="{Binding SecuritiesCapitalGainRate}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Valeur mobiliere montant" FontWeight="SemiBold"/><TextBox Text="{Binding SecuritiesCapitalGainAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Revenus valeurs taux" FontWeight="SemiBold"/><TextBox Text="{Binding SecuritiesIncomeRate}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Revenus valeurs montant" FontWeight="SemiBold"/><TextBox Text="{Binding SecuritiesIncomeAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3"><TextBlock Text="Regime privilegie" FontWeight="SemiBold"/><TextBox Text="{Binding PrivilegedTaxRegimeAmount}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="TVA retenue" FontWeight="SemiBold"/><TextBox Text="{Binding A4VatWithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Montant des retenues" FontWeight="SemiBold"/><TextBox Text="{Binding A4WithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="2"><TextBlock Text="Montant net servi" FontWeight="SemiBold"/><TextBox Text="{Binding A4NetPaidAmount}"/></StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding IsA5, Converter={StaticResource BoolToVisibility}}">
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Code 512 / 0.5%" FontWeight="SemiBold"/><TextBox Text="{Binding PurchasesFromTenPercentCompanies}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Code 513 / 1%" FontWeight="SemiBold"/><TextBox Text="{Binding PurchasesFromFifteenPercentCompanies}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Code 514 / deduction 2/3" FontWeight="SemiBold"/><TextBox Text="{Binding PurchasesFromTwoThirdsDeductionBusinesses}"/></StackPanel>
+                                <StackPanel Grid.Column="3"><TextBlock Text="Code 515 / autres" FontWeight="SemiBold"/><TextBox Text="{Binding PurchasesFromOtherBusinesses}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Code 516 TVA" FontWeight="SemiBold"/><TextBox Text="{Binding A5VatWithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Retenue 3% plateformes" FontWeight="SemiBold"/><TextBox Text="{Binding DeliveryPlatformThreePercentWithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Retenues" FontWeight="SemiBold"/><TextBox Text="{Binding A5WithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3"><TextBlock Text="Montant net servi" FontWeight="SemiBold"/><TextBox Text="{Binding A5NetPaidAmount}"/></StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding IsA6, Converter={StaticResource BoolToVisibility}}">
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Type des montants" FontWeight="SemiBold"/><ComboBox ItemsSource="{Binding A6RebateTypes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding RebateType, Mode=TwoWay}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Montants des ristournes" FontWeight="SemiBold"/><TextBox Text="{Binding RebateAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Ventes PP" FontWeight="SemiBold"/><TextBox Text="{Binding FlatRegimeSalesAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3"><TextBlock Text="Avance ventes PP" FontWeight="SemiBold"/><TextBox Text="{Binding FlatRegimeSalesAdvanceAmount}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                    <ColumnDefinition Width="170"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Jeux montant" FontWeight="SemiBold"/><TextBox Text="{Binding GamblingIncomeAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Jeux retenue" FontWeight="SemiBold"/><TextBox Text="{Binding GamblingWithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Ventes ≤ 20 DT" FontWeight="SemiBold"/><TextBox Text="{Binding DistributionNetworkSalesAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3" Margin="0,0,10,10"><TextBlock Text="Retenue ≤ 20 DT" FontWeight="SemiBold"/><TextBox Text="{Binding DistributionNetworkWithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="4"><TextBlock Text="Especes recouvrees" FontWeight="SemiBold"/><TextBox Text="{Binding CashCollectionsAmount}"/></StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Ventes alcool" FontWeight="SemiBold"/><TextBox Text="{Binding AlcoholSalesAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="1"><TextBlock Text="Avance alcool" FontWeight="SemiBold"/><TextBox Text="{Binding AlcoholSalesAdvanceAmount}"/></StackPanel>
+                            </Grid>
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding IsA7, Converter={StaticResource BoolToVisibility}}">
+                            <Grid Margin="0,12,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="220"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="180"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,10"><TextBlock Text="Type des montants payes" FontWeight="SemiBold"/><ComboBox ItemsSource="{Binding A7PaidAmountTypes}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding PaidAmountType, Mode=TwoWay}"/></StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,10,10"><TextBlock Text="Montants payes" FontWeight="SemiBold"/><TextBox Text="{Binding A7PaidAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="2" Margin="0,0,10,10"><TextBlock Text="Retenue a la source" FontWeight="SemiBold"/><TextBox Text="{Binding A7WithheldAmount}"/></StackPanel>
+                                <StackPanel Grid.Column="3"><TextBlock Text="Montant net servi" FontWeight="SemiBold"/><TextBox Text="{Binding A7NetPaidAmount}"/></StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="18" BorderBrush="#E2E8F0" BorderThickness="1">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="Erreurs / controle" FontSize="18" FontWeight="SemiBold" Foreground="#111827" Margin="0,0,0,12"/>
+                    <DataGrid ItemsSource="{Binding ValidationMessages}" AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" BorderThickness="0">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Severite" Binding="{Binding Severity}" Width="100"/>
+                            <DataGridTextColumn Header="Message" Binding="{Binding Message}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="4" Background="#111827" CornerRadius="8" Padding="12" Margin="0,16,0,0">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="White" FontSize="13" TextWrapping="Wrap"/>
+        </Border>
+    </Grid>
+</UserControl>

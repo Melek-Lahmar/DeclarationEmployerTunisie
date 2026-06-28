@@ -53,6 +53,11 @@ public partial class App : Application
                     client.BaseAddress = new Uri("http://localhost:5050/");
                 }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
 
+                services.AddHttpClient<EmpccaAnnexesApiClient>(client =>
+                {
+                    client.BaseAddress = new Uri("http://localhost:5050/");
+                }).AddHttpMessageHandler<AuthorizationHeaderHandler>();
+
                 services.AddHttpClient<DeclarationBeneficiariesApiClient>(client =>
                 {
                     client.BaseAddress = new Uri("http://localhost:5050/");
@@ -114,12 +119,14 @@ public partial class App : Application
                 services.AddTransient<FiscalYearsViewModel>();
                 services.AddTransient<DeclarationsViewModel>();
                 services.AddTransient<ModulePlaceholderViewModel>();
+                services.AddTransient<AnnexWorkbenchViewModel>();
                 services.AddTransient<LoginView>();
                 services.AddTransient<DashboardView>();
                 services.AddTransient<ClientsView>();
                 services.AddTransient<FiscalYearsView>();
                 services.AddTransient<DeclarationsView>();
                 services.AddTransient<ModulePlaceholderView>();
+                services.AddTransient<AnnexWorkbenchView>();
                 services.AddTransient<LoginWindow>();
                 services.AddTransient<MainWindow>();
             })

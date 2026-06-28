@@ -39,6 +39,53 @@ public sealed class EmpccaRemainingAnnexService : DeclarationServiceBase, IEmpcc
         await Save(id, line, "A3", ct); return ToA3(line);
     }
 
+    public async Task<EmpccaDetailedLineDto<CreateEmpccaAnnexA3LineRequest>> UpdateA3LineAsync(Guid id, Guid lineId, CreateEmpccaAnnexA3LineRequest r, CancellationToken ct = default)
+    {
+        await Validate(_a3, r, ct);
+        var line = await GetExistingLine(id, "A3", lineId, ct);
+        await PrepareUpdate(id, "A3", lineId, r.OrderNumber, r.Beneficiary, line, ct);
+        var detail = line.AnnexA3Detail ?? new AnnexA3Detail { LineId = line.Id };
+        ApplyBaseLine(line, r.OrderNumber, $"EMPCCA-A3", r.SavingsAccountInterest + r.OtherMovableCapitalIncome + r.NonEstablishedBankLoanInterest, r.WithheldAmount);
+        detail.SavingsAccountInterest = r.SavingsAccountInterest;
+        detail.OtherMovableCapitalIncome = r.OtherMovableCapitalIncome;
+        detail.NonEstablishedBankLoanInterest = r.NonEstablishedBankLoanInterest;
+        detail.WithheldAmount = r.WithheldAmount;
+        detail.NetPaidAmount = r.NetPaidAmount;
+        line.AnnexA3Detail = detail;
+        await Db.SaveChangesAsync(ct);
+        return ToA3(line);
+    }
+
+    public async Task DeleteA3LineAsync(Guid id, Guid lineId, CancellationToken ct = default)
+    {
+        await GetEditableDeclarationAsync(id, ct);
+        var line = await GetExistingLine(id, "A3", lineId, ct);
+        Db.DeclarationLines.Remove(line);
+        await Db.SaveChangesAsync(ct);
+    }
+
+    public async Task<EmpccaAnnexSummaryDto> GetA3SummaryAsync(Guid declarationId, CancellationToken cancellationToken = default)
+    {
+        var details = await Query(declarationId, "A3").Where(x => x.AnnexA3Detail != null).Select(x => x.AnnexA3Detail!).ToListAsync(cancellationToken);
+        return new EmpccaAnnexSummaryDto
+        {
+            AnnexCode = "A3",
+            LineCount = details.Count,
+            GrossAmountTotal = details.Sum(x => x.SavingsAccountInterest + x.OtherMovableCapitalIncome + x.NonEstablishedBankLoanInterest),
+            WithheldAmountTotal = details.Sum(x => x.WithheldAmount),
+            NetPaidAmountTotal = details.Sum(x => x.NetPaidAmount)
+        };
+    }
+
+    public async Task<EmpccaAnnexValidationDto> ValidateA3Async(Guid declarationId, CancellationToken cancellationToken = default)
+    {
+        var lines = await GetA3LinesAsync(declarationId, cancellationToken);
+        var blocking = ValidateOrders(lines.Select(x => x.OrderNumber), "A3");
+        if (lines.Any(x => x.Details.SavingsAccountInterest + x.Details.OtherMovableCapitalIncome + x.Details.NonEstablishedBankLoanInterest <= 0))
+            blocking.Add("Chaque ligne A3 doit contenir au moins un montant d'interet positif.");
+        return new EmpccaAnnexValidationDto { BlockingIssues = blocking };
+    }
+
     public async Task<IReadOnlyList<EmpccaDetailedLineDto<CreateEmpccaAnnexA4LineRequest>>> GetA4LinesAsync(Guid id, CancellationToken ct = default)
     {
         await GetDeclarationAsync(id, ct);
@@ -59,6 +106,62 @@ public sealed class EmpccaRemainingAnnexService : DeclarationServiceBase, IEmpcc
             PrivilegedTaxRegimeAmount = r.PrivilegedTaxRegimeAmount, VatWithheldAmount = r.VatWithheldAmount,
             WithheldAmount = r.WithheldAmount, NetPaidAmount = r.NetPaidAmount };
         await Save(id, line, "A4", ct); return ToA4(line);
+    }
+
+    public async Task<EmpccaDetailedLineDto<CreateEmpccaAnnexA4LineRequest>> UpdateA4LineAsync(Guid id, Guid lineId, CreateEmpccaAnnexA4LineRequest r, CancellationToken ct = default)
+    {
+        await Validate(_a4, r, ct);
+        var line = await GetExistingLine(id, "A4", lineId, ct);
+        await PrepareUpdate(id, "A4", lineId, r.OrderNumber, r.Beneficiary, line, ct);
+        var gross = r.ProfessionalAmount + r.ConstructionWorkAmount + r.RealEstateCapitalGainAmount + r.SecuritiesCapitalGainAmount + r.SecuritiesIncomeAmount + r.PrivilegedTaxRegimeAmount;
+        var detail = line.AnnexA4Detail ?? new AnnexA4Detail { LineId = line.Id };
+        ApplyBaseLine(line, r.OrderNumber, $"EMPCCA-A4", gross, r.WithheldAmount);
+        detail.AmountType = r.AmountType;
+        detail.ProfessionalAmountRate = r.ProfessionalAmountRate;
+        detail.ProfessionalAmount = r.ProfessionalAmount;
+        detail.ConstructionWorkRate = r.ConstructionWorkRate;
+        detail.ConstructionWorkAmount = r.ConstructionWorkAmount;
+        detail.RealEstateCapitalGainRate = r.RealEstateCapitalGainRate;
+        detail.RealEstateCapitalGainAmount = r.RealEstateCapitalGainAmount;
+        detail.SecuritiesCapitalGainRate = r.SecuritiesCapitalGainRate;
+        detail.SecuritiesCapitalGainAmount = r.SecuritiesCapitalGainAmount;
+        detail.SecuritiesIncomeRate = r.SecuritiesIncomeRate;
+        detail.SecuritiesIncomeAmount = r.SecuritiesIncomeAmount;
+        detail.PrivilegedTaxRegimeAmount = r.PrivilegedTaxRegimeAmount;
+        detail.VatWithheldAmount = r.VatWithheldAmount;
+        detail.WithheldAmount = r.WithheldAmount;
+        detail.NetPaidAmount = r.NetPaidAmount;
+        line.AnnexA4Detail = detail;
+        await Db.SaveChangesAsync(ct);
+        return ToA4(line);
+    }
+
+    public async Task DeleteA4LineAsync(Guid id, Guid lineId, CancellationToken ct = default)
+    {
+        await GetEditableDeclarationAsync(id, ct);
+        var line = await GetExistingLine(id, "A4", lineId, ct);
+        Db.DeclarationLines.Remove(line);
+        await Db.SaveChangesAsync(ct);
+    }
+
+    public async Task<EmpccaAnnexSummaryDto> GetA4SummaryAsync(Guid declarationId, CancellationToken cancellationToken = default)
+    {
+        var details = await Query(declarationId, "A4").Where(x => x.AnnexA4Detail != null).Select(x => x.AnnexA4Detail!).ToListAsync(cancellationToken);
+        return new EmpccaAnnexSummaryDto
+        {
+            AnnexCode = "A4",
+            LineCount = details.Count,
+            GrossAmountTotal = details.Sum(x => x.ProfessionalAmount + x.ConstructionWorkAmount + x.RealEstateCapitalGainAmount + x.SecuritiesCapitalGainAmount + x.SecuritiesIncomeAmount + x.PrivilegedTaxRegimeAmount),
+            WithheldAmountTotal = details.Sum(x => x.WithheldAmount),
+            NetPaidAmountTotal = details.Sum(x => x.NetPaidAmount)
+        };
+    }
+
+    public async Task<EmpccaAnnexValidationDto> ValidateA4Async(Guid declarationId, CancellationToken cancellationToken = default)
+    {
+        var lines = await GetA4LinesAsync(declarationId, cancellationToken);
+        var blocking = ValidateOrders(lines.Select(x => x.OrderNumber), "A4");
+        return new EmpccaAnnexValidationDto { BlockingIssues = blocking };
     }
 
     public async Task<IReadOnlyList<EmpccaDetailedLineDto<CreateEmpccaAnnexA6LineRequest>>> GetA6LinesAsync(Guid id, CancellationToken ct = default)
@@ -82,6 +185,60 @@ public sealed class EmpccaRemainingAnnexService : DeclarationServiceBase, IEmpcc
         await Save(id, line, "A6", ct); return ToA6(line);
     }
 
+    public async Task<EmpccaDetailedLineDto<CreateEmpccaAnnexA6LineRequest>> UpdateA6LineAsync(Guid id, Guid lineId, CreateEmpccaAnnexA6LineRequest r, CancellationToken ct = default)
+    {
+        await Validate(_a6, r, ct);
+        var line = await GetExistingLine(id, "A6", lineId, ct);
+        await PrepareUpdate(id, "A6", lineId, r.OrderNumber, r.Beneficiary, line, ct);
+        var gross = r.RebateAmount + r.FlatRegimeSalesAmount + r.GamblingIncomeAmount + r.DistributionNetworkSalesAmount + r.CashCollectionsAmount + r.AlcoholSalesAmount;
+        var withheld = r.FlatRegimeSalesAdvanceAmount + r.GamblingWithheldAmount + r.DistributionNetworkWithheldAmount + r.AlcoholSalesAdvanceAmount;
+        var detail = line.AnnexA6Detail ?? new AnnexA6Detail { LineId = line.Id };
+        ApplyBaseLine(line, r.OrderNumber, $"EMPCCA-A6", gross, withheld);
+        detail.RebateType = r.RebateType;
+        detail.RebateAmount = r.RebateAmount;
+        detail.FlatRegimeSalesAmount = r.FlatRegimeSalesAmount;
+        detail.FlatRegimeSalesAdvanceAmount = r.FlatRegimeSalesAdvanceAmount;
+        detail.GamblingIncomeAmount = r.GamblingIncomeAmount;
+        detail.GamblingWithheldAmount = r.GamblingWithheldAmount;
+        detail.DistributionNetworkSalesAmount = r.DistributionNetworkSalesAmount;
+        detail.DistributionNetworkWithheldAmount = r.DistributionNetworkWithheldAmount;
+        detail.CashCollectionsAmount = r.CashCollectionsAmount;
+        detail.AlcoholSalesAmount = r.AlcoholSalesAmount;
+        detail.AlcoholSalesAdvanceAmount = r.AlcoholSalesAdvanceAmount;
+        line.AnnexA6Detail = detail;
+        await Db.SaveChangesAsync(ct);
+        return ToA6(line);
+    }
+
+    public async Task DeleteA6LineAsync(Guid id, Guid lineId, CancellationToken ct = default)
+    {
+        await GetEditableDeclarationAsync(id, ct);
+        var line = await GetExistingLine(id, "A6", lineId, ct);
+        Db.DeclarationLines.Remove(line);
+        await Db.SaveChangesAsync(ct);
+    }
+
+    public async Task<EmpccaAnnexSummaryDto> GetA6SummaryAsync(Guid declarationId, CancellationToken cancellationToken = default)
+    {
+        var details = await Query(declarationId, "A6").Where(x => x.AnnexA6Detail != null).Select(x => x.AnnexA6Detail!).ToListAsync(cancellationToken);
+        return new EmpccaAnnexSummaryDto
+        {
+            AnnexCode = "A6",
+            LineCount = details.Count,
+            GrossAmountTotal = details.Sum(x => x.RebateAmount + x.FlatRegimeSalesAmount + x.GamblingIncomeAmount + x.DistributionNetworkSalesAmount + x.CashCollectionsAmount + x.AlcoholSalesAmount),
+            WithheldAmountTotal = details.Sum(x => x.FlatRegimeSalesAdvanceAmount + x.GamblingWithheldAmount + x.DistributionNetworkWithheldAmount + x.AlcoholSalesAdvanceAmount),
+            NetPaidAmountTotal = details.Sum(x => (x.RebateAmount + x.FlatRegimeSalesAmount + x.GamblingIncomeAmount + x.DistributionNetworkSalesAmount + x.CashCollectionsAmount + x.AlcoholSalesAmount)
+                - (x.FlatRegimeSalesAdvanceAmount + x.GamblingWithheldAmount + x.DistributionNetworkWithheldAmount + x.AlcoholSalesAdvanceAmount))
+        };
+    }
+
+    public async Task<EmpccaAnnexValidationDto> ValidateA6Async(Guid declarationId, CancellationToken cancellationToken = default)
+    {
+        var lines = await GetA6LinesAsync(declarationId, cancellationToken);
+        var blocking = ValidateOrders(lines.Select(x => x.OrderNumber), "A6");
+        return new EmpccaAnnexValidationDto { BlockingIssues = blocking };
+    }
+
     public async Task<IReadOnlyList<EmpccaDetailedLineDto<CreateEmpccaAnnexA7LineRequest>>> GetA7LinesAsync(Guid id, CancellationToken ct = default)
     {
         await GetDeclarationAsync(id, ct);
@@ -94,6 +251,50 @@ public sealed class EmpccaRemainingAnnexService : DeclarationServiceBase, IEmpcc
         line.AnnexA7Detail = new AnnexA7Detail { LineId = line.Id, PaidAmountType = r.PaidAmountType,
             PaidAmount = r.PaidAmount, WithheldAmount = r.WithheldAmount, NetPaidAmount = r.NetPaidAmount };
         await Save(id, line, "A7", ct); return ToA7(line);
+    }
+
+    public async Task<EmpccaDetailedLineDto<CreateEmpccaAnnexA7LineRequest>> UpdateA7LineAsync(Guid id, Guid lineId, CreateEmpccaAnnexA7LineRequest r, CancellationToken ct = default)
+    {
+        await Validate(_a7, r, ct);
+        var line = await GetExistingLine(id, "A7", lineId, ct);
+        await PrepareUpdate(id, "A7", lineId, r.OrderNumber, r.Beneficiary, line, ct);
+        var detail = line.AnnexA7Detail ?? new AnnexA7Detail { LineId = line.Id };
+        ApplyBaseLine(line, r.OrderNumber, $"EMPCCA-A7", r.PaidAmount, r.WithheldAmount);
+        detail.PaidAmountType = r.PaidAmountType;
+        detail.PaidAmount = r.PaidAmount;
+        detail.WithheldAmount = r.WithheldAmount;
+        detail.NetPaidAmount = r.NetPaidAmount;
+        line.AnnexA7Detail = detail;
+        await Db.SaveChangesAsync(ct);
+        return ToA7(line);
+    }
+
+    public async Task DeleteA7LineAsync(Guid id, Guid lineId, CancellationToken ct = default)
+    {
+        await GetEditableDeclarationAsync(id, ct);
+        var line = await GetExistingLine(id, "A7", lineId, ct);
+        Db.DeclarationLines.Remove(line);
+        await Db.SaveChangesAsync(ct);
+    }
+
+    public async Task<EmpccaAnnexSummaryDto> GetA7SummaryAsync(Guid declarationId, CancellationToken cancellationToken = default)
+    {
+        var details = await Query(declarationId, "A7").Where(x => x.AnnexA7Detail != null).Select(x => x.AnnexA7Detail!).ToListAsync(cancellationToken);
+        return new EmpccaAnnexSummaryDto
+        {
+            AnnexCode = "A7",
+            LineCount = details.Count,
+            GrossAmountTotal = details.Sum(x => x.PaidAmount),
+            WithheldAmountTotal = details.Sum(x => x.WithheldAmount),
+            NetPaidAmountTotal = details.Sum(x => x.NetPaidAmount)
+        };
+    }
+
+    public async Task<EmpccaAnnexValidationDto> ValidateA7Async(Guid declarationId, CancellationToken cancellationToken = default)
+    {
+        var lines = await GetA7LinesAsync(declarationId, cancellationToken);
+        var blocking = ValidateOrders(lines.Select(x => x.OrderNumber), "A7");
+        return new EmpccaAnnexValidationDto { BlockingIssues = blocking };
     }
 
     private IQueryable<DeclarationLine> Query(Guid declarationId, string code) => Db.DeclarationLines
@@ -133,16 +334,63 @@ public sealed class EmpccaRemainingAnnexService : DeclarationServiceBase, IEmpcc
         value.Address = input.Address.Trim(); value.IsResident = input.IdentifierType is 1 or 2; return value;
     }
 
+    private async Task PrepareUpdate(Guid declarationId, string code, Guid lineId, int order, EmpccaBeneficiaryInput input, DeclarationLine line, CancellationToken ct)
+    {
+        await GetEditableDeclarationAsync(declarationId, ct);
+        if (await Query(declarationId, code).AnyAsync(x => x.OrderNumber == order && x.Id != lineId, ct))
+            throw new ApplicationConflictException($"Le numero d'ordre {order} existe deja dans {code}.");
+        var beneficiary = await EnsureBeneficiary(declarationId, input, ct);
+        line.BeneficiaryId = beneficiary.Id;
+        line.Beneficiary = beneficiary;
+    }
+
+    private async Task<DeclarationLine> GetExistingLine(Guid declarationId, string code, Guid lineId, CancellationToken ct)
+    {
+        IQueryable<DeclarationLine> query = Query(declarationId, code);
+        query = code switch
+        {
+            "A3" => query.Include(x => x.AnnexA3Detail),
+            "A4" => query.Include(x => x.AnnexA4Detail),
+            "A6" => query.Include(x => x.AnnexA6Detail),
+            "A7" => query.Include(x => x.AnnexA7Detail),
+            _ => query
+        };
+
+        var line = await query.FirstOrDefaultAsync(x => x.Id == lineId, ct);
+        if (line is null)
+            throw new ApplicationNotFoundException($"Ligne {code} introuvable.");
+        return line;
+    }
+
     private async Task Save(Guid declarationId, DeclarationLine line, string code, CancellationToken ct)
     {
         Db.DeclarationLines.Add(line); AddAudit($"EMPCCA_{code}_LINE_CREATED", nameof(DeclarationLine), line.Id.ToString(), $"Creation ligne {code} detaillee.");
         AddEvent(declarationId, $"EMPCCA_{code}_LINE_CREATED", $"Creation ligne {code} numero {line.OrderNumber}."); await Db.SaveChangesAsync(ct);
     }
 
+    private static void ApplyBaseLine(DeclarationLine line, int orderNumber, string operationType, decimal gross, decimal withheld)
+    {
+        line.OrderNumber = orderNumber;
+        line.OperationType = operationType;
+        line.GrossAmount = gross;
+        line.TaxableAmount = gross;
+        line.WithheldAmount = withheld;
+        line.UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
     private static async Task Validate<T>(IValidator<T> validator, T request, CancellationToken ct)
     {
         var result = await validator.ValidateAsync(request, ct);
         if (!result.IsValid) throw new ApplicationConflictException(string.Join(" ", result.Errors.Select(x => x.ErrorMessage).Distinct()));
+    }
+
+    private static List<string> ValidateOrders(IEnumerable<int> values, string annexCode)
+    {
+        var orders = values.ToList();
+        var issues = new List<string>();
+        if (orders.Count == 0) issues.Add($"L'annexe {annexCode} ne contient aucune ligne detaillee EMPCCA.");
+        if (orders.Distinct().Count() != orders.Count) issues.Add($"Les numeros d'ordre {annexCode} doivent etre uniques.");
+        return issues;
     }
 
     private static EmpccaBeneficiaryInput B(DeclarationLine x) => new() { IdentifierType = x.Beneficiary!.IdentifierType switch

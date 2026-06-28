@@ -94,25 +94,25 @@ public partial class MainWindow : Window
                         ShowManagementActions: false));
                 break;
             case "annexe-a1":
-                await ShowAnnexPlaceholderAsync("Annexe I", "Gestion de l'annexe I - Traitement des Salaires.");
+                await ShowAnnexWorkbenchAsync("A1", "A1 : Traitement des Salaires", "Gestion des lignes de salaires, traitements, pensions, rentes et retenues.");
                 break;
             case "annexe-a2":
-                await ShowAnnexPlaceholderAsync("Annexe II", "Gestion de l'annexe II - Montants servis aux residents.");
+                await ShowAnnexWorkbenchAsync("A2", "A2 : MTs servis aux residents", "Gestion des montants servis aux residents et des retenues associees.");
                 break;
             case "annexe-a3":
-                await ShowAnnexPlaceholderAsync("Annexe III", "Gestion de l'annexe III - Interets.");
+                await ShowAnnexWorkbenchAsync("A3", "A3 : Interets", "Gestion detaillee des interets et retenues associees.");
                 break;
             case "annexe-a4":
-                await ShowAnnexPlaceholderAsync("Annexe IV", "Gestion de l'annexe IV - Montants servis aux non residents.");
+                await ShowAnnexWorkbenchAsync("A4", "A4 : MTs servis aux non residents", "Gestion detaillee des montants servis aux non residents.");
                 break;
             case "annexe-a5":
-                await ShowAnnexPlaceholderAsync("Annexe V", "Gestion de l'annexe V - Montants payes soumis a la retenue a la source.");
+                await ShowAnnexWorkbenchAsync("A5", "A5 : MTs payes soumis a la retenue a la source", "Gestion detaillee des montants payes soumis a retenue a la source.");
                 break;
             case "annexe-a6":
-                await ShowAnnexPlaceholderAsync("Annexe VI", "Gestion de l'annexe VI - Ristournes commerciales et non commerciales.");
+                await ShowAnnexWorkbenchAsync("A6", "A6 : Ristournes commerciales et non commerciales", "Gestion detaillee des ristournes, ventes et montants recouvres.");
                 break;
             case "annexe-a7":
-                await ShowAnnexPlaceholderAsync("Annexe VII", "Gestion de l'annexe VII - Montants payes pour autrui.");
+                await ShowAnnexWorkbenchAsync("A7", "A7 : Montants payes pour autrui", "Gestion detaillee des montants payes pour autrui.");
                 break;
             case "edition-a1":
                 await ShowEditionPlaceholderAsync("Edition Annexe I", "Apercu et edition de l'Annexe I pour la declaration active.");
@@ -251,6 +251,21 @@ public partial class MainWindow : Window
 
                 ShowDeclarationsWorkspace(1, "Gestion annexe : utilise l'onglet Lignes pour ajouter, modifier ou supprimer les donnees.");
             });
+    }
+
+    private async Task ShowAnnexWorkbenchAsync(string annexCode, string title, string description)
+    {
+        if (!_currentDeclarationService.HasCurrent)
+        {
+            await ShowAnnexPlaceholderAsync(title, description);
+            return;
+        }
+
+        var annexWorkbenchView = _serviceProvider.GetRequiredService<AnnexWorkbenchView>();
+        await annexWorkbenchView.ConfigureAsync(
+            new AnnexWorkbenchConfiguration(annexCode, title, description),
+            () => ShowDeclarationsWorkspace(0, "Selectionne ou cree une declaration employeur pour poursuivre la saisie des annexes."));
+        MainContent.Content = annexWorkbenchView;
     }
 
     private async Task ShowEditionPlaceholderAsync(string title, string description)

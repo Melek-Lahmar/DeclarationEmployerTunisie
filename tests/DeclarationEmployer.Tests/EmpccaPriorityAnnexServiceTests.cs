@@ -86,6 +86,65 @@ public sealed class EmpccaPriorityAnnexServiceTests
         db.AnnexA5Details.Should().ContainSingle(x => x.DeliveryPlatformThreePercentWithheldAmount == 60);
     }
 
+    [Fact]
+    public async Task UpdateA2LineAsync_UpdatesDetailedFields()
+    {
+        await using var db = CreateDbContext();
+        var declarationId = await SeedDeclarationAsync(db);
+        var service = CreateService(db);
+        var created = await service.CreateA2LineAsync(declarationId, new CreateEmpccaAnnexA2LineRequest
+        {
+            OrderNumber = 1,
+            Beneficiary = Beneficiary(1),
+            AmountType = 1,
+            GrossProfessionalAmount = 1000,
+            WithheldAmount = 150,
+            NetPaidAmount = 850
+        });
+
+        var updated = await service.UpdateA2LineAsync(declarationId, created.Id, new CreateEmpccaAnnexA2LineRequest
+        {
+            OrderNumber = 1,
+            Beneficiary = new EmpccaBeneficiaryInput
+            {
+                IdentifierType = 1,
+                Identifier = "1234567A/B000",
+                Name = "Beneficiaire Modifie",
+                Activity = "Conseil",
+                JobTitle = "Consultant",
+                Address = "10 rue de Tunis"
+            },
+            AmountType = 2,
+            GrossProfessionalAmount = 1200,
+            WithheldAmount = 180,
+            NetPaidAmount = 1020
+        });
+
+        updated.Details.AmountType.Should().Be(2);
+        updated.Details.GrossProfessionalAmount.Should().Be(1200);
+        db.AnnexA2Details.Should().ContainSingle(x => x.AmountType == 2 && x.GrossProfessionalAmount == 1200);
+    }
+
+    [Fact]
+    public async Task DeleteA5LineAsync_RemovesLine()
+    {
+        await using var db = CreateDbContext();
+        var declarationId = await SeedDeclarationAsync(db);
+        var service = CreateService(db);
+        var created = await service.CreateA5LineAsync(declarationId, new CreateEmpccaAnnexA5LineRequest
+        {
+            OrderNumber = 1,
+            Beneficiary = Beneficiary(1),
+            PurchasesFromOtherBusinesses = 1000,
+            WithheldAmount = 15,
+            NetPaidAmount = 985
+        });
+
+        await service.DeleteA5LineAsync(declarationId, created.Id);
+
+        (await service.GetA5LinesAsync(declarationId)).Should().BeEmpty();
+    }
+
     private static EmpccaPriorityAnnexService CreateService(ApplicationDbContext db) => new(
         db, new FakeCurrentUserService(), new TestHostEnvironment(),
         new CreateEmpccaAnnexA1LineRequestValidator(),
