@@ -45,6 +45,38 @@ restent des chaines pour conserver les zéros initiaux.
 - La recherche couvre Code, Raison sociale, Identifiant et Ville.
 - Le filtre propose Tous, Actifs et Inactifs.
 
+## Sidebar metier
+
+Le sidebar gauche conserve le style DET 2025 mais adopte une organisation metier
+en menus deroulants :
+
+- `Fichier` : Societe, Exercice, Taux, Type de Montant.
+- `Annexe` : A1 a A7 pour la gestion des annexes.
+- `Edition` : A1 a A7 et Recap pour les apercus et editions.
+- `Transfert` : Support magnetique, Etat des erreurs, Editer Transfert Recap.
+- `Cloture` : Annulation Cloture.
+- `Administration` : Generer Key, Maj Base de donnee, Importation, Supp. multiple,
+  Controle retenu.
+- `Tableau de bord` reste le dernier element principal.
+
+Le mapping principal est le suivant :
+
+- `Fichier > Societe` ouvre `Societes clientes`.
+- `Fichier > Exercice` ouvre `Exercices fiscaux`.
+- `Administration > Importation` ouvre `Declarations employeur` sur l'onglet
+  `Import Excel`.
+- `Administration > Controle retenu` et `Transfert > Etat des erreurs` ouvrent
+  `Declarations employeur` sur l'onglet `Anomalies`.
+- `Transfert > Support magnetique` ouvre `Declarations employeur` avec un guidage
+  vers les actions EMPCCA et export.
+
+Quand un ecran specialise n'existe pas encore, le Desktop affiche un placeholder
+professionnel avec titre, description, message et contexte de declaration active.
+Si aucune declaration active n'est selectionnee pour un module qui en depend,
+le placeholder affiche :
+
+`Veuillez creer ou selectionner une declaration employeur avant de continuer.`
+
 ## Boutons de l'ecran Declarations
 
 - `Rafraichir` recharge les filtres et declarations.

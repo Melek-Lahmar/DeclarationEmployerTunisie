@@ -1,0 +1,151 @@
+<UserControl x:Class="DeclarationEmployer.Desktop.Views.ModulePlaceholderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="650"
+             d:DesignWidth="1000">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                Background="White"
+                CornerRadius="12"
+                Padding="18"
+                BorderBrush="#E2E8F0"
+                BorderThickness="1">
+            <StackPanel>
+                <TextBlock Text="{Binding Title}"
+                           FontSize="26"
+                           FontWeight="SemiBold"
+                           Foreground="#111827"/>
+                <TextBlock Text="{Binding Description}"
+                           Margin="0,6,0,0"
+                           Foreground="#6B7280"
+                           FontSize="13"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="18"
+                    Margin="0,0,16,0"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Message"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#111827"/>
+                    <TextBlock Text="{Binding Message}"
+                               Margin="0,10,0,0"
+                               Foreground="#374151"
+                               TextWrapping="Wrap"/>
+
+                    <Border Margin="0,16,0,0"
+                            Padding="12"
+                            CornerRadius="10"
+                            BorderBrush="#BFDBFE"
+                            BorderThickness="1"
+                            Background="#EFF6FF">
+                        <StackPanel>
+                            <TextBlock Text="{Binding DeclarationTitle}"
+                                       FontWeight="SemiBold"
+                                       Foreground="#1E3A8A"
+                                       TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding DeclarationMeta}"
+                                       Margin="0,6,0,0"
+                                       Foreground="#1D4ED8"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <WrapPanel Margin="0,16,0,0">
+                        <Button Content="Ouvrir declarations"
+                                Height="36"
+                                Padding="14,0"
+                                Margin="0,0,10,10"
+                                Visibility="{Binding ShowOpenDeclarationsAction, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Command="{Binding OpenDeclarationsCommand}"/>
+                        <Button Content="Ajouter"
+                                Height="36"
+                                Padding="14,0"
+                                Margin="0,0,10,10"
+                                Visibility="{Binding CanUseManagementActions, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Command="{Binding AddCommand}"/>
+                        <Button Content="Modifier"
+                                Height="36"
+                                Padding="14,0"
+                                Margin="0,0,10,10"
+                                Visibility="{Binding CanUseManagementActions, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Command="{Binding EditCommand}"/>
+                        <Button Content="Supprimer"
+                                Height="36"
+                                Padding="14,0"
+                                Margin="0,0,10,10"
+                                Visibility="{Binding CanUseManagementActions, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Command="{Binding DeleteCommand}"/>
+                        <Button Content="Controler"
+                                Height="36"
+                                Padding="14,0"
+                                Margin="0,0,10,10"
+                                Visibility="{Binding CanUseManagementActions, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Command="{Binding ControlCommand}"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Background="White"
+                    CornerRadius="12"
+                    Padding="18"
+                    BorderBrush="#E2E8F0"
+                    BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Resume declaration active"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#111827"/>
+                    <TextBlock Text="{Binding LineCount, StringFormat=Lignes : {0}}"
+                               Margin="0,12,0,0"/>
+                    <TextBlock Text="{Binding TotalGrossAmount, StringFormat=Total brut : {0:N3}}"
+                               Margin="0,6,0,0"/>
+                    <TextBlock Text="{Binding TotalTaxableAmount, StringFormat=Total taxable : {0:N3}}"
+                               Margin="0,6,0,0"/>
+                    <TextBlock Text="{Binding TotalWithheldAmount, StringFormat=Total retenue : {0:N3}}"
+                               Margin="0,6,0,0"/>
+                    <TextBlock Text="{Binding BlockingAnomaliesCount, StringFormat=Anomalies bloquantes : {0}}"
+                               Margin="0,6,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2"
+                Background="#111827"
+                CornerRadius="8"
+                Padding="12"
+                Margin="0,16,0,0">
+            <TextBlock Foreground="White"
+                       TextWrapping="Wrap">
+                <Run Text="Astuce : "/>
+                <Run Text="si aucune declaration active n'est selectionnee, ouvre d'abord le module Declarations employeur pour choisir le dossier de travail."/>
+            </TextBlock>
+        </Border>
+    </Grid>
+</UserControl>

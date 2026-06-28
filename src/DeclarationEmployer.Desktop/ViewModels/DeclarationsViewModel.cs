@@ -62,6 +62,7 @@ public sealed class DeclarationsViewModel : ObservableObject
     private DeclarationExportPreviewDto? _exportPreview;
     private DeclarationExportResultDto? _lastExportResult;
     private EmpccaGenerationPreviewDto? _empccaPreview;
+    private int _selectedWorkspaceTabIndex;
     private bool _isBusy;
     private string _statusMessage = "Pret.";
 
@@ -385,6 +386,12 @@ public sealed class DeclarationsViewModel : ObservableObject
         set => SetProperty(ref _empccaPreview, value);
     }
 
+    public int SelectedWorkspaceTabIndex
+    {
+        get => _selectedWorkspaceTabIndex;
+        set => SetProperty(ref _selectedWorkspaceTabIndex, value);
+    }
+
     public bool IsBusy
     {
         get => _isBusy;
@@ -395,6 +402,16 @@ public sealed class DeclarationsViewModel : ObservableObject
     {
         get => _statusMessage;
         set => SetProperty(ref _statusMessage, value);
+    }
+
+    public void FocusWorkspaceTab(int tabIndex, string? hintMessage = null)
+    {
+        SelectedWorkspaceTabIndex = Math.Clamp(tabIndex, 0, 3);
+
+        if (!string.IsNullOrWhiteSpace(hintMessage))
+        {
+            StatusMessage = hintMessage;
+        }
     }
 
     public async Task LoadAsync()

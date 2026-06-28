@@ -113,11 +113,13 @@ public partial class App : Application
                 services.AddTransient<ClientsViewModel>();
                 services.AddTransient<FiscalYearsViewModel>();
                 services.AddTransient<DeclarationsViewModel>();
+                services.AddTransient<ModulePlaceholderViewModel>();
                 services.AddTransient<LoginView>();
                 services.AddTransient<DashboardView>();
                 services.AddTransient<ClientsView>();
                 services.AddTransient<FiscalYearsView>();
                 services.AddTransient<DeclarationsView>();
+                services.AddTransient<ModulePlaceholderView>();
                 services.AddTransient<LoginWindow>();
                 services.AddTransient<MainWindow>();
             })

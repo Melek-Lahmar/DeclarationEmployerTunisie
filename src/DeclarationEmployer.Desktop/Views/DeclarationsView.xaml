@@ -299,7 +299,7 @@
                                     Command="{Binding RefreshDetailsCommand}"/>
                         </StackPanel>
 
-                        <TabControl>
+                        <TabControl SelectedIndex="{Binding SelectedWorkspaceTabIndex, Mode=TwoWay}">
                             <TabItem Header="Beneficiaires">
                                 <Grid Margin="4">
                                     <Grid.RowDefinitions>

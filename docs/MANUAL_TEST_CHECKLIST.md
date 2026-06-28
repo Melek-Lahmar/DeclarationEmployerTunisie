@@ -59,3 +59,33 @@ dotnet ef migrations has-pending-model-changes --project src\DeclarationEmployer
   la retire de la grille.
 - [ ] Tenter de supprimer une societe liee a une declaration et verifier le message
   invitant a utiliser `Desactiver`.
+
+## Test Sidebar metier deroulant
+
+- [ ] Lancer l'API : `dotnet run --project src\DeclarationEmployer.Api --urls http://localhost:5050`.
+- [ ] Lancer le Desktop : `dotnet run --project src\DeclarationEmployer.Desktop`.
+- [ ] Se connecter avec `admin`.
+- [ ] Verifier les menus parents dans le sidebar gauche :
+  `Fichier`, `Annexe`, `Edition`, `Transfert`, `Cloture`, `Administration`,
+  `Tableau de bord`.
+- [ ] Ouvrir `Fichier` puis verifier les sous-menus `Societe`, `Exercice`, `Taux`,
+  `Type de Montant`.
+- [ ] Cliquer `Societe` et verifier l'ouverture de `Societes clientes`.
+- [ ] Cliquer `Exercice` et verifier l'ouverture de `Exercices fiscaux`.
+- [ ] Ouvrir `Annexe` puis verifier les entrees `A1` a `A7`.
+- [ ] Cliquer `Annexe > A1` sans declaration active et verifier le message
+  `Veuillez creer ou selectionner une declaration employeur avant de continuer.`
+- [ ] Ouvrir `Edition` puis verifier `A1` a `A7` et `Recap`.
+- [ ] Ouvrir `Transfert` puis verifier `Support magnetique`, `Etat des erreurs`,
+  `Editer Transfert Recap`.
+- [ ] Ouvrir `Cloture` puis verifier `Annulation Cloture`.
+- [ ] Ouvrir `Administration` puis verifier `Generer Key`, `Maj Base de donnee`,
+  `Importation`, `Supp. multiple`, `Controle retenu`.
+- [ ] Cliquer `Administration > Importation` et verifier que `Declarations employeur`
+  s'ouvre sur l'onglet `Import Excel`.
+- [ ] Cliquer `Administration > Controle retenu` et verifier que `Declarations employeur`
+  s'ouvre sur l'onglet `Anomalies`.
+- [ ] Cliquer `Tableau de bord` et verifier l'ouverture du dashboard.
+- [ ] Verifier que `Deconnexion` fonctionne toujours.
+- [ ] Verifier que l'utilisateur, la version locale et `API : localhost:5050`
+  restent visibles en bas du sidebar.

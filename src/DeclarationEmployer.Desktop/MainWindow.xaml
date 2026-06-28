@@ -8,74 +8,56 @@
         MinWidth="1150"
         WindowStartupLocation="CenterScreen"
         Background="#F3F6FA">
+    <Window.Resources>
+        <Style x:Key="SidebarSubmenuButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+            <Setter Property="Padding" Value="18,0,12,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Foreground" Value="#CBD5E1"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#1E293B"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarMainButtonStyle" TargetType="Button" BasedOn="{StaticResource SidebarSubmenuButtonStyle}">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Padding" Value="12,0,12,0"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13.5"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="260"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0"
                 Background="#0F172A">
             <DockPanel LastChildFill="True">
-                <StackPanel DockPanel.Dock="Top" Margin="18">
-                    <TextBlock Text="DET 2025"
-                               Foreground="White"
-                               FontSize="24"
-                               FontWeight="Bold"/>
-                    <TextBlock Text="Declaration Employeur Tunisie"
-                               Foreground="#CBD5E1"
-                               FontSize="12"
-                               Margin="0,6,0,22"/>
-
-                    <Button Content="Tableau de bord"
-                            Height="42"
-                            Margin="0,0,0,10"
-                            Padding="12"
-                            HorizontalContentAlignment="Left"
-                            FontWeight="SemiBold"
-                            Click="ShowDashboard_Click"/>
-
-                    <Button Content="Societes clientes"
-                            Height="42"
-                            Margin="0,0,0,10"
-                            Padding="12"
-                            HorizontalContentAlignment="Left"
-                            FontWeight="SemiBold"
-                            Click="ShowClients_Click"/>
-
-                    <Button Content="Exercices fiscaux"
-                            Height="42"
-                            Margin="0,0,0,10"
-                            Padding="12"
-                            HorizontalContentAlignment="Left"
-                            FontWeight="SemiBold"
-                            Click="ShowFiscalYears_Click"/>
-
-                    <Button Content="Declarations employeur"
-                            Height="42"
-                            Margin="0,0,0,10"
-                            Padding="12"
-                            HorizontalContentAlignment="Left"
-                            FontWeight="SemiBold"
-                            Click="ShowDeclarations_Click"/>
-
-                    <TextBlock Text="Annexes"
-                               Foreground="#94A3B8"
-                               Margin="12,12,0,0"/>
-                    <TextBlock Text="Import Excel"
-                               Foreground="#94A3B8"
-                               Margin="12,12,0,0"/>
-                    <TextBlock Text="Controles"
-                               Foreground="#94A3B8"
-                               Margin="12,12,0,0"/>
-                    <TextBlock Text="Generation fichiers"
-                               Foreground="#94A3B8"
-                               Margin="12,12,0,0"/>
-                    <TextBlock Text="Archivage"
-                               Foreground="#94A3B8"
-                               Margin="12,12,0,0"/>
-                </StackPanel>
-
                 <StackPanel DockPanel.Dock="Bottom" Margin="18">
                     <TextBlock x:Name="ConnectedUserText"
                                Text="Utilisateur : non connecte"
@@ -93,6 +75,161 @@
                             Height="34"
                             Click="Logout_Click"/>
                 </StackPanel>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="18">
+                        <TextBlock Text="DET 2025"
+                                   Foreground="White"
+                                   FontSize="24"
+                                   FontWeight="Bold"/>
+                        <TextBlock Text="Declaration Employeur Tunisie"
+                                   Foreground="#CBD5E1"
+                                   FontSize="12"
+                                   Margin="0,6,0,22"/>
+
+                        <Expander x:Name="FichierExpander"
+                                  Margin="0,0,0,10"
+                                  Foreground="White"
+                                  Background="#1E293B">
+                            <Expander.Header>
+                                <Border Background="#1E293B" CornerRadius="8" Padding="12">
+                                    <TextBlock Text="Fichier"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                            </Expander.Header>
+                            <StackPanel Margin="0,8,0,0">
+                                <Button x:Name="SocieteMenuButton"
+                                        Content="Societe"
+                                        Tag="fichier-societe"
+                                        Style="{StaticResource SidebarSubmenuButtonStyle}"
+                                        Click="SidebarRoute_Click"/>
+                                <Button x:Name="ExerciceMenuButton"
+                                        Content="Exercice"
+                                        Tag="fichier-exercice"
+                                        Style="{StaticResource SidebarSubmenuButtonStyle}"
+                                        Click="SidebarRoute_Click"/>
+                                <Button x:Name="TauxMenuButton"
+                                        Content="Taux"
+                                        Tag="fichier-taux"
+                                        Style="{StaticResource SidebarSubmenuButtonStyle}"
+                                        Click="SidebarRoute_Click"/>
+                                <Button x:Name="TypeMontantMenuButton"
+                                        Content="Type de Montant"
+                                        Tag="fichier-type-montant"
+                                        Style="{StaticResource SidebarSubmenuButtonStyle}"
+                                        Click="SidebarRoute_Click"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander x:Name="AnnexeExpander"
+                                  Margin="0,0,0,10"
+                                  Foreground="White"
+                                  Background="#1E293B">
+                            <Expander.Header>
+                                <Border Background="#1E293B" CornerRadius="8" Padding="12">
+                                    <TextBlock Text="Annexe"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                            </Expander.Header>
+                            <StackPanel Margin="0,8,0,0">
+                                <Button Content="A1 : Traitement des Salaires" Tag="annexe-a1" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A2 : MTs servis aux residents" Tag="annexe-a2" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A3 : Interets" Tag="annexe-a3" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A4 : MTs servis aux non residents" Tag="annexe-a4" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A5 : MTs payes soumis a la retenue a la source" Tag="annexe-a5" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A6 : Ristournes commerciales et non commerciales" Tag="annexe-a6" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A7 : Montants payes pour autrui" Tag="annexe-a7" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander x:Name="EditionExpander"
+                                  Margin="0,0,0,10"
+                                  Foreground="White"
+                                  Background="#1E293B">
+                            <Expander.Header>
+                                <Border Background="#1E293B" CornerRadius="8" Padding="12">
+                                    <TextBlock Text="Edition"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                            </Expander.Header>
+                            <StackPanel Margin="0,8,0,0">
+                                <Button Content="A1 : Traitement des Salaires" Tag="edition-a1" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A2 : MTs servis aux residents" Tag="edition-a2" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A3 : Interets" Tag="edition-a3" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A4 : MTs servis aux non residents" Tag="edition-a4" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A5 : MTs payes soumis a la retenue a la source" Tag="edition-a5" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A6 : Ristournes commerciales et non commerciales" Tag="edition-a6" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="A7 : Montants payes pour autrui" Tag="edition-a7" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="Recap" Tag="edition-recap" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander x:Name="TransfertExpander"
+                                  Margin="0,0,0,10"
+                                  Foreground="White"
+                                  Background="#1E293B">
+                            <Expander.Header>
+                                <Border Background="#1E293B" CornerRadius="8" Padding="12">
+                                    <TextBlock Text="Transfert"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                            </Expander.Header>
+                            <StackPanel Margin="0,8,0,0">
+                                <Button Content="Support magnetique" Tag="transfert-support" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="Etat des erreurs" Tag="transfert-erreurs" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="Editer Transfert Recap" Tag="transfert-recap" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander x:Name="ClotureExpander"
+                                  Margin="0,0,0,10"
+                                  Foreground="White"
+                                  Background="#1E293B">
+                            <Expander.Header>
+                                <Border Background="#1E293B" CornerRadius="8" Padding="12">
+                                    <TextBlock Text="Cloture"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                            </Expander.Header>
+                            <StackPanel Margin="0,8,0,0">
+                                <Button Content="Annulation Cloture" Tag="cloture-annulation" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Expander x:Name="AdministrationExpander"
+                                  Margin="0,0,0,10"
+                                  Foreground="White"
+                                  Background="#1E293B">
+                            <Expander.Header>
+                                <Border Background="#1E293B" CornerRadius="8" Padding="12">
+                                    <TextBlock Text="Administration"
+                                               Foreground="White"
+                                               FontWeight="SemiBold"/>
+                                </Border>
+                            </Expander.Header>
+                            <StackPanel Margin="0,8,0,0">
+                                <Button Content="Generer Key" Tag="admin-key" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="Maj Base de donnee" Tag="admin-db-update" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="Importation" Tag="admin-importation" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="Supp. multiple" Tag="admin-supp-multiple" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                                <Button Content="Controle retenu" Tag="admin-controle-retenu" Style="{StaticResource SidebarSubmenuButtonStyle}" Click="SidebarRoute_Click"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <Button x:Name="DashboardMenuButton"
+                                Content="Tableau de bord"
+                                Tag="dashboard"
+                                Margin="0,6,0,0"
+                                Style="{StaticResource SidebarMainButtonStyle}"
+                                Click="SidebarRoute_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
             </DockPanel>
         </Border>
 
